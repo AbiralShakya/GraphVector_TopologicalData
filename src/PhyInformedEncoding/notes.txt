@@ -1,0 +1,1 @@
+physics informed constraints on encoding is crucial
