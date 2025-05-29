@@ -1,4 +1,5 @@
-import numpy as np
+# single query handling
+
 import torch # Retained if future extensions might use it
 import torch.nn as nn # Retained if future extensions might use it
 import pandas as pd
