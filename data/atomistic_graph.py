@@ -7,7 +7,8 @@ import warnings
 from pymatgen.core import Structure 
 from typing import Dict, Optional
 from jarvis.core.atoms import Atoms
-from jarvis.core.graphs import GraphGenerator
+#from jarvis.core.graphs import GraphGenerator
+from pymatgen.analysis.local_env import CrystalNN
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -21,10 +22,20 @@ def parse_poscar_text_content(
 
         structure = Structure.from_str(poscar_string_content, fmt="poscar")
 
-        jarvis_atoms = Atoms.from_dict(structure.as_dict())
-        ggen = GraphGenerator()
+        # jarvis_atoms = Atoms.from_dict(structure.as_dict())
+        nn = CrystalNN()
+        graph = {"nodes": [], "edges": []}
 
-        atomistic_graph = ggen.get_graphdict(jarvis_atoms)
+
+        for i, site in enumerate(structure.sites):
+            graph["nodes"].append({
+                "id": i,
+                "species": site.specie.symbol,
+                "coords": site.coords.tolist(),
+            })
+            # edges
+            for nbr in nn.get_nn_info(structure, i):
+                graph["edges"].append((i, nbr["site_index"], {"distance": nbr["weight"]}))
 
         comment_line = ""
         if poscar_string_content:
@@ -45,7 +56,7 @@ def parse_poscar_text_content(
             "selective_dynamics": None, 
             "velocities": None,       
             "pymatgen_structure": structure,
-            "atomistic_graph": atomistic_graph
+            "atomistic_graph": graph
         }
     except Exception as e:
         print(f"Error parsing POSCAR content from '{source_identifier}' using Structure.from_str: {e}")
@@ -56,10 +67,6 @@ def process_first_poscar_link_from_csv(
     link_column_name: str = 'POSCAR_link',
     disable_ssl_verify: bool = False
 ) -> Optional[Dict]:
-    if not os.path.exists(csv_filepath):
-        print(f"Error: CSV file not found at '{csv_filepath}'")
-        return None
-
     try:
         df = pd.read_csv(csv_filepath, nrows=1)
     except pd.errors.EmptyDataError:
@@ -164,15 +171,26 @@ if __name__ == '__main__':
         else:
             print("\nNo POSCAR data was extracted or an error occurred during processing the first row's link.")
             
-    
-        G = nx.graph()
-        for n in extracted_poscar_data['atomistic graph']['nodes']:
-            G.add_node["id"]
-        for u, v, _ in extracted_poscar_data['atomistic graph']['edges']:
-            G.add_edge(u,v)
-        
+        graph_dict = extracted_poscar_data["atomistic_graph"]
+        G = nx.Graph()
+
+        for node in graph_dict["nodes"]:
+            G.add_node(
+                node["id"],
+                species=node.get("species"),
+                coords=node.get("coords")
+            )
+
+        for u, v, attrs in graph_dict["edges"]:
+            G.add_edge(u, v, **attrs)
         plt.figure(figsize=(6,6))
         pos = nx.spring_layout(G, seed=42)
-        nx.draw(G, pos, node_size=50, edge_color="gray")
+        nx.draw(
+            G,
+            pos,
+            node_size=50,
+            edge_color="gray",
+            with_labels=False
+        )
         plt.axis("off")
         plt.show()
