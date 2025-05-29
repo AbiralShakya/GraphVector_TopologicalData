@@ -29,7 +29,6 @@ class UnifiedMaterialGraphDB:
     def load_jarvis_database(self):
         """Load JARVIS database for property lookup"""
         try:
-            # Load DFT-3D database (most comprehensive)
             self.jarvis_data = data('dft_3d')
             print(f"Loaded JARVIS database with {len(self.jarvis_data)} materials")
         except Exception as e:
@@ -43,24 +42,14 @@ class UnifiedMaterialGraphDB:
         cutoff: float = 8.0,
         use_canonize: bool = True
     ) -> Optional[Dict]:
-        """Parse POSCAR and create JARVIS-style graphs with enhanced features"""
         try:
             if not isinstance(poscar_string_content, str) or not poscar_string_content.strip():
                 return None
 
-            # Create PyMatGen structure first
             structure = Structure.from_str(poscar_string_content, fmt="poscar")
-            
-            # Convert to JARVIS atoms
             jarvis_atoms = Atoms.from_dict(structure.as_dict())
-            
-            # Create JARVIS graph with multiple representations
             graph_data = self._create_jarvis_graphs(jarvis_atoms, cutoff, use_canonize)
-            
-            # Get material properties from JARVIS if available
             jarvis_properties = self._get_jarvis_properties(structure)
-            
-            # Get symmetry and topological data
             symmetry_data = self._get_symmetry_data(jarvis_atoms)
             
             # Extract comment
@@ -83,15 +72,12 @@ class UnifiedMaterialGraphDB:
                 "pymatgen_structure": structure,
                 "jarvis_atoms": jarvis_atoms,
                 
-                # Graph representations
                 "atomistic_graph": graph_data["atomistic_graph"],
                 "line_graph": graph_data["line_graph"],
                 "undirected_graph": graph_data["undirected_graph"],
                 
-                # JARVIS vector properties
                 "jarvis_properties": jarvis_properties,
                 
-                # Symmetry and topological data
                 "symmetry_data": symmetry_data,
                 
                 # Placeholder for k-space data (would need band structure calculation)
@@ -110,7 +96,6 @@ class UnifiedMaterialGraphDB:
     def _create_jarvis_graphs(self, atoms: Atoms, cutoff: float, use_canonize: bool) -> Dict:
         """Create multiple JARVIS graph representations"""
         try:
-            # Standard atomistic graph
             g = Graph.atom_dgl_multigraph(
                 atoms, 
                 cutoff=cutoff,
@@ -118,10 +103,8 @@ class UnifiedMaterialGraphDB:
                 use_canonize=use_canonize
             )
             
-            # Line graph (important for some ML models like ALIGNN)
             lg = Graph.get_line_graph_from_graph(g)
             
-            # Undirected version for some analyses
             ug = Graph.atom_dgl_multigraph(
                 atoms,
                 cutoff=cutoff,
@@ -130,14 +113,13 @@ class UnifiedMaterialGraphDB:
                 id_tag='jid'
             )
             
-            # Convert to networkx for compatibility with your existing code
             atomistic_nx = self._dgl_to_networkx(g, atoms)
             
             return {
                 "atomistic_graph": atomistic_nx,
                 "line_graph": lg,
                 "undirected_graph": ug,
-                "dgl_graph": g  # Keep original DGL graph for deep learning
+                "dgl_graph": g  
             }
             
         except Exception as e:
@@ -150,7 +132,6 @@ class UnifiedMaterialGraphDB:
             import dgl
             graph_dict = {"nodes": [], "edges": []}
             
-            # Add nodes with features
             for i, site in enumerate(atoms.cart_coords):
                 graph_dict["nodes"].append({
                     "id": i,
@@ -159,10 +140,8 @@ class UnifiedMaterialGraphDB:
                     "atomic_number": atoms.atomic_numbers[i]
                 })
             
-            # Add edges
             src, dst = dgl_graph.edges()
             for s, d in zip(src.numpy(), dst.numpy()):
-                # Calculate distance
                 coords1 = atoms.cart_coords[s]
                 coords2 = atoms.cart_coords[d]
                 distance = np.linalg.norm(coords1 - coords2)
@@ -182,7 +161,6 @@ class UnifiedMaterialGraphDB:
         try:
             formula = structure.composition.reduced_formula
             
-            # Find matching entry in JARVIS database
             matching_entries = []
             for entry in self.jarvis_data:
                 if entry.get('formula', '') == formula:
@@ -384,7 +362,6 @@ class UnifiedMaterialGraphDB:
         
         G = nx.Graph()
         
-        # Add nodes with species information
         node_colors = []
         for node in graph_dict["nodes"]:
             G.add_node(node["id"], **node)
@@ -393,23 +370,19 @@ class UnifiedMaterialGraphDB:
             color_map = {"C": "gray", "Si": "blue", "O": "red", "N": "green", "H": "white"}
             node_colors.append(color_map.get(species, "purple"))
         
-        # Add edges
         for u, v, attrs in graph_dict["edges"]:
             G.add_edge(u, v, **attrs)
         
         plt.figure(figsize=(12, 8))
         
-        # Create subplots
         fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 12))
         
-        # Graph visualization
         pos = nx.spring_layout(G, seed=42)
         nx.draw(G, pos, node_color=node_colors, node_size=100, 
                 edge_color="gray", with_labels=True, ax=ax1)
         ax1.set_title(f"Atomistic Graph: {material_data['formula']}")
         ax1.axis("off")
         
-        # Property visualization
         props = material_data.get('jarvis_properties', {})
         if props and props.get('jarvis_match'):
             prop_names = []
@@ -449,7 +422,6 @@ class UnifiedMaterialGraphDB:
 
 
 def main():
-    # Initialize the unified database system
     db_system = UnifiedMaterialGraphDB()
     
     csv_path = "/Users/abiralshakya/Downloads/materials_database.csv"
@@ -458,12 +430,11 @@ def main():
         print(f"CSV file not found: {csv_path}")
         return
     
-    # Process materials (start with a small number for testing)
     print("Processing materials with unified graph approach...")
     unified_database = db_system.process_csv_with_unified_graphs(
         csv_path,
         link_column_name='POSCAR_link',
-        max_materials=5,  # Start small for testing
+        max_materials=5,  # Can change this
         disable_ssl_verify=True
     )
     
