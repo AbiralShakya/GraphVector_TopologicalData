@@ -4,7 +4,7 @@
 import numpy as np
 import pandas as pd 
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Table, Any
+from typing import Dict, List, Optional, Table, Any, Tuple
 import json
 import torch
 import torch.nn as nn 
