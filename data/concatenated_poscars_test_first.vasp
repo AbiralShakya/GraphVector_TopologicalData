@@ -1,0 +1,39 @@
+Cubic Diamond (First Structure)
+1.0
+3.56 0.00 0.00
+0.00 3.56 0.00
+0.00 0.00 3.56
+C
+2
+Direct
+0.00 0.00 0.00
+0.25 0.25 0.25
+FCC Al (Second Structure)
+1.0
+4.05 0.00 0.00
+0.00 4.05 0.00
+0.00 0.00 4.05
+Al
+4
+Direct
+0.00 0.00 0.00
+0.50 0.50 0.00
+0.00 0.50 0.50
+0.50 0.00 0.50
+NaCl Structure with Selective Dynamics (Third Structure)
+1.0
+5.64 0.00 0.00
+0.00 5.64 0.00
+0.00 0.00 5.64
+Na Cl
+4 4
+Selective dynamics
+Direct
+0.00 0.00 0.00 T T F  ! Na1
+0.50 0.50 0.00 F F F  ! Na2
+0.00 0.50 0.50 T F T  ! Na3
+0.50 0.00 0.50 F T F  ! Na4
+0.50 0.00 0.00         ! Cl1
+0.00 0.50 0.00         ! Cl2
+0.50 0.50 0.50         ! Cl3
+0.00 0.00 0.50         ! Cl4
