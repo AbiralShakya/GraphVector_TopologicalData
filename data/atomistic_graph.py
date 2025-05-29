@@ -1,9 +1,15 @@
+# script to get atomistic graph from materials_database.csv file
+
 import os
 import pandas as pd
 import requests
 import warnings
 from pymatgen.core import Structure 
 from typing import Dict, Optional
+from jarvis.core.atoms import Atoms
+from jarvis.core.graphs import GraphGenerator
+import networkx as nx
+import matplotlib.pyplot as plt
 
 def parse_poscar_text_content(
     poscar_string_content: str,
@@ -14,6 +20,11 @@ def parse_poscar_text_content(
             return None
 
         structure = Structure.from_str(poscar_string_content, fmt="poscar")
+
+        jarvis_atoms = Atoms.from_dict(structure.as_dict())
+        ggen = GraphGenerator()
+
+        atomistic_graph = ggen.get_graphdict(jarvis_atoms)
 
         comment_line = ""
         if poscar_string_content:
@@ -33,7 +44,8 @@ def parse_poscar_text_content(
                       for site in structure.sites],
             "selective_dynamics": None, 
             "velocities": None,       
-            "pymatgen_structure": structure
+            "pymatgen_structure": structure,
+            "atomistic_graph": atomistic_graph
         }
     except Exception as e:
         print(f"Error parsing POSCAR content from '{source_identifier}' using Structure.from_str: {e}")
@@ -151,3 +163,16 @@ if __name__ == '__main__':
             print(f"Pymatgen Structure: {extracted_poscar_data['pymatgen_structure']}")
         else:
             print("\nNo POSCAR data was extracted or an error occurred during processing the first row's link.")
+            
+    
+        G = nx.graph()
+        for n in extracted_poscar_data['atomistic graph']['nodes']:
+            G.add_node["id"]
+        for u, v, _ in extracted_poscar_data['atomistic graph']['edges']:
+            G.add_edge(u,v)
+        
+        plt.figure(figsize=(6,6))
+        pos = nx.spring_layout(G, seed=42)
+        nx.draw(G, pos, node_size=50, edge_color="gray")
+        plt.axis("off")
+        plt.show()
