@@ -10,6 +10,8 @@ import seaborn as sns
 from dataclasses import fields # For accessing dataclass fields
 from topologicalmaterial import TopologicalMaterial
 
+#TODO: implement with api key like in other repo
+
 class TopologicalQueryEngine:
     """Advanced query engine for topological materials database."""
 
