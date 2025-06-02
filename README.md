@@ -16,3 +16,11 @@ Revised insight:
 
     prev generative modelling for TI have all been constrained to TQC, we change that, a lot
         more data, physics informed, crystal structure aware, band structure & topology aware (constructed as graph in db so save computational time in training / inference)
+
+
+https://www.nature.com/articles/s41535-025-00731-0 -- vanilla
+https://www.nature.com/articles/s41578-021-00380-2?fromPaywallRec=false#Sec15 -- review of physics & db
+https://www.nature.com/articles/s41524-025-01592-8?fromPaywallRec=false#data-availability -- constraint / target feature
+https://www.nature.com/articles/s41524-023-00987-9?fromPaywallRec=false -- Phy Inform dl
+
+can use 3d crystal graphs for 2d generative modelling later (isolate monolayers, train multi task classifier)
