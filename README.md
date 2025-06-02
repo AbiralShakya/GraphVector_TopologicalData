@@ -10,3 +10,9 @@ this project aims to combine JARVIS & topological data with a unified graph-vect
 EBR from TQC --> symmetry and interconnections in k space + poscar based lattice structure combined with jarvis data 
     change to vector database (jarvis + TQC regular)
     accompanby with corresponding graph based structure as stated above 
+
+Revised insight: 
+    lower computational power & energy load w/ engi
+
+    prev generative modelling for TI have all been constrained to TQC, we change that, a lot
+        more data, physics informed, crystal structure aware, band structure & topology aware (constructed as graph in db so save computational time in training / inference)

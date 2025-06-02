@@ -62,3 +62,5 @@ todo that: find such a material in the first place
 predict material with certain band gap
 
 my multi task classifier is useful 
+
+bi4br4 
