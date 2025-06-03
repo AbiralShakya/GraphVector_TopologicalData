@@ -1,0 +1,16 @@
+important for TQC data retrieval
+
+https://www.science.org/doi/10.1126/science.abg9094 -- all topological bands of all nonmagnetic stoichiometric materials
+        dataset generation subsection, papers 37, 38
+
+    https://www.science.org/doi/10.1126/science.abg9094#core-collateral-R37 -- all topological bands of all nonmagnetic stoichiometric materials 
+    
+    https://www.nature.com/articles/s41586-019-0954-4 -- a complete catalogue of high quality topological materials
+
+
+
+    TQC just nonmagetic, consider magnetic topological database download, added to this repo
+
+
+Supplementary information from https://in.iphy.ac.cn/upload/s40/a/202209021736085649.pdf -- a complete catalaog of high quality topogical materials
+https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-019-0954-4/MediaObjects/41586_2019_954_MOESM1_ESM.pdf 
