@@ -26,3 +26,10 @@ https://www.nature.com/articles/s41524-023-00987-9?fromPaywallRec=false -- Phy I
 can use 3d crystal graphs for 2d generative modelling later (isolate monolayers, train multi task classifier)
 
 https://www.cryst.ehu.es/#structuretop is my goat, downloaded local files
+
+
+the hacky method: just change ICSD id url lol
+    i.e. https://www.topologicalquantumchemistry.fr/#/detail/3
+        & https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-165/Mat-3/POSCAR
+        
+    k-paths 

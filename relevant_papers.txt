@@ -14,3 +14,7 @@ https://www.science.org/doi/10.1126/science.abg9094 -- all topological bands of 
 
 Supplementary information from https://in.iphy.ac.cn/upload/s40/a/202209021736085649.pdf -- a complete catalaog of high quality topogical materials
 https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-019-0954-4/MediaObjects/41586_2019_954_MOESM1_ESM.pdf 
+
+
+symmetry data vector clasified into one of five possible topological classess -- all topological band of all nonmagnetic stoichiometric materials
+    
