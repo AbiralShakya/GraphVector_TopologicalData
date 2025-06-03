@@ -33,3 +33,5 @@ the hacky method: just change ICSD id url lol
         & https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-165/Mat-3/POSCAR
         
     k-paths 
+
+https://static-content.springer.com/esm/art%3A10.1038%2Fnature23268/MediaObjects/41586_2017_BFnature23268_MOESM1_ESM.pdf -- download local files for space group BANDREP
