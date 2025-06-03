@@ -1,0 +1,5 @@
+Locate the EBR rows for your Wyckoff sites (SG 139: 2a, 4e). Copy down each “Irrep → (Γ, X, L, W content) + (E/PE, KR, Re).”
+Use your DFT bands to identify which of those induced‐EBRs actually occur as “Level 1, 2, 3” at Γ/X/L/W. That gives you the degeneracy table.
+Check for fragility by seeing whether the occupied set can be written purely in terms of elementary PEBRs (E/PE = e).
+Follow the subgroup chain in the Supplement (SG 139 → 87 → 82 → … → 1). At each step, use the Supplement to see how each EBR “breaks” or stays intact, then feed the resulting irreps into that subgroup’s known indicator formula to recover “Z₂, Z₄, Z₈, etc.” exactly as in your example.
+Assemble the final chart of “Symmetry Group → Topological Indices → Band Representations.”
