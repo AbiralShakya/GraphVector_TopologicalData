@@ -24,3 +24,6 @@ https://www.nature.com/articles/s41524-025-01592-8?fromPaywallRec=false#data-ava
 https://www.nature.com/articles/s41524-023-00987-9?fromPaywallRec=false -- Phy Inform dl
 
 can use 3d crystal graphs for 2d generative modelling later (isolate monolayers, train multi task classifier)
+
+
+https://www.cryst.ehu.es/#structuretop is my goat, downloaded local files

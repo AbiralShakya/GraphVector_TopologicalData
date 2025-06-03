@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from dataclasses import fields # For accessing dataclass fields
 from topologicalmaterial import TopologicalMaterial
+import numpy as np
 
 #TODO: implement with api key like in other repo
 
