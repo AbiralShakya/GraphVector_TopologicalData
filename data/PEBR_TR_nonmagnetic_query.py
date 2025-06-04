@@ -1531,55 +1531,43 @@ from pathlib import Path
 def parse_kpoint_cells(irreps_txt):
     """
     Parses a string containing multiple k-point irrep cells into a list of individual cell strings.
-    Handles cells like "A1(2)", "2 Γ3Γ4(2)", and "D3D3(2) ⊕ D4D4(2)" as single tokens.
+    Handles cells like "A1(2)", "2 Γ3Γ4(2)", "D3D3(2) ⊕ D4D4(2)", 
+    "Γ1(1) ⊕ Γ2(1) ⊕ Γ3(1) ⊕ Γ4(1)", and "2 X2X3(2) ⊕ 2 X4X5(2)" as single tokens.
     """
     if not irreps_txt:
         return []
 
-    # Define a pattern for a single irrep unit, e.g., "A1+(1)", "AgAg↑G(4)", "D1+D2+(2)"
+    # Define a pattern for a single irrep unit, e.g., "A1+(1)", "AgAg↑G(4)", "D1+D2+(2)", "X2X3(2)"
     # It's a name (letters, numbers, +, -, arrows) followed by (digits)
-    irrep_unit_pattern = r"[A-ZΓa-z0-9+\-↑↓]+?\([^\)]+\)" # Non-greedy name to handle internal +,-
+    irrep_unit_pattern = r"[A-ZΓa-z0-9+\-↑↓]+?\([^\)]+\)" 
 
-    # Define patterns for different types of cells, ordered by complexity to ensure correct matching
-    # 1. Oplus-combined form: IRREP_UNIT space* OPLUS space* IRREP_UNIT
-    oplus_form_pattern = rf"({irrep_unit_pattern}\s*⊕\s*{irrep_unit_pattern})"
-    # 2. Numbered form: NUMBER space+ IRREP_UNIT
-    numbered_form_pattern = rf"(\d+\s+{irrep_unit_pattern})"
-    # 3. Simple irrep unit form (must be last as it's a sub-pattern of others)
-    simple_form_pattern = rf"({irrep_unit_pattern})"
-
-    # Combine patterns for re.match in a loop. Order matters: try most complex first.
-    # This regex will try to match one full cell at the beginning of the string.
-    cell_parser_regex = re.compile(
-        f"(?:{oplus_form_pattern}|{numbered_form_pattern}|{simple_form_pattern})",
-        re.UNICODE
-    )
-
+    # Define a "component" pattern: this is what can appear on either side of an oplus,
+    # or as a standalone cell, or as a numbered cell.
+    # It can be a simple irrep_unit OR a numbered irrep_unit.
+    # e.g., "X4X5(2)" OR "2 X4X5(2)"
+    component_pattern = rf"(?:\d+\s+{irrep_unit_pattern}|{irrep_unit_pattern})"
+    
+    # Define the full cell pattern:
+    # A cell starts with an initial component (which could be numbered or plain),
+    # and then can be followed by zero or more "⊕ component" sequences.
+    # The outer parentheses (group 0) will capture the entire matched cell.
+    full_cell_pattern_str = rf"((?:{component_pattern})(?:\s*⊕\s*(?:{component_pattern}))*)"
+    
+    cell_parser_regex = re.compile(full_cell_pattern_str, re.UNICODE)
+    
     cells = []
-    current_text = irreps_txt.strip()
-    while current_text:
-        match = cell_parser_regex.match(current_text)
+    remaining_text = irreps_txt.strip()
+    while remaining_text:
+        match = cell_parser_regex.match(remaining_text) # Tries to match at the beginning of the current text
         if match:
-            token = match.group(0).strip() # group(0) is the whole match
+            token = match.group(0).strip() # group(0) is the whole matched cell
             cells.append(token)
-            current_text = current_text[match.end():].strip() # Move to the next part of the string
+            remaining_text = remaining_text[match.end():].strip() # Consume matched part and leading spaces for next token
         else:
-            # If no pattern matches, it implies either end of string or an unparsable segment.
-            # This could happen if there's unexpected text or malformed irreps.
-            # For robustness, one might try a simple split for the remainder or log an error.
-            # However, if the regex is comprehensive, this 'else' block should ideally not be hit
-            # if the input is well-formed according to the defined patterns.
-            if current_text: # If there's text left that didn't match
-                # Fallback: Take the next non-whitespace block. This might misinterpret complex cases.
-                # Consider raising an error here if strict parsing is required.
-                # print(f"Warning: Unrecognized pattern in k-point cells near: '{current_text[:30]}'. Attempting fallback split.", file=sys.stderr)
-                next_chunk = current_text.split(maxsplit=1)
-                if next_chunk:
-                    cells.append(next_chunk[0])
-                    current_text = next_chunk[1].strip() if len(next_chunk) > 1 else ""
-                else: # Should not happen if current_text is non-empty
-                    break
-            else: # current_text is empty
+            if remaining_text: # Text remains but doesn't match our definition of a cell
+                # This indicates a parsing problem or unexpected format not covered by the regex.
+                raise ValueError(f"Could not parse k-point cell structure near: '{remaining_text[:50]}'")
+            else: # No text left, parsing is complete
                 break
     return cells
 
