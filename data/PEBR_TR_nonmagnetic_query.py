@@ -1532,42 +1532,49 @@ def parse_kpoint_cells(irreps_txt):
     """
     Parses a string containing multiple k-point irrep cells into a list of individual cell strings.
     Handles cells like "A1(2)", "2 Γ3Γ4(2)", "D3D3(2) ⊕ D4D4(2)", 
-    "Γ1(1) ⊕ Γ2(1) ⊕ Γ3(1) ⊕ Γ4(1)", and "2 X2X3(2) ⊕ 2 X4X5(2)" as single tokens.
+    "Γ1(1) ⊕ Γ2(1) ⊕ Γ3(1) ⊕ Γ4(1)", "2 X2X3(2) ⊕ 2 X4X5(2)",
+    and a placeholder like "-" as single tokens.
     """
     if not irreps_txt:
         return []
 
-    # Define a pattern for a single irrep unit, e.g., "A1+(1)", "AgAg↑G(4)", "D1+D2+(2)", "X2X3(2)"
-    # It's a name (letters, numbers, +, -, arrows) followed by (digits)
+    # Define a pattern for a single irrep unit
     irrep_unit_pattern = r"[A-ZΓa-z0-9+\-↑↓]+?\([^\)]+\)" 
 
-    # Define a "component" pattern: this is what can appear on either side of an oplus,
-    # or as a standalone cell, or as a numbered cell.
-    # It can be a simple irrep_unit OR a numbered irrep_unit.
-    # e.g., "X4X5(2)" OR "2 X4X5(2)"
+    # Define a "component" pattern: a simple irrep_unit OR a numbered irrep_unit.
     component_pattern = rf"(?:\d+\s+{irrep_unit_pattern}|{irrep_unit_pattern})"
     
     # Define the full cell pattern:
-    # A cell starts with an initial component (which could be numbered or plain),
-    # and then can be followed by zero or more "⊕ component" sequences.
-    # The outer parentheses (group 0) will capture the entire matched cell.
-    full_cell_pattern_str = rf"((?:{component_pattern})(?:\s*⊕\s*(?:{component_pattern}))*)"
+    # Starts with an initial component, followed by zero or more "⊕ component" sequences.
+    # OR it's our special placeholder for a "button" / missing decomposable irrep string.
+    placeholder_pattern = r"(-)" # Placeholder is a hyphen
+
+    full_cell_pattern_str = rf"((?:{component_pattern})(?:\s*⊕\s*(?:{component_pattern}))*|{placeholder_pattern})"
     
     cell_parser_regex = re.compile(full_cell_pattern_str, re.UNICODE)
     
     cells = []
     remaining_text = irreps_txt.strip()
     while remaining_text:
-        match = cell_parser_regex.match(remaining_text) # Tries to match at the beginning of the current text
+        match = cell_parser_regex.match(remaining_text)
         if match:
-            token = match.group(0).strip() # group(0) is the whole matched cell
+            token = match.group(0).strip() 
             cells.append(token)
-            remaining_text = remaining_text[match.end():].strip() # Consume matched part and leading spaces for next token
+            remaining_text = remaining_text[match.end():].strip()
         else:
-            if remaining_text: # Text remains but doesn't match our definition of a cell
-                # This indicates a parsing problem or unexpected format not covered by the regex.
-                raise ValueError(f"Could not parse k-point cell structure near: '{remaining_text[:50]}'")
-            else: # No text left, parsing is complete
+            if remaining_text:
+                # Fallback if main regex fails: try to take the next non-whitespace chunk
+                # This helps with potential edge cases or slightly malformed simple tokens
+                # not perfectly caught by the more complex regex.
+                parts = remaining_text.split(maxsplit=1)
+                if parts:
+                    cells.append(parts[0])
+                    remaining_text = parts[1].strip() if len(parts) > 1 else ""
+                    # print(f"Warning: Used fallback split for token '{parts[0]}' near '{remaining_text[:30]}'", file=sys.stderr)
+                else: # Should not happen if remaining_text is non-empty
+                    raise ValueError(f"Could not parse k-point cell structure (fallback failed) near: '{remaining_text[:50]}'")
+
+            else: # No text left
                 break
     return cells
 
