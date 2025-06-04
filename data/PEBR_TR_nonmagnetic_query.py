@@ -1902,6 +1902,27 @@ class EBRDatabaseManager:
                     )
         self.conn.commit()
         return inserted_ebr_info_list
+    
+    def validate_input_file(self, filepath):
+        """Validate that input file exists and has expected format."""
+        if not os.path.exists(filepath):
+            return False, f"File '{filepath}' not found."
+        
+        try:
+            with open(filepath, 'r', encoding='utf-8') as f:
+                content = f.read()
+                
+            # Check for required sections
+            required_sections = ["Wyckoff pos.", "Band-Rep.", "Decomposable"]
+            missing = [section for section in required_sections if section not in content]
+            
+            if missing:
+                return False, f"Missing required sections: {', '.join(missing)}"
+            
+            return True, "File format appears valid."
+            
+        except Exception as e:
+            return False, f"Error reading file: {str(e)}"
 
     def ingest_file(self, sg_number, filepath, prompt_for_branches_immediately=False):
         if not (1 <= sg_number <= 230): raise ValueError(f"SG number {sg_number} out of range 1-230")
