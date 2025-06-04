@@ -2026,10 +2026,9 @@ class EBRDatabaseManager:
         print(f"\n--- Managing Branches for EBR ID: {ebr_id} ({wyckoff_info} - {orbital_info}) ---")
         
         if called_from_ingest:
-            # Ensure it's actually marked decomposable before asking (already checked by caller)
             choice = input("This EBR is marked 'decomposable'. Add/edit decomposition branches now? (y/n): ").strip().lower()
             if choice != 'y':
-                print(f"ℹ️ Branch input for EBR ID {ebr_id} skipped. Manage later via main menu option 4 if needed.")
+                print(f"ℹ️ Branch input for EBR ID {ebr_id} skipped. Manage later via main menu option if needed.")
                 return
 
         while True:
@@ -2041,9 +2040,10 @@ class EBRDatabaseManager:
             else:
                 print("  No existing branches for this EBR.")
 
-            branch_action = input("\n  Branch actions: (A)dd new, (D)elete specific, (C)lear all for this EBR, (R)eturn/Done: ").strip().upper()
+            # ADDED (B)ulk add option
+            branch_action = input("\n  Branch actions: (A)dd one, (B)ulk add from paste, (D)elete specific, (C)lear all, (R)eturn/Done: ").strip().upper()
             
-            if branch_action == 'A':
+            if branch_action == 'A': # Add one by one
                 try:
                     dec_idx_str = input("    Enter decomposition index (e.g., 1, 2): ").strip()
                     if not dec_idx_str.isdigit():
@@ -2060,15 +2060,74 @@ class EBRDatabaseManager:
                     
                     if self.add_ebr_decomposition_branch(ebr_id, dec_idx, b1_str, b2_str):
                         print(f"✅ Branch index {dec_idx} added/updated for EBR ID {ebr_id}.")
-                    else: 
-                        # add_ebr_decomposition_branch prints its own error
-                        pass 
+                    # add_ebr_decomposition_branch prints its own error on failure
                 except ValueError: 
                     print("❌ Invalid input for decomposition index (must be a number).")
                 except Exception as e:
                      print(f"❌ Error during add operation: {e}")
 
-            elif branch_action == 'D':
+            elif branch_action == 'B': # NEW: Bulk add
+                print("\n  Paste branch data below. Format each line as:")
+                print("  <index> <Branch1_Irreps_String> <Branch2_Irreps_String>")
+                print("  (Separated by multiple spaces or tabs. Branch strings themselves should not contain tabs or multiple consecutive spaces if they are not part of the irrep name).")
+                print("  Example: 1   X3X4,S3S4   X3X4,S3S4")
+                print("  Enter a blank line (or Ctrl+D/Ctrl+Z+Enter) to finish pasting.")
+                
+                bulk_lines = []
+                while True:
+                    try:
+                        line = input("  > ")
+                        if not line.strip(): # Empty line signifies end of bulk paste
+                            break
+                        bulk_lines.append(line)
+                    except EOFError:
+                        break
+                
+                if not bulk_lines:
+                    print("ℹ️ No bulk data pasted.")
+                    continue
+
+                added_count = 0
+                updated_count = 0
+                error_lines = []
+
+                # Optional: Ask to clear existing before bulk add
+                clear_existing_choice = input("  Clear all existing branches for this EBR before bulk adding? (y/n, default n): ").strip().lower()
+                if clear_existing_choice == 'y':
+                    deleted_count = self.delete_all_ebr_decomposition_branches(ebr_id)
+                    print(f"  Cleared {deleted_count} existing branches.")
+                    existing_branches = [] # Refresh local view
+
+                for i, line_data in enumerate(bulk_lines):
+                    parts = re.split(r'\s+', line_data.strip(), 2) # Split by any whitespace, max 2 splits
+                    if len(parts) == 3:
+                        idx_str, b1, b2 = parts
+                        try:
+                            dec_idx = int(idx_str)
+                            # Check if this index already exists for 'update' count
+                            is_update = any(br[0] == dec_idx for br in existing_branches)
+
+                            if self.add_ebr_decomposition_branch(ebr_id, dec_idx, b1, b2):
+                                if is_update and clear_existing_choice != 'y': # only count as update if not cleared
+                                    updated_count += 1
+                                else:
+                                    added_count +=1
+                            else:
+                                error_lines.append(f"Line {i+1} (DB Error): {line_data}")
+                        except ValueError:
+                            error_lines.append(f"Line {i+1} (Bad Index): {line_data}")
+                    else:
+                        error_lines.append(f"Line {i+1} (Bad Format): {line_data}")
+                
+                print(f"\n  Bulk Add Summary for EBR ID {ebr_id}:")
+                print(f"    Successfully added: {added_count} new branches.")
+                if updated_count > 0 : print(f"    Successfully updated: {updated_count} existing branches.")
+                if error_lines:
+                    print(f"    Errors on {len(error_lines)} lines:")
+                    for err_line in error_lines:
+                        print(f"      {err_line}")
+
+            elif branch_action == 'D': # Delete specific
                 try:
                     dec_idx_del_str = input("    Enter decomposition index to delete: ").strip()
                     if not dec_idx_del_str.isdigit():
@@ -2085,7 +2144,7 @@ class EBRDatabaseManager:
                 except Exception as e:
                     print(f"❌ Error during delete operation: {e}")
             
-            elif branch_action == 'C':
+            elif branch_action == 'C': # Clear all
                 confirm_clear = input(f"⚠️ Are you sure you want to delete ALL branches for EBR ID {ebr_id}? (yes/no): ").strip().lower()
                 if confirm_clear == 'yes':
                     count = self.delete_all_ebr_decomposition_branches(ebr_id)
@@ -2098,7 +2157,8 @@ class EBRDatabaseManager:
                 break
             
             else: 
-                print("❌ Invalid branch action. Please choose A, D, C, or R.")
+                print("❌ Invalid branch action. Please choose A, B, D, C, or R.")
+    
     
     # ... (get_next_space_group, get_database_status, query_space_group as in previous full code) ...
     def get_next_space_group(self):
