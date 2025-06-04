@@ -1,23 +1,10 @@
 # physical elementary band representation w/ time reversal from bilbao to simple sql db
-"""
+# Usage:
+    # python ebr_database_manager.py --interactive
+    # python ebr_database_manager.py --sg <space_group_number> <input_file>
+    # python ebr_database_manager.py --status
+    # python ebr_database_manager.py --query --sg <space_group_number>
 
-Enhanced script for managing elementary band representations with time reversal 
-from Bilbao crystal server data.
-
-Usage:
-    python ebr_database_manager.py --interactive
-    python ebr_database_manager.py --sg <space_group_number> <input_file>
-    python ebr_database_manager.py --status
-    python ebr_database_manager.py --query --sg <space_group_number>
-
-Examples:
-    python ebr_database_manager.py --interactive  # Start interactive mode
-    python ebr_database_manager.py --sg 10 raw_sg10.txt  # Import specific SG
-    python ebr_database_manager.py --status  # Show database status
-    python ebr_database_manager.py --query --sg 10  # Query specific space group
-
-Interactive mode allows sequential input from SG 1 to 230 with automatic increment.
-"""
 
 import sqlite3
 import argparse
@@ -236,6 +223,48 @@ class EBRDatabaseManager:
         
         return num_cols
     
+    def ingest_text(self, sg_number, raw_text):
+        """Ingest data from raw text string for specified space group."""
+        # Validate inputs
+        if not (1 <= sg_number <= 230):
+            raise ValueError(f"Space group number must be between 1 and 230, got {sg_number}")
+        
+        if not raw_text or not raw_text.strip():
+            raise ValueError("Raw text cannot be empty")
+        
+        # Parse the raw text data
+        try:
+            wyckoff_line, orbital_line, notes_line, kpoint_lines = self._parse_raw_text(raw_text)
+        except Exception as e:
+            raise ValueError(f"Error parsing raw text: {str(e)}")
+        
+        # Process data
+        wyckoff_entries = wyckoff_line.split()
+        orbital_entries = orbital_line.split()
+        notes_entries = notes_line.split()
+        
+        # Validate column consistency
+        num_cols = len(wyckoff_entries)
+        if not (len(orbital_entries) == num_cols == len(notes_entries)):
+            raise ValueError(
+                f"Column count mismatch: Wyckoff({len(wyckoff_entries)}), "
+                f"Orbital({len(orbital_entries)}), Notes({len(notes_entries)})"
+            )
+        
+        # Parse k-point data
+        kpoint_data = []
+        for kp_line in kpoint_lines:
+            tokens = kp_line.split()
+            if tokens:
+                kp_label = tokens[0].rstrip(":")
+                reps = tokens[1:]
+                kpoint_data.append((kp_label, reps))
+        
+        # Insert into database
+        self._insert_data(sg_number, wyckoff_entries, orbital_entries, notes_entries, kpoint_data)
+        
+        return num_cols
+    
     def _parse_file_content(self, raw_lines):
         """Parse file content to extract required sections."""
         wyckoff_line = None
@@ -281,6 +310,84 @@ class EBRDatabaseManager:
         if not all([wyckoff_line, orbital_line, notes_line]):
             raise ValueError("Could not locate all required sections in file")
         
+        return wyckoff_line, orbital_line, notes_line, kpoint_lines
+    
+    def _parse_raw_text(self, raw_text):
+        """Parse raw text data to extract required sections."""
+        # Clean and normalize the text
+        text = raw_text.strip()
+        
+        # Debug print to see what we're working with
+        print(f"DEBUG: Raw text length: {len(text)}")
+        print(f"DEBUG: First 200 chars: {text[:200]}")
+        
+        # Find the main sections using more flexible patterns
+        wyckoff_match = re.search(r'Wyckoff pos\.\s*(.+?)\s*Band-Rep\.', text, re.IGNORECASE)
+        orbital_match = re.search(r'Band-Rep\.\s*(.+?)\s*Decomposable', text, re.IGNORECASE)
+        
+        if not wyckoff_match or not orbital_match:
+            raise ValueError("Could not find required sections (Wyckoff pos. or Band-Rep.)")
+        
+        wyckoff_line = wyckoff_match.group(1).strip()
+        orbital_line = orbital_match.group(1).strip()
+        
+        # Find decomposable section - look for the pattern after "Decomposable"
+        decomp_match = re.search(r'Decomposable\\?\s*(.+?)(?=\s+[A-ZΓ]+:)', text, re.IGNORECASE)
+        if not decomp_match:
+            # Alternative pattern - try to find text between "Decomposable" and first k-point
+            decomp_match = re.search(r'Decomposable\\?\s*(.+?)(?=\s+R:|T:|U:|V:|X:|Y:|Z:|Γ:)', text, re.IGNORECASE)
+        
+        if not decomp_match:
+            raise ValueError("Could not find Decomposable section")
+        
+        notes_line = decomp_match.group(1).strip()
+        
+        # Find k-point data using the format from your example
+        # Pattern: K-point:(coordinates) irrep1 irrep2 ...
+        kpoint_pattern = r'([A-ZΓ]+):\(([^)]+)\)\s+([^A-ZΓ:]*?)(?=\s+[A-ZΓ]+:|$)'
+        kpoint_matches = re.findall(kpoint_pattern, text)
+        
+        print(f"DEBUG: Found {len(kpoint_matches)} k-point matches")
+        
+        if not kpoint_matches:
+            # Try a more flexible pattern
+            # Look for patterns like "R:(1/2,1/2,1/2) R1(1) R2R2(2)"
+            lines = text.split()
+            kpoint_lines = []
+            i = 0
+            while i < len(lines):
+                line = lines[i]
+                # Check if this looks like a k-point line
+                if re.match(r'^[A-ZΓ]+:\([^)]+\)$', line):
+                    kpoint = re.match(r'^([A-ZΓ]+):\(([^)]+)\)$', line)
+                    if kpoint:
+                        kp_name = kpoint.group(1)
+                        kp_coords = kpoint.group(2)
+                        
+                        # Collect irreps that follow
+                        irreps = []
+                        i += 1
+                        while i < len(lines) and not re.match(r'^[A-ZΓ]+:\([^)]+\)$', lines[i]):
+                            irreps.append(lines[i])
+                            i += 1
+                        
+                        kpoint_lines.append(f"{kp_name}:({kp_coords}) {' '.join(irreps)}")
+                        continue
+                i += 1
+            
+            if not kpoint_lines:
+                raise ValueError("Could not find k-point data in expected format")
+            
+            print(f"DEBUG: Parsed {len(kpoint_lines)} k-point lines")
+            return wyckoff_line, orbital_line, notes_line, kpoint_lines
+        
+        kpoint_lines = []
+        for kpoint, coords, irreps in kpoint_matches:
+            # Clean up the irreps data
+            irreps = re.sub(r'\s+', ' ', irreps.strip())
+            kpoint_lines.append(f"{kpoint}:({coords}) {irreps}")
+        
+        print(f"DEBUG: Final k-point lines: {kpoint_lines}")
         return wyckoff_line, orbital_line, notes_line, kpoint_lines
     
     def _insert_data(self, sg_number, wyckoff_entries, orbital_entries, notes_entries, kpoint_data):
@@ -401,26 +508,83 @@ def interactive_mode():
         print(f"Missing space groups: {len(status['missing_sgs'])}")
         
         print("\nOptions:")
-        print("1. Input data for next space group")
-        print("2. Input data for specific space group")
-        print("3. Show database status")
-        print("4. Query space group data")
-        print("5. Exit")
+        print("1. Input raw data for next space group")
+        print("2. Input raw data for specific space group")
+        print("3. Input from file for specific space group")
+        print("4. Show database status")
+        print("5. Query space group data")
+        print("6. Exit")
         
-        choice = input("\nEnter choice (1-5): ").strip()
+        choice = input("\nEnter choice (1-6): ").strip()
         
         if choice == "1":
-            # Input for next space group
-            filepath = input(f"Enter file path for space group {next_sg}: ").strip()
+            # Input raw data for next space group
+            print(f"\nEntering data for space group {next_sg}")
+            print("Paste your raw data below (press Enter twice when done):")
+            print("Example format: 'Wyckoff pos.1a(1)1a(1)Band-Rep.A↑G(1)AA↑G(2)Decomposable\\...'")
+            print("-" * 80)
             
+            raw_data = ""
+            empty_lines = 0
+            while True:
+                try:
+                    line = input()
+                    if not line.strip():
+                        empty_lines += 1
+                        if empty_lines >= 2:
+                            break
+                    else:
+                        empty_lines = 0
+                        raw_data += line + " "
+                except EOFError:
+                    break
+            
+            if raw_data.strip():
+                try:
+                    num_ebrs = db.ingest_text(next_sg, raw_data.strip())
+                    print(f"✅ Successfully imported {num_ebrs} EBRs for space group {next_sg}")
+                except Exception as e:
+                    print(f"❌ Error: {str(e)}")
+                    print("Please check your data format and try again.")
+            else:
+                print("❌ No data entered.")
+        
+        elif choice == "2":
+            # Input raw data for specific space group
             try:
-                num_ebrs = db.ingest_file(next_sg, filepath)
-                print(f"✅ Successfully imported {num_ebrs} EBRs for space group {next_sg}")
+                sg_num = int(input("Enter space group number (1-230): "))
+                print(f"\nEntering data for space group {sg_num}")
+                print("Paste your raw data below (press Enter twice when done):")
+                print("-" * 80)
+                
+                raw_data = ""
+                empty_lines = 0
+                while True:
+                    try:
+                        line = input()
+                        if not line.strip():
+                            empty_lines += 1
+                            if empty_lines >= 2:
+                                break
+                        else:
+                            empty_lines = 0
+                            raw_data += line + " "
+                    except EOFError:
+                        break
+                
+                if raw_data.strip():
+                    num_ebrs = db.ingest_text(sg_num, raw_data.strip())
+                    print(f"✅ Successfully imported {num_ebrs} EBRs for space group {sg_num}")
+                else:
+                    print("❌ No data entered.")
+                    
+            except ValueError as e:
+                print(f"❌ Error: {str(e)}")
             except Exception as e:
                 print(f"❌ Error: {str(e)}")
         
-        elif choice == "2":
-            # Input for specific space group
+        elif choice == "3":
+            # Input from file for specific space group
             try:
                 sg_num = int(input("Enter space group number (1-230): "))
                 filepath = input(f"Enter file path for space group {sg_num}: ").strip()
@@ -432,7 +596,7 @@ def interactive_mode():
             except Exception as e:
                 print(f"❌ Error: {str(e)}")
         
-        elif choice == "3":
+        elif choice == "4":
             # Show detailed status
             print(f"\nDetailed Status:")
             if status['missing_sgs']:
@@ -443,7 +607,7 @@ def interactive_mode():
                     print(f"Missing space groups: {missing_count} total")
                     print(f"First 10: {', '.join(status['missing_sgs'][:10])}")
         
-        elif choice == "4":
+        elif choice == "5":
             # Query space group
             try:
                 sg_num = int(input("Enter space group number to query: "))
@@ -463,7 +627,7 @@ def interactive_mode():
             except ValueError:
                 print("❌ Please enter a valid number")
         
-        elif choice == "5":
+        elif choice == "6":
             break
         
         else:
@@ -546,6 +710,7 @@ Examples:
             print(f"No data found for space group {args.sg}")
         
         db.close()
+
     elif args.sg and args.input_file:
         db = EBRDatabaseManager()
         try:
