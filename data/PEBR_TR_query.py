@@ -5,7 +5,6 @@
     # python ebr_database_manager.py --status
     # python ebr_database_manager.py --query --sg <space_group_number>
 
-
 import sqlite3
 import argparse
 import re
@@ -199,13 +198,24 @@ class EBRDatabaseManager:
         # Process data
         wyckoff_entries = wyckoff_line.split()
         orbital_entries = orbital_line.split()
-        notes_entries = notes_line.split()
-        
-        # Validate column consistency
+        notes_entries   = notes_line.split()
+
         num_cols = len(wyckoff_entries)
+
+        # If notes_entries has more tokens than columns, keep only the last `num_cols` tokens
+        if len(notes_entries) > num_cols:
+            notes_entries = notes_entries[-num_cols:]
+        elif len(notes_entries) < num_cols:
+            raise ValueError(
+                f"Column count mismatch: Wyckoff({num_cols}), "
+                f"Orbital({len(orbital_entries)}), Notes({len(notes_entries)})"
+            )
+
+        # Now we can assert consistency
         if not (len(orbital_entries) == num_cols == len(notes_entries)):
             raise ValueError(
-                f"Column count mismatch: Wyckoff({len(wyckoff_entries)}), "
+                f"Column count mismatch after trimming: "
+                f"Wyckoff({len(wyckoff_entries)}), "
                 f"Orbital({len(orbital_entries)}), Notes({len(notes_entries)})"
             )
         
@@ -245,9 +255,20 @@ class EBRDatabaseManager:
         
         # Validate column consistency
         num_cols = len(wyckoff_entries)
-        if not (len(orbital_entries) == num_cols == len(notes_entries)):
+        
+        # Apply the same fix for trimming excess notes entries
+        if len(notes_entries) > num_cols:
+            notes_entries = notes_entries[-num_cols:]
+        elif len(notes_entries) < num_cols:
             raise ValueError(
                 f"Column count mismatch: Wyckoff({len(wyckoff_entries)}), "
+                f"Orbital({len(orbital_entries)}), Notes({len(notes_entries)})"
+            )
+        
+        if not (len(orbital_entries) == num_cols == len(notes_entries)):
+            raise ValueError(
+                f"Column count mismatch after trimming: "
+                f"Wyckoff({len(wyckoff_entries)}), "
                 f"Orbital({len(orbital_entries)}), Notes({len(notes_entries)})"
             )
         
@@ -266,129 +287,177 @@ class EBRDatabaseManager:
         return num_cols
     
     def _parse_file_content(self, raw_lines):
-        """Parse file content to extract required sections."""
+        """
+        Parse file content (from a .txt) to extract Wyckoff, Orbital, notes, and k-points.
+        First, collapse ANY trailing backslash+newline into a single space.
+        """
+        # 1) Re-join into one big string and collapse backslash+newline → space
+        joined = "\n".join(raw_lines)
+        joined = re.sub(r'\\\s*\n\s*', ' ', joined)
+
+        # 2) Re-split into clean lines (dropping any blank lines)
+        lines = [line.rstrip("\n") for line in joined.splitlines() if line.strip()]
+
+        # 3) Now apply your existing "find Wyckoff / Band-Rep / Decomposable" logic
         wyckoff_line = None
-        orbital_line = None
-        notes_line = None
-        kpoint_lines = []
-        
+        orbital_line  = None
+        notes_line    = None
+        kpoint_lines  = []
+
         i = 0
-        while i < len(raw_lines):
-            line = raw_lines[i]
-            
+        while i < len(lines):
+            line = lines[i]
+
             if line.startswith("Wyckoff pos."):
                 i += 1
-                while i < len(raw_lines) and not raw_lines[i].strip():
+                # skip any blank lines
+                while i < len(lines) and not lines[i].strip():
                     i += 1
-                if i < len(raw_lines):
-                    wyckoff_line = raw_lines[i]
-            
+                if i < len(lines):
+                    wyckoff_line = lines[i]
+
             elif line.startswith("Band-Rep."):
                 i += 1
-                while i < len(raw_lines) and not raw_lines[i].strip():
+                # skip any blank lines
+                while i < len(lines) and not lines[i].strip():
                     i += 1
-                if i < len(raw_lines):
-                    orbital_line = raw_lines[i]
-            
+                if i < len(lines):
+                    orbital_line = lines[i]
+
             elif line.startswith("Decomposable"):
+                # skip the "Decomposable" line itself
                 i += 1
-                while i < len(raw_lines) and not raw_lines[i].strip():
+                # skip the "Indecomposable" header line
+                while i < len(lines) and not lines[i].strip():
                     i += 1
-                if i < len(raw_lines):
-                    notes_line = raw_lines[i]
-                
-                # Collect remaining k-point lines
+                if i < len(lines):
+                    i += 1  # move past the header line
+
+                # next non-blank is actual notes
+                while i < len(lines) and not lines[i].strip():
+                    i += 1
+                if i < len(lines):
+                    notes_line = lines[i]
+
+                # everything after that is k-point data
                 i += 1
-                while i < len(raw_lines):
-                    if raw_lines[i].strip():
-                        kpoint_lines.append(raw_lines[i])
+                while i < len(lines):
+                    if lines[i].strip():
+                        kpoint_lines.append(lines[i])
                     i += 1
                 break
-            
+
             i += 1
-        
+
         if not all([wyckoff_line, orbital_line, notes_line]):
             raise ValueError("Could not locate all required sections in file")
-        
+
         return wyckoff_line, orbital_line, notes_line, kpoint_lines
+
+
     
     def _parse_raw_text(self, raw_text):
-        """Parse raw text data to extract required sections."""
-        # Clean and normalize the text
-        text = raw_text.strip()
-        
-        # Debug print to see what we're working with
-        print(f"DEBUG: Raw text length: {len(text)}")
-        print(f"DEBUG: First 200 chars: {text[:200]}")
-        
-        # Find the main sections using more flexible patterns
-        wyckoff_match = re.search(r'Wyckoff pos\.\s*(.+?)\s*Band-Rep\.', text, re.IGNORECASE)
-        orbital_match = re.search(r'Band-Rep\.\s*(.+?)\s*Decomposable', text, re.IGNORECASE)
-        
+        """
+        Parse raw pasted text (from interactive mode) to extract:
+          - Wyckoff line
+          - Band-Rep. line
+          - exactly one notes row
+          - all k-point lines afterward
+
+        Fixed version that properly handles the Decomposable section.
+        """
+        # 1) Strip and collapse any "\<spaces><newline><spaces>" into a single space:
+        text = re.sub(r'\\\s*\n\s*', ' ', raw_text.strip())
+
+        # 2) Extract Wyckoff: between "Wyckoff pos." and "Band-Rep."
+        wyckoff_match = re.search(
+            r'Wyckoff pos\.\s*(.+?)\s*Band-Rep\.',
+            text, re.IGNORECASE | re.DOTALL
+        )
+        # 3) Extract Orbital: between "Band-Rep." and "Decomposable"
+        orbital_match = re.search(
+            r'Band-Rep\.\s*(.+?)\s*Decomposable',
+            text, re.IGNORECASE | re.DOTALL
+        )
+
         if not wyckoff_match or not orbital_match:
             raise ValueError("Could not find required sections (Wyckoff pos. or Band-Rep.)")
-        
-        wyckoff_line = wyckoff_match.group(1).strip()
-        orbital_line = orbital_match.group(1).strip()
-        
-        # Find decomposable section - look for the pattern after "Decomposable"
-        decomp_match = re.search(r'Decomposable\\?\s*(.+?)(?=\s+[A-ZΓ]+:)', text, re.IGNORECASE)
-        if not decomp_match:
-            # Alternative pattern - try to find text between "Decomposable" and first k-point
-            decomp_match = re.search(r'Decomposable\\?\s*(.+?)(?=\s+R:|T:|U:|V:|X:|Y:|Z:|Γ:)', text, re.IGNORECASE)
+
+        wyckoff_line = re.sub(r'\s+', ' ', wyckoff_match.group(1).strip())
+        orbital_line = re.sub(r'\s+', ' ', orbital_match.group(1).strip())
+
+        # 4) Extract everything after "Decomposable" and find the actual notes line
+        decomp_pattern = r'Decomposable\s*(.*?)(?=[A-ZΓ]+:\([^)]+\))'
+        decomp_match = re.search(decomp_pattern, text, re.IGNORECASE | re.DOTALL)
         
         if not decomp_match:
             raise ValueError("Could not find Decomposable section")
         
-        notes_line = decomp_match.group(1).strip()
+        decomp_section = decomp_match.group(1).strip()
         
-        # Find k-point data using the format from your example
-        # Pattern: K-point:(coordinates) irrep1 irrep2 ...
-        kpoint_pattern = r'([A-ZΓ]+):\(([^)]+)\)\s+([^A-ZΓ:]*?)(?=\s+[A-ZΓ]+:|$)'
-        kpoint_matches = re.findall(kpoint_pattern, text)
+        # Split by newlines and find the actual data line
+        # Skip header lines like "Indecomposable" that appear alone
+        lines = [line.strip() for line in decomp_section.split('\n') if line.strip()]
         
-        print(f"DEBUG: Found {len(kpoint_matches)} k-point matches")
+        # Find the line that has the same number of tokens as Wyckoff entries
+        expected_cols = len(wyckoff_line.split())
+        notes_line = None
         
-        if not kpoint_matches:
-            # Try a more flexible pattern
-            # Look for patterns like "R:(1/2,1/2,1/2) R1(1) R2R2(2)"
-            lines = text.split()
-            kpoint_lines = []
-            i = 0
-            while i < len(lines):
-                line = lines[i]
-                # Check if this looks like a k-point line
-                if re.match(r'^[A-ZΓ]+:\([^)]+\)$', line):
-                    kpoint = re.match(r'^([A-ZΓ]+):\(([^)]+)\)$', line)
-                    if kpoint:
-                        kp_name = kpoint.group(1)
-                        kp_coords = kpoint.group(2)
-                        
-                        # Collect irreps that follow
-                        irreps = []
-                        i += 1
-                        while i < len(lines) and not re.match(r'^[A-ZΓ]+:\([^)]+\)$', lines[i]):
-                            irreps.append(lines[i])
-                            i += 1
-                        
-                        kpoint_lines.append(f"{kp_name}:({kp_coords}) {' '.join(irreps)}")
-                        continue
-                i += 1
-            
-            if not kpoint_lines:
-                raise ValueError("Could not find k-point data in expected format")
-            
-            print(f"DEBUG: Parsed {len(kpoint_lines)} k-point lines")
-            return wyckoff_line, orbital_line, notes_line, kpoint_lines
+        for line in lines:
+            tokens = line.split()
+            if len(tokens) == expected_cols:
+                notes_line = line
+                break
         
+        # If we couldn't find a line with exact match, take the last non-header line
+        if not notes_line and lines:
+            # Filter out obvious header lines
+            data_lines = [line for line in lines if not line.lower().startswith('indecomposable') or len(line.split()) > 1]
+            if data_lines:
+                notes_line = data_lines[-1]
+            else:
+                notes_line = lines[-1]
+        
+        if not notes_line:
+            raise ValueError("Could not find notes data line")
+
+        # 5) Extract all k-point lines
+        kpoint_start_match = re.search(
+            r'([A-ZΓ]+:\([^)]+\).*)',
+            text, re.IGNORECASE | re.DOTALL
+        )
+        if not kpoint_start_match:
+            raise ValueError("Could not find k-point data")
+
+        kpoint_text = kpoint_start_match.group(1)
+        kpoint_pattern = r'([A-ZΓ]+):\(([^)]+)\)'
+        matches = list(re.finditer(kpoint_pattern, kpoint_text))
+
         kpoint_lines = []
-        for kpoint, coords, irreps in kpoint_matches:
-            # Clean up the irreps data
-            irreps = re.sub(r'\s+', ' ', irreps.strip())
-            kpoint_lines.append(f"{kpoint}:({coords}) {irreps}")
-        
-        print(f"DEBUG: Final k-point lines: {kpoint_lines}")
+        for idx, m in enumerate(matches):
+            kpoint_name = m.group(1)
+            kpoint_coords = m.group(2)
+            start_pos = m.end()
+            if idx + 1 < len(matches):
+                end_pos = matches[idx + 1].start()
+                irreps_txt = kpoint_text[start_pos:end_pos]
+            else:
+                irreps_txt = kpoint_text[start_pos:]
+            irreps = [token for token in irreps_txt.split() if token.strip()]
+            if irreps:
+                kpoint_lines.append(f"{kpoint_name}:({kpoint_coords}) {' '.join(irreps)}")
+
+        # Debug prints:
+        print(f"DEBUG: Wyckoff: {wyckoff_line}")
+        print(f"DEBUG: Orbital: {orbital_line}")
+        print(f"DEBUG: Notes: {notes_line}")
+        print(f"DEBUG: # of Wyckoff columns: {len(wyckoff_line.split())}")
+        print(f"DEBUG: # of Notes entries: {len(notes_line.split())}")
+        print(f"DEBUG: # of k-point lines: {len(kpoint_lines)}")
+
         return wyckoff_line, orbital_line, notes_line, kpoint_lines
+
+
     
     def _insert_data(self, sg_number, wyckoff_entries, orbital_entries, notes_entries, kpoint_data):
         """Insert parsed data into database."""
@@ -666,6 +735,7 @@ Examples:
     
     if args.interactive:
         interactive_mode()
+
     elif args.status:
         db = EBRDatabaseManager()
         status = db.get_database_status()
@@ -708,8 +778,6 @@ Examples:
                     print(f"    {k_point}: {irrep_label}{mult_str}")
         else:
             print(f"No data found for space group {args.sg}")
-        
-        db.close()
 
     elif args.sg and args.input_file:
         db = EBRDatabaseManager()
