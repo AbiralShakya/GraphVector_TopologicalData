@@ -1,3 +1,26 @@
+import sqlite3
+import argparse
+import re
+import sys
+import os
+from pathlib import Path
+
+# Helper functions
+# def parse_kpoint_cells(irreps_txt):
+#     """
+#     Given a string like "A1+(1)⊕A2+(1)   A3A4(2)",
+#     return ["A1+(1)","A2+(1)"] as a two-tuple for the first token, and "A3A4(2)" for the next.
+#     """
+#     tokens = [tok.strip() for tok in irreps_txt.split() if tok.strip()]
+#     processed = []
+#     for tok in tokens:
+#         if '⊕' in tok:
+#             left, right = [p.strip() for p in tok.split('⊕', 1)]
+#             processed.append((left, right))
+#         else:
+#             processed.append(tok)
+#     return processed
+
 # physical elementary band representation w/ time reversal from bilbao to simple sql db
 # Usage:
     # python ebr_database_manager.py --interactive
@@ -27,6 +50,8 @@ CREATE TABLE ebrs (
   branch         INTEGER NOT NULL DEFAULT 0,
   topo_single    INTEGER,  -- (optional) store Z₂ or Z₄ index for single‐valued
   topo_double    INTEGER,  -- (optional) store Z₂ or Z₄ index for double‐valued
+  branch1_irreps TEXT,     -- for decomposable EBRs
+  branch2_irreps TEXT,     -- for decomposable EBRs
   created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -50,21 +75,13 @@ from pathlib import Path
 # Helper functions
 def parse_kpoint_cells(irreps_txt):
     """
-    Given the raw “irreps” substring for one k-point (e.g. "A1+(1) ⊕ A2+(1)   A3A4(2)"),
-    split on whitespace into tokens, then for each token:
-    - if it contains “⊕”, split it into exactly two parts and store as a tuple
-    - otherwise leave it as a single string
-    Returns a list where each entry is either a str or a 2-tuple of str.
+    Given a substring like "C1+(1) ⊕ C2+(1)   C3C4(2)",
+    return ["C1+(1) ⊕ C2+(1)", "C3C4(2)"].
+
+    In other words, treat each whitespace-separated token as a single string
+    (even if it contains "⊕").
     """
-    tokens = [tok.strip() for tok in irreps_txt.split() if tok.strip()]
-    processed = []
-    for tok in tokens:
-        if '⊕' in tok:
-            left, right = [p.strip() for p in tok.split('⊕')]
-            processed.append((left, right))
-        else:
-            processed.append(tok)
-    return processed
+    return [tok.strip() for tok in irreps_txt.split() if tok.strip()]
 
 def split_decomposable_column(j, kpoint_data):
         # decomposable columns in bilbao bandrep nonmagnetic tqc are buttons leading to tables of branch 1 branch 2 data
@@ -126,6 +143,8 @@ class EBRDatabaseManager:
           single_index   TEXT,
           double_index   TEXT,
           notes          TEXT,
+          branch1_irreps TEXT,
+          branch2_irreps TEXT,
           created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         """)
@@ -213,9 +232,11 @@ class EBRDatabaseManager:
             return entry, ""
     
     def parse_orbital(self, entry):
-        """Parse orbital entry like 'A↑G(1)' -> 'A↑G'."""
-        m = re.match(r"^(.+)\(\d+\)$", entry)
-        return m.group(1) if m else entry
+        """Parse orbital entry like 'A↑G(1)' -> ('A↑G', 1)."""
+        m = re.match(r"^(.+)\((\d+)\)$", entry)
+        if m:
+            return m.group(1), int(m.group(2))
+        return entry, 1
     
     def parse_multiplicity(self, entry):
         """Parse multiplicity from entry like 'R2R2(2)' -> 2."""
@@ -223,6 +244,11 @@ class EBRDatabaseManager:
         if m:
             return int(m.group(1))
         return None
+    
+    def parse_irrep_label(self, entry):
+        """Parse irrep label by removing the multiplicity part."""
+        m = re.match(r"^(.+)\(\d+\)$", entry)
+        return m.group(1) if m else entry
     
     def validate_input_file(self, filepath):
         """Validate that input file exists and has expected format."""
@@ -312,13 +338,7 @@ class EBRDatabaseManager:
         if not raw_text or not raw_text.strip():
             raise ValueError("Raw text cannot be empty")
         
-        # # Parse raw text data
-        # try:
-        #     wyckoff_line, orbital_line, notes_line, kpoint_lines = self._parse_raw_text(raw_text)
-        # except Exception as e:
-        #     raise ValueError(f"Error parsing raw text: {str(e)}")
-        
-          # Parse raw text data
+        # Parse raw text data
         try:
             wyckoff_line, orbital_line, notes_line, kpoint_data = self._parse_raw_text(raw_text)
         except Exception as e:
@@ -347,20 +367,6 @@ class EBRDatabaseManager:
                 f"Orbital({len(orbital_entries)}), Notes({len(notes_entries)})"
             )
         
-        # # Parse k-point data
-        # kpoint_data = []
-        # for kp_line in kpoint_lines:
-        #     tokens = kp_line.split()
-        #     if tokens:
-        #         kp_label = tokens[0].rstrip(":")
-        #         reps = tokens[1:]
-        #         kpoint_data.append((kp_label, reps))
-        
-        # # Insert into database
-        # self._insert_data(sg_number, wyckoff_entries, orbital_entries, notes_entries, kpoint_data)
-        
-        # return num_cols
-
         return self._insert_data(sg_number, wyckoff_entries, orbital_entries, notes_entries, kpoint_data)
     
     def _parse_file_content(self, raw_lines):
@@ -431,46 +437,43 @@ class EBRDatabaseManager:
 
         return wyckoff_line, orbital_line, notes_line, kpoint_lines
 
-
     def _parse_raw_text(self, raw_text):
         """
-        Parse raw pasted text (from interactive mode) to extract:
-          - wyckoff_line      (single string)
-          - orbital_line      (single string)
-          - notes_line        (single string)
-          - kpoint_data       (list of (kpt_label, cells_list)), where cells_list[j]
-                              is either a plain str (e.g. "A1+(1)") or a 2-tuple
-                              (e.g. ("A1+(1)", "A2+(1)")) if that column was decomposable.
+        Parse raw pasted text to extract:
+          • wyckoff_line  (string)
+          • orbital_line  (string)
+          • notes_line    (string)
+          • kpoint_data   (list of (kpt_label, cells_list)),
+                           where each cells_list[j] is a single string
+                           (e.g. "C1+(1) ⊕ C2+(1)").
         """
-        # 1) Collapse any "\<spaces>\n<spaces>" → single space
+        # 1) Collapse any "\" + newline into a single space:
         text = re.sub(r'\\\s*\n\s*', ' ', raw_text.strip())
 
         # 2) Extract Wyckoff: between "Wyckoff pos." and "Band-Rep."
         wyckoff_match = re.search(
-            r'Wyckoff pos\.\s*(.+?)\s*Band-Rep\.',
-            text, re.IGNORECASE | re.DOTALL
+            r'Wyckoff pos\.\s*(.+?)\s*Band-Rep\.', text,
+            re.IGNORECASE | re.DOTALL
         )
         # 3) Extract Orbital: between "Band-Rep." and "Decomposable"
         orbital_match = re.search(
-            r'Band-Rep\.\s*(.+?)\s*Decomposable',
-            text, re.IGNORECASE | re.DOTALL
+            r'Band-Rep\.\s*(.+?)\s*Decomposable', text,
+            re.IGNORECASE | re.DOTALL
         )
-
         if not wyckoff_match or not orbital_match:
             raise ValueError("Could not find required sections (Wyckoff pos. or Band-Rep.)")
 
         wyckoff_line = re.sub(r'\s+', ' ', wyckoff_match.group(1).strip())
         orbital_line = re.sub(r'\s+', ' ', orbital_match.group(1).strip())
 
-        # 4) Extract the Decomposable section, then pick the correct notes_line
-        decomp_pattern = r'Decomposable\s*(.*?)(?=[A-ZΓ]+:\([^)]+\))'
+        # 4) Extract everything after "Decomposable" (allow optional backslash)
+        decomp_pattern = r'Decomposable\\?\s*(.*?)(?=[A-ZΓ]+:\([^)]+\))'
         decomp_match = re.search(decomp_pattern, text, re.IGNORECASE | re.DOTALL)
-        
         if not decomp_match:
             raise ValueError("Could not find Decomposable section")
-        
+
         decomp_section = decomp_match.group(1).strip()
-        lines = [ln.strip() for ln in decomp_section.split('\n') if ln.strip()]
+        lines = [line.strip() for line in decomp_section.split('\n') if line.strip()]
 
         expected_cols = len(wyckoff_line.split())
         notes_line = None
@@ -479,22 +482,21 @@ class EBRDatabaseManager:
             if len(toks) == expected_cols:
                 notes_line = ln
                 break
-
         if not notes_line:
+            # fallback: pick the last "data" line
             data_lines = [ln for ln in lines
                           if not ln.lower().startswith('indecomposable') or len(ln.split()) > 1]
             if data_lines:
                 notes_line = data_lines[-1]
             else:
                 notes_line = lines[-1] if lines else ""
-
         if not notes_line:
             raise ValueError("Could not find notes data line")
 
-        # 5) Extract k-point block and parse each k-point’s irreps
+        # 5) Extract k-point block
         kpoint_start_match = re.search(
-            r'([A-ZΓ]+:\([^)]+\).*)',
-            text, re.IGNORECASE | re.DOTALL
+            r'([A-ZΓ]+:\([^)]+\).*)', text,
+            re.IGNORECASE | re.DOTALL
         )
         if not kpoint_start_match:
             raise ValueError("Could not find k-point data")
@@ -505,131 +507,27 @@ class EBRDatabaseManager:
 
         kpoint_data = []
         for idx, m in enumerate(matches):
-            kpoint_name   = m.group(1)
-            kpoint_coords = m.group(2)
-            start_pos     = m.end()
+            kpt_label = m.group(1)
+            # (coords = m.group(2) not strictly needed here)
+
+            start_pos = m.end()
             if idx + 1 < len(matches):
                 end_pos = matches[idx + 1].start()
                 irreps_txt = kpoint_text[start_pos:end_pos]
             else:
                 irreps_txt = kpoint_text[start_pos:]
 
-            # Instead of splitting irreps_txt naively, call parse_kpoint_cells:
+            # Each whitespace-separated token (e.g. "C1+(1) ⊕ C2+(1)")
             cells = parse_kpoint_cells(irreps_txt)
-            # cells is now a list of length = expected_cols; each entry is str or (str, str)
-            kpoint_data.append((kpoint_name, cells))
+            kpoint_data.append((kpt_label, cells))
 
-        # Return the four pieces
         return wyckoff_line, orbital_line, notes_line, kpoint_data
-
-    
-    # def _parse_raw_text(self, raw_text):
-    #     """
-    #     Parse raw pasted text (from interactive mode) to extract:
-    #       - Wyckoff line
-    #       - Band-Rep. line
-    #       - exactly one notes row
-    #       - all k-point lines afterward
-
-    #     Fixed version that properly handles the Decomposable section.
-    #     """
-    #     # 1) Strip and collapse any "\<spaces><newline><spaces>" into a single space:
-    #     text = re.sub(r'\\\s*\n\s*', ' ', raw_text.strip())
-
-    #     # 2) Extract Wyckoff: between "Wyckoff pos." and "Band-Rep."
-    #     wyckoff_match = re.search(
-    #         r'Wyckoff pos\.\s*(.+?)\s*Band-Rep\.',
-    #         text, re.IGNORECASE | re.DOTALL
-    #     )
-    #     # 3) Extract Orbital: between "Band-Rep." and "Decomposable"
-    #     orbital_match = re.search(
-    #         r'Band-Rep\.\s*(.+?)\s*Decomposable',
-    #         text, re.IGNORECASE | re.DOTALL
-    #     )
-
-    #     if not wyckoff_match or not orbital_match:
-    #         raise ValueError("Could not find required sections (Wyckoff pos. or Band-Rep.)")
-
-    #     wyckoff_line = re.sub(r'\s+', ' ', wyckoff_match.group(1).strip())
-    #     orbital_line = re.sub(r'\s+', ' ', orbital_match.group(1).strip())
-
-    #     # 4) Extract everything after "Decomposable" and find the actual notes line
-    #     decomp_pattern = r'Decomposable\s*(.*?)(?=[A-ZΓ]+:\([^)]+\))'
-    #     decomp_match = re.search(decomp_pattern, text, re.IGNORECASE | re.DOTALL)
-        
-    #     if not decomp_match:
-    #         raise ValueError("Could not find Decomposable section")
-        
-    #     decomp_section = decomp_match.group(1).strip()
-        
-    #     # Split by newlines and find the actual data line
-    #     # Skip header lines like "Indecomposable" that appear alone
-    #     lines = [line.strip() for line in decomp_section.split('\n') if line.strip()]
-        
-    #     # Find the line that has the same number of tokens as Wyckoff entries
-    #     expected_cols = len(wyckoff_line.split())
-    #     notes_line = None
-        
-    #     for line in lines:
-    #         tokens = line.split()
-    #         if len(tokens) == expected_cols:
-    #             notes_line = line
-    #             break
-        
-    #     # If we couldn't find a line with exact match, take the last non-header line
-    #     if not notes_line and lines:
-    #         # Filter out obvious header lines
-    #         data_lines = [line for line in lines if not line.lower().startswith('indecomposable') or len(line.split()) > 1]
-    #         if data_lines:
-    #             notes_line = data_lines[-1]
-    #         else:
-    #             notes_line = lines[-1]
-        
-    #     if not notes_line:
-    #         raise ValueError("Could not find notes data line")
-
-    #     # 5) Extract all k-point lines
-    #     kpoint_start_match = re.search(
-    #         r'([A-ZΓ]+:\([^)]+\).*)',
-    #         text, re.IGNORECASE | re.DOTALL
-    #     )
-    #     if not kpoint_start_match:
-    #         raise ValueError("Could not find k-point data")
-
-    #     kpoint_text = kpoint_start_match.group(1)
-    #     kpoint_pattern = r'([A-ZΓ]+):\(([^)]+)\)'
-    #     matches = list(re.finditer(kpoint_pattern, kpoint_text))
-
-    #     kpoint_lines = []
-    #     for idx, m in enumerate(matches):
-    #         kpoint_name = m.group(1)
-    #         kpoint_coords = m.group(2)
-    #         start_pos = m.end()
-    #         if idx + 1 < len(matches):
-    #             end_pos = matches[idx + 1].start()
-    #             irreps_txt = kpoint_text[start_pos:end_pos]
-    #         else:
-    #             irreps_txt = kpoint_text[start_pos:]
-    #         irreps = [token for token in irreps_txt.split() if token.strip()]
-    #         if irreps:
-    #             kpoint_lines.append(f"{kpoint_name}:({kpoint_coords}) {' '.join(irreps)}")
-
-    #     # Debug prints:
-    #     print(f"DEBUG: Wyckoff: {wyckoff_line}")
-    #     print(f"DEBUG: Orbital: {orbital_line}")
-    #     print(f"DEBUG: Notes: {notes_line}")
-    #     print(f"DEBUG: # of Wyckoff columns: {len(wyckoff_line.split())}")
-    #     print(f"DEBUG: # of Notes entries: {len(notes_line.split())}")
-    #     print(f"DEBUG: # of k-point lines: {len(kpoint_lines)}")
-
-    #     return wyckoff_line, orbital_line, notes_line, kpoint_lines
-
     
     def _insert_data(self, sg_number, wyckoff_entries, orbital_entries, notes_entries, kpoint_data):
         """
-        Ingest each column j:
-         - If column j is non-decomposable (all k-point cells[j] are str), insert one EBR
-         - If column j is decomposable (any cells[j] is a 2-tuple), split into two child EBRs
+        For each column j (0 <= j < len(wyckoff_entries)):
+         - If column j is not decomposable: insert one EBR + its irreps (as before).
+         - If column j is decomposable: insert one EBR but don't populate irreps.
         """
         cursor = self.conn.cursor()
 
@@ -642,13 +540,13 @@ class EBRDatabaseManager:
         cursor.execute("SELECT id FROM space_groups WHERE number = ?", (sg_number,))
         sg_id = cursor.fetchone()[0]
 
-        # 2) Delete any existing EBRs for this SG
+        # 2) Delete old EBRs (and their irreps) for this SG
         cursor.execute("DELETE FROM ebrs WHERE space_group_id = ?", (sg_id,))
         self.conn.commit()
 
         num_cols = len(wyckoff_entries)
         for j in range(num_cols):
-            # a) Parse Wyckoff entry, e.g. "2a(2/m)" → ("2a", "(2/m)")
+            # a) Parse wyckoff_entries[j]
             wyck_raw = wyckoff_entries[j]
             m = re.match(r"^(\d+\w)(\([^)]+\))$", wyck_raw)
             if m:
@@ -658,7 +556,7 @@ class EBRDatabaseManager:
                 wyckoff_letter = wyck_raw
                 site_symmetry  = ""
 
-            # b) Parse orbital entry, e.g. "Ag↑G(1)" or "AgAg↑G(4)"
+            # b) Parse orbital_entries[j]
             orb_raw = orbital_entries[j]
             orb_label, orb_mult = self.parse_orbital(orb_raw)
             if orb_mult > 1:
@@ -668,16 +566,10 @@ class EBRDatabaseManager:
                 single_val = orb_label
                 double_val = None
 
-            note = notes_entries[j].strip()
+            note_j = notes_entries[j].lower()  # should be either "decomposable" or "indecomposable"
 
-            # c) Check if column j is decomposable:
-            # i.e. if any kpoint_data[k][1][j] is a tuple
-            is_decomposable = any(
-                isinstance(cells[j], tuple) for (_, cells) in kpoint_data
-            )
-
-            if not is_decomposable:
-                # ---- Non-decomposable: insert exactly one EBR + its irreps ----
+            if note_j == "indecomposable":
+                # Insert exactly one EBR + its irreps (loop over kpoint_data[j] strings)
                 cursor.execute("""
                     INSERT INTO ebrs (
                       space_group_id,
@@ -687,41 +579,43 @@ class EBRDatabaseManager:
                       time_reversal,
                       single_index,
                       double_index,
-                      notes
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                      notes,
+                      branch1_irreps,
+                      branch2_irreps
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     sg_id,
                     wyckoff_letter,
                     site_symmetry,
                     orb_label,
-                    1,            # time_reversal = 1
+                    1,
                     single_val,
                     double_val,
-                    note
+                    note_j,          # typically "indecomposable"
+                    None,
+                    None
                 ))
                 self.conn.commit()
-                ebr_id_main = cursor.lastrowid
+                ebr_id = cursor.lastrowid
 
-                # Insert that EBR's irreps (each cells[j] is a plain string)
+                # Write all irreps exactly as strings, including any "⊕"
                 for (kp_label, cells) in kpoint_data:
-                    full_str = cells[j]       # guaranteed str
-                    mult     = self.parse_multiplicity(full_str)
-                    label    = self.parse_irrep_label(full_str)
-                    cursor.execute("""
-                        INSERT INTO irreps (
-                          ebr_id,
-                          k_point,
-                          irrep_label,
-                          multiplicity
-                        ) VALUES (?, ?, ?, ?)
-                    """, (ebr_id_main, kp_label, label, mult))
+                    if j < len(cells):  # Safety check
+                        full_str = cells[j]    # e.g. "C1+(1) ⊕ C2+(1)"
+                        mult = self.parse_multiplicity(full_str)
+                        label = self.parse_irrep_label(full_str)
+                        cursor.execute("""
+                            INSERT INTO irreps (
+                              ebr_id,
+                              k_point,
+                              irrep_label,
+                              multiplicity
+                            ) VALUES (?, ?, ?, ?)
+                        """, (ebr_id, kp_label, label, mult))
                 self.conn.commit()
 
-            else:
-                # ---- Decomposable: split into two child EBRs ----
-                branch1, branch2 = split_decomposable_column(j, kpoint_data)
-
-                # 1st child EBR
+            else:  # note_j == "decomposable"
+                # Insert one EBR row, but set branch1_irreps/branch2_irreps = NULL
                 cursor.execute("""
                     INSERT INTO ebrs (
                       space_group_id,
@@ -731,8 +625,10 @@ class EBRDatabaseManager:
                       time_reversal,
                       single_index,
                       double_index,
-                      notes
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                      notes,
+                      branch1_irreps,
+                      branch2_irreps
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     sg_id,
                     wyckoff_letter,
@@ -741,65 +637,30 @@ class EBRDatabaseManager:
                     1,
                     single_val,
                     double_val,
-                    note
+                    note_j,      # typically "decomposable"
+                    None,
+                    None
                 ))
                 self.conn.commit()
-                ebr_id_b1 = cursor.lastrowid
+                ebr_id = cursor.lastrowid
 
-                # Insert irreps for branch #1
-                for idx, (kp_label, cells) in enumerate(kpoint_data):
-                    full_str1 = branch1[idx]
-                    mult1     = self.parse_multiplicity(full_str1)
-                    label1    = self.parse_irrep_label(full_str1)
-                    cursor.execute("""
-                        INSERT INTO irreps (
-                          ebr_id,
-                          k_point,
-                          irrep_label,
-                          multiplicity
-                        ) VALUES (?, ?, ?, ?)
-                    """, (ebr_id_b1, kp_label, label1, mult1))
+                # For decomposable entries, still store the combined irrep representation
+                for (kp_label, cells) in kpoint_data:
+                    if j < len(cells):  # Safety check
+                        full_str = cells[j]  # still a single string, e.g. "C1+(1) ⊕ C2+(1)"
+                        mult = self.parse_multiplicity(full_str)
+                        label = self.parse_irrep_label(full_str)
+                        cursor.execute("""
+                            INSERT INTO irreps (
+                              ebr_id,
+                              k_point,
+                              irrep_label,
+                              multiplicity
+                            ) VALUES (?, ?, ?, ?)
+                        """, (ebr_id, kp_label, label, mult))
                 self.conn.commit()
-
-                # 2nd child EBR
-                cursor.execute("""
-                    INSERT INTO ebrs (
-                      space_group_id,
-                      wyckoff_letter,
-                      site_symmetry,
-                      orbital_label,
-                      time_reversal,
-                      single_index,
-                      double_index,
-                      notes
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    sg_id,
-                    wyckoff_letter,
-                    site_symmetry,
-                    orb_label,
-                    1,
-                    single_val,
-                    double_val,
-                    note
-                ))
-                self.conn.commit()
-                ebr_id_b2 = cursor.lastrowid
-
-                # Insert irreps for branch #2
-                for idx, (kp_label, cells) in enumerate(kpoint_data):
-                    full_str2 = branch2[idx]
-                    mult2     = self.parse_multiplicity(full_str2)
-                    label2    = self.parse_irrep_label(full_str2)
-                    cursor.execute("""
-                        INSERT INTO irreps (
-                          ebr_id,
-                          k_point,
-                          irrep_label,
-                          multiplicity
-                        ) VALUES (?, ?, ?, ?)
-                    """, (ebr_id_b2, kp_label, label2, mult2))
-                self.conn.commit()
+        
+        return num_cols
     
     def query_space_group(self, sg_number):
         """Query data for a specific space group."""
