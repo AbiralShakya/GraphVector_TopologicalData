@@ -286,6 +286,21 @@ class EBRDatabaseManager:
         
         return num_cols
     
+    def split_decomposable_column(j, kpoint_data):
+        # decomposable columns in bilbao bandrep nonmagnetic tqc are buttons leading to tables of branch 1 branch 2 data
+        branch1 = []
+        branch2 = []
+        for (kp_label, reps) in kpoint_data:
+            cell = reps[j]
+            if isinstance(cell, tuple):
+                branch1.append(cell[0].strip())
+                branch2.append(cell[1].strip())
+            else:
+                s = cell.strip()
+                branch1.append(s)
+                branch2.append(s)
+        return branch1, branch2
+    
     def _parse_file_content(self, raw_lines):
         """
         Parse file content (from a .txt) to extract Wyckoff, Orbital, notes, and k-points.
