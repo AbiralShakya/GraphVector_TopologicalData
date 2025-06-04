@@ -1,3 +1,5 @@
+# visualization for tqc nonmagnetic, output of PEBR_TR_nonmagnetic_query.py file
+
 import sqlite3
 
 def print_space_groups(conn):
