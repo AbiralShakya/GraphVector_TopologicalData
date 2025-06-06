@@ -1,3 +1,5 @@
+#important note ~ ebr ID 3675 (space group 3gmmm Eu spin up G), and also both 3fmmm, ID 3676, 3677, has 108 combos but only generated 100 combos for branch. in space group 191
+
 Wyckoff pos.
 1a(mmm)	1a(mmm)	1a(mmm)	1a(mmm)	1a(mmm)	1a(mmm)	1a(mmm)	1a(mmm)	1b(mmm)	1b(mmm)	1b(mmm)	1b(mmm)	1b(mmm)	1b(mmm)	1b(mmm)	1b(mmm)	1c(mmm)	1c(mmm)	1c(mmm)	1c(mmm)	1c(mmm)	1c(mmm)	1c(mmm)	1c(mmm)	1d(mmm)	1d(mmm)	1d(mmm)	1d(mmm)	1d(mmm)	1d(mmm)	1d(mmm)	1d(mmm)	1e(mmm)	1e(mmm)	1e(mmm)	1e(mmm)	1e(mmm)	1e(mmm)	1e(mmm)	1e(mmm)	1f(mmm)	1f(mmm)	1f(mmm)	1f(mmm)	1f(mmm)	1f(mmm)	1f(mmm)	1f(mmm)	1g(mmm)	1g(mmm)	1g(mmm)	1g(mmm)	1g(mmm)	1g(mmm)	1g(mmm)	1g(mmm)	1h(mmm)	1h(mmm)	1h(mmm)	1h(mmm)	1h(mmm)	1h(mmm)	1h(mmm)	1h(mmm)	1a(mmm)	1a(mmm)	1b(mmm)	1b(mmm)	1c(mmm)	1c(mmm)	1d(mmm)	1d(mmm)	1e(mmm)	1e(mmm)	1f(mmm)	1f(mmm)	1g(mmm)	1g(mmm)	1h(mmm)	1h(mmm)
 Band-Rep.

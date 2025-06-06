@@ -1,0 +1,3 @@
+magnetic space groups 
+
+pair wise siamese network probably for inverse graph generation

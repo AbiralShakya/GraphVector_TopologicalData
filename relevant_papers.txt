@@ -20,3 +20,6 @@ symmetry data vector clasified into one of five possible topological classess --
 
 https://arxiv.org/pdf/1706.08529 -- graph theory data for tqc
 https://www.nature.com/articles/nature23268#Sec16 -- OG tqc paper
+
+
+https://www.nature.com/articles/s41467-021-26241-8#Tab1 -- magnetic topological quantum checmistry
