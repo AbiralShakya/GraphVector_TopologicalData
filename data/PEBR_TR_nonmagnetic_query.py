@@ -1579,11 +1579,7 @@ def parse_kpoint_cells(irreps_txt):
     return cells
 
 class EBRDatabaseManager:
-    # ... (constructor, connect, close, create_tables, parsing helpers, validation, 
-    #      _parse_file_content, _parse_raw_text, branch management methods like 
-    #      get_decomposable_ebrs, add_ebr_decomposition_branch, etc. are assumed from previous full code) ...
-
-    def __init__(self, db_path="pebr_tr_nonmagnetic.db"):
+    def __init__(self, db_path="pebr_tr_nonmagnetic_rev3.db"):
         self.db_path = db_path
         self.conn = None
         self.connect()
@@ -1722,6 +1718,78 @@ class EBRDatabaseManager:
             missing = [p for p, v in [("Wyckoff pos.", wyckoff_line), ("Band-Rep.", orbital_line)] if not v]
             raise ValueError(f"Could not locate required sections in file: {', '.join(missing)}")
         return wyckoff_line, orbital_line, notes_line if notes_line else "", kpoint_lines
+    
+    def _parse_and_insert_from_text(self, sg_number, raw_text_data):
+        """Takes the structured text block and performs parsing and database insertion."""
+        lines = [line.strip() for line in raw_text_data.strip().split('\n') if line.strip()]
+        
+        sections = {}
+        current_header = None
+        header_pattern = re.compile(r'^(Wyckoff pos\.|Band-Rep\.|Decomposable)')
+        
+        # This logic correctly groups lines under their respective headers
+        for line in lines:
+            match = header_pattern.match(line)
+            if match:
+                current_header = match.group(1)
+                sections[current_header] = [line[len(current_header):].strip()]
+            elif re.match(r'^[A-ZΓ]+:', line):
+                current_header = "kpoints"
+                if current_header not in sections: sections[current_header] = []
+                sections[current_header].append(line)
+            elif current_header and current_header != "kpoints":
+                sections[current_header].append(line)
+
+        wyckoff_entries = " ".join(sections.get('Wyckoff pos.', [])).split()
+        orbital_entries = " ".join(sections.get('Band-Rep.', [])).split()
+        notes_entries = " ".join(sections.get('Decomposable', [])).split()
+        kpoint_lines = sections.get('kpoints', [])
+
+        if not wyckoff_entries or not orbital_entries:
+            raise ValueError("Failed to parse Wyckoff or Band-Rep lines from scraped text.")
+
+        num_cols = len(wyckoff_entries)
+
+        kpoint_data_final = []
+        for kp_line_str in kpoint_lines:
+            parts = kp_line_str.split(':', 1)
+            kp_label = parts[0].strip()
+            irreps_text = parts[1].strip() if len(parts) > 1 else ""
+            cells = parse_kpoint_cells(irreps_text)
+            if len(cells) != num_cols:
+                raise ValueError(f"Mismatch at k-point {kp_label}. Expected {num_cols} irrep columns, found {len(cells)} in '{irreps_text}'.")
+            kpoint_data_final.append((kp_label, cells))
+
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT id FROM space_groups WHERE number = ?", (sg_number,))
+        sg_row = cursor.fetchone()
+        sg_id = sg_row[0] if sg_row else cursor.execute("INSERT INTO space_groups(number) VALUES (?)", (sg_number,)).lastrowid
+        
+        cursor.execute("DELETE FROM ebrs WHERE space_group_id = ?", (sg_id,))
+        
+        for j in range(num_cols):
+            wyck_letter, site_sym = self.parse_wyckoff(wyckoff_entries[j])
+            orb_label, orb_mult = self.parse_orbital(orbital_entries[j])
+            note = notes_entries[j] if j < len(notes_entries) else "indecomposable"
+
+            cursor.execute("""
+                INSERT INTO ebrs (space_group_id, wyckoff_letter, site_symmetry, orbital_label, orbital_multiplicity, notes, time_reversal)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (sg_id, wyck_letter, site_sym, orb_label, orb_mult, note, 1))
+            ebr_id = cursor.lastrowid
+            
+            for (kp_label, cells) in kpoint_data_final:
+                full_irrep_str = cells[j]
+                mult = self.parse_multiplicity(full_irrep_str)
+                label_no_mult = self.parse_irrep_label(full_irrep_str)
+                cursor.execute("""
+                    INSERT INTO irreps (ebr_id, k_point, irrep_label, multiplicity)
+                    VALUES (?, ?, ?, ?)
+                """, (ebr_id, kp_label, label_no_mult, mult))
+        
+        self.conn.commit()
+        print(f"✅ Successfully ingested {num_cols} EBRs for SG {sg_number} into the database.")
+        return True
 
     def _parse_raw_text(self, raw_text): # Assumed from previous, ensure it's correct
         text = re.sub(r'\\\s*\n\s*', ' ', raw_text.strip())
