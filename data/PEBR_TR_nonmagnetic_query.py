@@ -1617,6 +1617,7 @@ class EBRDatabaseManager:
           wyckoff_letter TEXT    NOT NULL,
           site_symmetry  TEXT    NOT NULL,
           orbital_label  TEXT    NOT NULL,
+          orbital_multiplicity INTEGER NOT NULL DEFAULT 1,
           time_reversal  BOOLEAN NOT NULL DEFAULT 1,
           single_index   TEXT,
           double_index   TEXT,
@@ -1781,23 +1782,85 @@ class EBRDatabaseManager:
             sg_row = cursor.fetchone()
             if not sg_row: return []
             sg_id = sg_row[0]
-        cursor.execute("SELECT id, wyckoff_letter, site_symmetry, orbital_label, notes FROM ebrs WHERE space_group_id = ? AND lower(notes) = 'decomposable' ORDER BY id", (sg_id,))
+        # Fetch the new orbital_multiplicity column
+        cursor.execute("""
+            SELECT id, wyckoff_letter, site_symmetry, orbital_label, orbital_multiplicity, notes 
+            FROM ebrs 
+            WHERE space_group_id = ? AND lower(notes) = 'decomposable' 
+            ORDER BY id
+        """, (sg_id,))
         return cursor.fetchall()
+    
+    def _calculate_irrep_string_dimension(self, irrep_string): 
+        """Calculates the total dimension of a comma-separated irrep string."""
+        if not irrep_string or not irrep_string.strip():
+            return 0
+        
+        total_dimension = 0
+        irrep_parts = [part.strip() for part in irrep_string.split(',')]
+        
+        for part in irrep_parts:
+            # Check for leading multiplicity, e.g., "2 A1(1)"
+            match = re.match(r"(\d+)\s+(.*)", part)
+            if match:
+                leading_mult = int(match.group(1))
+                irrep_name = match.group(2)
+            else:
+                leading_mult = 1
+                irrep_name = part
 
-    def add_ebr_decomposition_branch(self, ebr_id, decomposition_index, branch1_str, branch2_str):
+            # Get dimension of the irrep itself, e.g., the (2) in "G(2)"
+            dim = self.parse_multiplicity(irrep_name)
+            if dim is None:
+                dim = 1 # Assume dimension is 1 if not specified (e.g., "A1")
+            
+            total_dimension += leading_mult * dim
+            
+        return total_dimension
+
+    def add_ebr_decomposition_branch(self, ebr_id, decomposition_index, branch1_str, branch2_str): 
+        """
+        Adds or replaces a decomposition branch after validating dimensions.
+        Raises ValueError if dimensions are inconsistent.
+        """
         cursor = self.conn.cursor()
+        
+        # 1. Get the parent EBR's dimension
+        cursor.execute("SELECT orbital_multiplicity FROM ebrs WHERE id = ?", (ebr_id,))
+        ebr_row = cursor.fetchone()
+        if not ebr_row:
+            raise ValueError(f"EBR with ID {ebr_id} not found.")
+        parent_dim = ebr_row[0]
+
+        # 2. Calculate the dimension of each branch from the irrep strings
+        dim_b1 = self._calculate_irrep_string_dimension(branch1_str)
+        dim_b2 = self._calculate_irrep_string_dimension(branch2_str)
+        
+        # 3. Validate: The dimension of each branch must equal the parent's dimension
+        if parent_dim != dim_b1:
+            raise ValueError(
+                f"Dimension mismatch for Branch 1. Parent dimension is {parent_dim}, "
+                f"but branch irreps sum to {dim_b1}."
+            )
+        if parent_dim != dim_b2:
+            raise ValueError(
+                f"Dimension mismatch for Branch 2. Parent dimension is {parent_dim}, "
+                f"but branch irreps sum to {dim_b2}."
+            )
+
+        # 4. If validation passes, insert or replace the data
         try:
-            cursor.execute("INSERT OR REPLACE INTO ebr_decomposition_branches (ebr_id, decomposition_index, branch1_irreps, branch2_irreps) VALUES (?, ?, ?, ?)", 
-                           (ebr_id, decomposition_index, branch1_str, branch2_str))
+            cursor.execute("""
+                INSERT OR REPLACE INTO ebr_decomposition_branches 
+                (ebr_id, decomposition_index, branch1_irreps, branch2_irreps) 
+                VALUES (?, ?, ?, ?)
+            """, (ebr_id, decomposition_index, branch1_str, branch2_str))
             self.conn.commit()
-            # Trigger should handle updated_at on ebrs if we decide to link it that way,
-            # but for now, this action doesn't directly modify the ebrs row itself.
-            # If an updated_at on ebrs is desired when a branch is added, it needs explicit update.
-            # For now, let's assume updated_at on ebrs is for its direct fields.
-            # cursor.execute("UPDATE ebrs SET updated_at = CURRENT_TIMESTAMP WHERE id = ?", (ebr_id,)) 
-            # self.conn.commit()
             return True
-        except sqlite3.Error as e: print(f"Error adding branch: {e}"); return False
+        except sqlite3.Error as e:
+            # This is a fallback; the main errors are now ValueErrors above
+            print(f"Error adding branch: {e}")
+            return False
 
     def get_ebr_decomposition_branches(self, ebr_id):
         cursor = self.conn.cursor()
@@ -1864,18 +1927,16 @@ class EBRDatabaseManager:
             orb_label, orb_mult = self.parse_orbital(orbital_entries[j])
             single_val, double_val = (None, orb_label) if orb_mult > 1 else (orb_label, None)
             
-            # Ensure note_j_status is available
-            note_j_status = "indecomposable" # Default
+            note_j_status = "indecomposable"
             if j < len(notes_final):
                 note_j_status = notes_final[j].lower()
-            # else: it remains 'indecomposable' if notes_final was shorter (should be handled by normalization above)
 
             cursor.execute("""
                 INSERT INTO ebrs (space_group_id, wyckoff_letter, site_symmetry, orbital_label, 
-                                  time_reversal, single_index, double_index, notes) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """, (sg_id, wyck_letter, site_sym, orb_label, 1, single_val, double_val, note_j_status))
-            ebr_id = cursor.lastrowid # Get ID of newly inserted EBR
+                                  orbital_multiplicity, time_reversal, single_index, double_index, notes) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (sg_id, wyck_letter, site_sym, orb_label, orb_mult, 1, single_val, double_val, note_j_status))
+            ebr_id = cursor.lastrowid
             
             inserted_ebr_info_list.append({
                 'ebr_id': ebr_id, 
@@ -2091,7 +2152,6 @@ class EBRDatabaseManager:
                 updated_count = 0
                 error_lines = []
 
-                # Optional: Ask to clear existing before bulk add
                 clear_existing_choice = input("  Clear all existing branches for this EBR before bulk adding? (y/n, default n): ").strip().lower()
                 if clear_existing_choice == 'y':
                     deleted_count = self.delete_all_ebr_decomposition_branches(ebr_id)
@@ -2312,12 +2372,18 @@ def interactive_mode():
                     continue
                 
                 print(f"\n--- Decomposable EBRs for SG {sg_num} ---")
-                ebr_map = {} # Maps display index (string) to the full EBR data tuple
+                ebr_map = {}
                 for i, ebr_data_tuple in enumerate(decomposable_ebrs):
                     display_idx_str = str(i + 1)
                     ebr_map[display_idx_str] = ebr_data_tuple 
-                    # ebr_data_tuple is (id, wyckoff_letter, site_symmetry, orbital_label, notes)
-                    print(f"  {display_idx_str}. EBR ID: {ebr_data_tuple[0]}, Wyckoff: {ebr_data_tuple[1]}{ebr_data_tuple[2]}, Orbital: {ebr_data_tuple[3]}")
+                    
+                    # MODIFIED DISPLAY LOGIC
+                    # ebr_data_tuple is (id, wl, ss, orbital_label, orbital_multiplicity, notes)
+                    label = ebr_data_tuple[3]
+                    mult = ebr_data_tuple[4]
+                    full_orbital_str = f"{label}({mult})" if mult > 1 else label
+                    
+                    print(f"  {display_idx_str}. EBR ID: {ebr_data_tuple[0]}, Wyckoff: {ebr_data_tuple[1]}{ebr_data_tuple[2]}, Orbital: {full_orbital_str}")
                 
                 ebr_choice_idx_str = input("Select EBR by number to manage branches: ").strip()
                 selected_ebr_tuple = ebr_map.get(ebr_choice_idx_str)
@@ -2327,9 +2393,12 @@ def interactive_mode():
                     continue
                 
                 selected_ebr_id = selected_ebr_tuple[0]
-                # Construct wyckoff_info and orbital_info from the tuple
-                wyck_info = f"{selected_ebr_tuple[1]}{selected_ebr_tuple[2]}" # wyckoff_letter + site_symmetry
-                orb_info = selected_ebr_tuple[3] # orbital_label
+                wyck_info = f"{selected_ebr_tuple[1]}{selected_ebr_tuple[2]}"
+                
+                # Reconstruct orb_info for the interactive prompt
+                orb_label = selected_ebr_tuple[3]
+                orb_mult = selected_ebr_tuple[4]
+                orb_info = f"{orb_label}({orb_mult})" if orb_mult > 1 else orb_label
 
                 db._manage_branches_interactively_for_ebr(selected_ebr_id, wyck_info, orb_info, called_from_ingest=False)
 
