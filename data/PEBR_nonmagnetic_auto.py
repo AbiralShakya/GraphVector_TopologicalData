@@ -15,6 +15,43 @@ from bs4 import BeautifulSoup
 # === PART 1: DATABASE MANAGER
 # === Your complete class for managing the SQLite DB, adapted for this script.
 # ==============================================================================
+def save_table_as_csv(self, sg_number, output_dir="table_data"):
+    """Save the extracted table data as a CSV file for inspection."""
+    import csv
+    import os
+    
+    table_data = self.extract_table_data_only(sg_number)
+    if not table_data:
+        return False
+    
+    os.makedirs(output_dir, exist_ok=True)
+    csv_path = os.path.join(output_dir, f"sg_{sg_number}_table.csv")
+    
+    with open(csv_path, 'w', newline='', encoding='utf-8') as csvfile:
+        writer = csv.writer(csvfile)
+        
+        # Write header information
+        writer.writerow(['Space Group', sg_number])
+        writer.writerow([])  # Empty row
+        
+        # Write Wyckoff positions
+        writer.writerow(['Wyckoff pos.'] + table_data['wyckoff_positions'])
+        
+        # Write band representations
+        writer.writerow(['Band-Rep.'] + table_data['band_representations'])
+        
+        # Write decomposability
+        writer.writerow(['Decomposable'] + table_data['decomposability'])
+        
+        writer.writerow([])  # Empty row
+        
+        # Write k-point data
+        writer.writerow(['K-point', 'Irreps'])
+        for kpoint, irreps in table_data['kpoints'].items():
+            writer.writerow([kpoint] + irreps)
+    
+    print(f"  -> ✅ Table data saved to {csv_path}")
+    return True
 
 def parse_kpoint_cells(irreps_txt):
     """Parses a string containing multiple k-point irrep cells into a list of individual cell strings."""
@@ -190,60 +227,211 @@ class BCS_Scraper:
         self.db = database_manager
         print("BCS Scraper initialized.")
 
+    def extract_table_data_only(self, sg_number):
+        """Alternative method that extracts only the raw table data as a dictionary."""
+        print(f"\n--- Extracting table data for Space Group: {sg_number} ---")
+        target_url = "https://www.cryst.ehu.es/cgi-bin/cryst/programs/bandrep.pl"
+
+        try:
+            self.driver.get(target_url)
+            wait = WebDriverWait(self.driver, 20)
+            
+            # Input space group and submit
+            sg_input_box = wait.until(EC.visibility_of_element_located((By.NAME, 'super')))
+            sg_input_box.clear()
+            sg_input_box.send_keys(str(sg_number))
+            
+            elementary_tr_button = wait.until(EC.element_to_be_clickable((By.NAME, 'elementaryTR')))
+            elementary_tr_button.click()
+            
+            # Wait for results
+            wait.until(EC.presence_of_element_located((By.XPATH, "//td[contains(text(), 'Wyckoff pos')]")))
+            time.sleep(3)
+            
+            soup = BeautifulSoup(self.driver.page_source, 'html.parser')
+            
+            # Find the main data table
+            data_table = None
+            tables = soup.find_all('table')
+            
+            for table in tables:
+                if table.find('td', string=lambda text: text and 'Wyckoff pos' in text):
+                    data_table = table
+                    break
+            
+            if not data_table:
+                print("  -> ❌ ERROR: Could not find the main data table")
+                return None
+            
+            # Extract raw table data as a structured dictionary
+            rows = data_table.find_all('tr')
+            table_dict = {
+                'space_group': sg_number,
+                'wyckoff_positions': [],
+                'band_representations': [],
+                'decomposability': [],
+                'kpoints': {}
+            }
+            
+            # Parse each row
+            for row in rows:
+                cells = row.find_all(['td', 'th'])
+                if not cells:
+                    continue
+                    
+                first_cell = cells[0].get_text(strip=True).lower()
+                row_data = [cell.get_text(strip=True) for cell in cells[1:]]
+                
+                if 'wyckoff' in first_cell:
+                    table_dict['wyckoff_positions'] = row_data
+                elif 'band-rep' in first_cell:
+                    table_dict['band_representations'] = row_data
+                elif 'decomposable' in first_cell or 'indecomposable' in first_cell:
+                    table_dict['decomposability'] = row_data
+                elif ':' in cells[0].get_text(strip=True):
+                    # This is a k-point row
+                    kpoint_label = cells[0].get_text(strip=True)
+                    irreps = [cell.get_text(strip=True) for cell in cells[1:]]
+                    table_dict['kpoints'][kpoint_label] = irreps
+            
+            print(f"  -> ✅ Successfully extracted table data for SG {sg_number}")
+            print(f"  -> Found {len(table_dict['wyckoff_positions'])} EBR columns")
+            print(f"  -> Found {len(table_dict['kpoints'])} k-points")
+            
+            return table_dict
+        
+        except Exception as e:
+            print(f"  -> ❌ Error extracting table data for SG {sg_number}: {e}")
+            return None
+
+    def get_ebr_data_for_sg_improved(self, sg_number):
+        """Improved version that uses the structured table extraction."""
+        table_data = self.extract_table_data_only(sg_number)
+        
+        if not table_data:
+            return False
+        
+        # Convert the structured data back to the text format your parser expects
+        text_lines = []
+        
+        if table_data['wyckoff_positions']:
+            text_lines.append("Wyckoff pos. " + " ".join(table_data['wyckoff_positions']))
+        
+        if table_data['band_representations']:
+            text_lines.append("Band-Rep. " + " ".join(table_data['band_representations']))
+        
+        if table_data['decomposability']:
+            text_lines.append("Decomposable " + " ".join(table_data['decomposability']))
+        
+        # Add k-point data
+        for kpoint, irreps in table_data['kpoints'].items():
+            irreps_text = " ".join(irreps)
+            text_lines.append(f"{kpoint}: {irreps_text}")
+        
+        formatted_text_data = "\n".join(text_lines)
+        
+        print(f"  -> Formatted data preview:\n{formatted_text_data[:300]}...")
+        
+        # Use your existing database insertion method
+        try:
+            self.db._parse_and_insert_from_text(sg_number, formatted_text_data)
+            return True
+        except Exception as e:
+            print(f"  -> ❌ Database insertion failed for SG {sg_number}: {e}")
+            return False
+
+
     def _parse_html_table_to_text(self, table_soup):
         """Converts the BeautifulSoup table object into a structured text block."""
         if not table_soup: 
             return ""
         
-        text_block = []
         rows = table_soup.find_all('tr')
-        
         if len(rows) < 4:
             print(f"  -> Warning: Table has only {len(rows)} rows, expected at least 4")
             return ""
         
-        # Find the header rows by looking for specific text content
-        wyckoff_row = None
-        bandrep_row = None
-        decomp_row = None
-        
-        for i, row in enumerate(rows):
+        # Extract all table data first
+        table_data = []
+        for row in rows:
             cells = row.find_all(['td', 'th'])
-            if cells:
-                first_cell_text = cells[0].get_text(strip=True)
-                if 'Wyckoff pos' in first_cell_text:
-                    wyckoff_row = row
-                elif 'Band-Rep' in first_cell_text:
-                    bandrep_row = row
-                elif 'Decomposable' in first_cell_text or 'Indecomposable' in first_cell_text:
-                    decomp_row = row
-                    break  # Data rows start after this
+            row_data = []
+            for cell in cells:
+                # Clean the cell text and handle special formatting
+                cell_text = cell.get_text(strip=True)
+                # Handle overlined text (represented as <font style="text-decoration:overline;">)
+                if cell.find('font', {'style': lambda x: x and 'overline' in x}):
+                    # Replace overlined characters with a bar notation
+                    overlined_parts = cell.find_all('font', {'style': lambda x: x and 'overline' in x})
+                    for part in overlined_parts:
+                        original_text = part.get_text(strip=True)
+                        cell_text = cell_text.replace(original_text, f"̄{original_text}")
+                row_data.append(cell_text)
+            if row_data:  # Only add non-empty rows
+                table_data.append(row_data)
         
-        if not all([wyckoff_row, bandrep_row, decomp_row]):
-            print("  -> Error: Could not find all required header rows")
+        if not table_data:
             return ""
         
-        # Extract header data
-        text_block.append("Wyckoff pos. " + " ".join(td.get_text(strip=True) for td in wyckoff_row.find_all(['td', 'th'])[1:]))
-        text_block.append("Band-Rep. " + " ".join(td.get_text(strip=True) for td in bandrep_row.find_all(['td', 'th'])[1:]))
-        text_block.append("Decomposable " + " ".join(td.get_text(strip=True) for td in decomp_row.find_all(['td', 'th'])[1:]))
+        # Identify the structure based on the first column content
+        wyckoff_row_idx = None
+        bandrep_row_idx = None
+        decomp_row_idx = None
+        kpoint_start_idx = None
+        
+        for i, row_data in enumerate(table_data):
+            if row_data and len(row_data) > 0:
+                first_cell = row_data[0].lower()
+                if 'wyckoff' in first_cell:
+                    wyckoff_row_idx = i
+                elif 'band-rep' in first_cell or 'band rep' in first_cell:
+                    bandrep_row_idx = i
+                elif 'decomposable' in first_cell or 'indecomposable' in first_cell:
+                    decomp_row_idx = i
+                    kpoint_start_idx = i + 1  # k-points start after decomposable row
+                    break
+        
+        if None in [wyckoff_row_idx, bandrep_row_idx, decomp_row_idx]:
+            print("  -> Error: Could not identify all required header rows")
+            return ""
+        
+        # Extract the number of EBR columns (excluding the first label column)
+        num_ebr_cols = len(table_data[wyckoff_row_idx]) - 1
+        
+        # Build the structured text output
+        text_lines = []
+        
+        # Wyckoff positions (skip first column which is the label)
+        wyckoff_data = table_data[wyckoff_row_idx][1:]
+        text_lines.append("Wyckoff pos. " + " ".join(wyckoff_data))
+        
+        # Band representations
+        bandrep_data = table_data[bandrep_row_idx][1:]
+        text_lines.append("Band-Rep. " + " ".join(bandrep_data))
+        
+        # Decomposable/Indecomposable
+        decomp_data = table_data[decomp_row_idx][1:]
+        text_lines.append("Decomposable " + " ".join(decomp_data))
+        
+        # K-point data
+        if kpoint_start_idx and kpoint_start_idx < len(table_data):
+            kpoint_lines = []
+            for i in range(kpoint_start_idx, len(table_data)):
+                row_data = table_data[i]
+                if len(row_data) >= 2:  # Must have k-point label and at least one irrep
+                    k_label = row_data[0]
+                    irreps = row_data[1:num_ebr_cols+1]  # Only take the expected number of columns
+                    
+                    # Skip empty or malformed k-point entries
+                    if k_label and any(irrep.strip() for irrep in irreps):
+                        irreps_text = " ".join(irreps)
+                        kpoint_lines.append(f"{k_label}: {irreps_text}")
+            
+            if kpoint_lines:
+                text_lines.extend(kpoint_lines)
+        
+        return "\n".join(text_lines)
 
-        # Extract k-point data (rows after decomposable row)
-        decomp_index = rows.index(decomp_row)
-        kpoint_lines = []
-        
-        for row in rows[decomp_index + 1:]:
-            cells = row.find_all(['td', 'th'])
-            if len(cells) > 1:
-                k_point_info = cells[0].get_text(strip=True)
-                if k_point_info and not k_point_info.isspace():  # Skip empty rows
-                    irreps = " ".join(td.get_text(strip=True) for td in cells[1:])
-                    kpoint_lines.append(f"{k_point_info}: {irreps}")
-        
-        if kpoint_lines:
-            text_block.append("\n".join(kpoint_lines))
-        
-        return "\n\n".join(text_block)
 
     def get_ebr_data_for_sg(self, sg_number):
         print(f"\n--- Processing Space Group: {sg_number} ---")
@@ -254,28 +442,15 @@ class BCS_Scraper:
             wait = WebDriverWait(self.driver, 20)
             
             print("  -> Inputting space group number...")
-            # Find the input field for space group number
-            sg_input_box = wait.until(EC.visibility_of_element_located((By.NAME, 'gnum')))
+            # Find the input field for space group number (name="super")
+            sg_input_box = wait.until(EC.visibility_of_element_located((By.NAME, 'super')))
             sg_input_box.clear()
             sg_input_box.send_keys(str(sg_number))
 
-            print("  -> Clicking 'choose it' button...")
-            # Find and click the 'choose it' button
-            choose_it_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@value='choose it']")))
-            choose_it_button.click()
-            
-            # Wait for the page to load the space group options
-            time.sleep(2)
-
-            print("  -> Selecting 'Elementary TR' option...")
-            # Look for the radio button for Elementary TR (option 2)
-            elementary_tr_radio = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@name='what' and @value='2']")))
-            self.driver.execute_script("arguments[0].click();", elementary_tr_radio)
-            
-            print("  -> Submitting form...")
-            # Find and click the submit button
-            submit_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@type='submit']")))
-            submit_button.click()
+            print("  -> Clicking 'Elementary TR' button...")
+            # Find and click the Elementary TR button directly (name="elementaryTR")
+            elementary_tr_button = wait.until(EC.element_to_be_clickable((By.NAME, 'elementaryTR')))
+            elementary_tr_button.click()
 
             print("  -> Waiting for results table to load...")
             # Wait for the results page to load - look for the specific table structure
@@ -328,7 +503,8 @@ class BCS_Scraper:
     def run_scraper_for_range(self, start_sg, end_sg):
         print(f"Starting scraper for space groups {start_sg} to {end_sg}.")
         for sg in range(start_sg, end_sg + 1):
-            self.get_ebr_data_for_sg(sg)
+            #self.get_ebr_data_for_sg(sg)
+            self.get_ebr_data_for_sg_improved(sg)
             print(f"--- Pausing for 5 seconds before next request ---")
             time.sleep(5)
         self.close_driver()
