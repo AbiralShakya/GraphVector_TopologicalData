@@ -34,3 +34,635 @@ U:(1/2,0,1/2) U1+(2) U1-(2) U1+(2) U1-(2) U1-(2) U1+(2) U1-(2) U1+(2) U1-(2) U1+
 X:(1/2,0,0) X1(2) X1(2) X2(2) X2(2) X1(2) X1(2) X2(2) X2(2) X1(2) X1(2) X2(2) X2(2) X1(2) X1(2) X2(2) X2(2) X1(2)⊕X2(2) X1(2)⊕X2(2) X3X4(4) X3X4(4) X3X4(4) X3X4(4) X3X4(4) X3X4(4) X3X4(4) X3X4(4) -
 Y:(0,1/2,0) Y1+(1)⊕Y3+(1) Y1-(1)⊕Y3-(1) Y2+(1)⊕Y4+(1) Y2-(1)⊕Y4-(1) Y1+(1)⊕Y3+(1) Y1-(1)⊕Y3-(1) Y2+(1)⊕Y4+(1) Y2-(1)⊕Y4-(1) Y2-(1)⊕Y4-(1) Y2+(1)⊕Y4+(1) Y1-(1)⊕Y3-(1) Y1+(1)⊕Y3+(1) Y2-(1)⊕Y4-(1) Y2+(1)⊕Y4+(1) Y1-(1)⊕Y3-(1) Y1+(1)⊕Y3+(1) Y1+(1)⊕Y1-(1)⊕Y4+(1)⊕Y4-(1) Y2+(1)⊕Y2-(1)⊕Y3+(1)⊕Y3-(1) 2Y5(2) 2Y6(2) 2Y5(2) 2Y6(2) 2Y6(2) 2Y5(2) 2Y6(2) 2Y5(2) -
 Z:(0,0,1/2) Z1(2) Z2(2) Z2(2) Z1(2) Z1(2) Z2(2) Z2(2) Z1(2) Z1(2) Z2(2) Z2(2) Z1(2) Z1(2) Z2(2) Z2(2) Z1(2) Z1(2)⊕Z2(2) Z1(2)⊕Z2(2) Z3Z4(4) Z3Z4(4) Z3Z4(4) Z3Z4(4) Z3Z4(4) Z3Z4(4) Z3Z4(4) Z3Z4(4) -
+
+
+sg 59 
+Wyckoff pos.
+2a(mm2) 2a(mm2) 2a(mm2) 2a(mm2) 2b(mm2) 2b(mm2) 2b(mm2) 2b(mm2) 4c(1) 4c(1) 4d(1) 4d(1) 2a(mm2) 2b(mm2) 4c(1) 4c(1) 4d(1) 4d(1)
+Band-Rep.
+A1↑G(2) A2↑G(2) B1↑G(2) B2↑G(2) A1↑G(2) A2↑G(2) B1↑G(2) B2↑G(2) Ag↑G(4) Au↑G(4) Ag↑G(4) Au↑G(4) E↑G(4) E↑G(4) AgAg↑G(8) AuAu↑G(8) AgAg↑G(8) AuAu↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Decomposable Decomposable Decomposable Decomposable
+Γ:(0,0,0) Γ1+(1)⊕Γ2-(1) Γ1-(1)⊕Γ2+(1) Γ3-(1)⊕Γ4+(1) Γ3+(1)⊕Γ4-(1) Γ1+(1)⊕Γ2-(1) Γ1-(1)⊕Γ2+(1) Γ3-(1)⊕Γ4+(1) Γ3+(1)⊕Γ4-(1) Γ1+(1)⊕Γ2+(1)⊕Γ3+(1)⊕Γ4+(1) Γ1-(1)⊕Γ2-(1)⊕Γ3-(1)⊕Γ4-(1) Γ1+(1)⊕Γ2+(1)⊕Γ3+(1)⊕Γ4+(1) Γ1-(1)⊕Γ2-(1)⊕Γ3-(1)⊕Γ4-(1) Γ5(2)⊕Γ6(2) Γ5(2)⊕Γ6(2) - - - -
+R:(1/2,1/2,1/2) R1(2) R1(2) R2(2) R2(2) R2(2) R2(2) R1(2) R1(2) R1(2)⊕R2(2) R1(2)⊕R2(2) R1(2)⊕R2(2) R1(2)⊕R2(2) R3R4(4) R3R4(4) - - - -
+S:(1/2,1/2,0) S1(2) S1(2) S2(2) S2(2) S2(2) S2(2) S1(2) S1(2) S1(2)⊕S2(2) S1(2)⊕S2(2) S1(2)⊕S2(2) S1(2)⊕S2(2) S3S4(4) S3S4(4) - - - -
+T:(0,1/2,1/2) T1(2) T2(2) T2(2) T1(2) T1(2) T2(2) T2(2) T1(2) T1(2)⊕T2(2) T1(2)⊕T2(2) T1(2)⊕T2(2) T1(2)⊕T2(2) T3T4(4) T3T4(4) - - - -
+U:(1/2,0,1/2) U1(2) U2(2) U1(2) U2(2) U1(2) U2(2) U1(2) U2(2) U1(2)⊕U2(2) U1(2)⊕U2(2) U1(2)⊕U2(2) U1(2)⊕U2(2) U3U4(4) U3U4(4) - - - -
+X:(1/2,0,0) X1(2) X2(2) X1(2) X2(2) X1(2) X2(2) X1(2) X2(2) X1(2)⊕X2(2) X1(2)⊕X2(2) X1(2)⊕X2(2) X1(2)⊕X2(2) X3X4(4) X3X4(4) - - - -
+Y:(0,1/2,0) Y1(2) Y2(2) Y2(2) Y1(2) Y1(2) Y2(2) Y2(2) Y1(2) Y1(2)⊕Y2(2) Y1(2)⊕Y2(2) Y1(2)⊕Y2(2) Y1(2)⊕Y2(2) Y3Y4(4) Y3Y4(4) - - - -
+Z:(0,0,1/2) Z1+(1)⊕Z2-(1) Z1-(1)⊕Z2+(1) Z3-(1)⊕Z4+(1) Z3+(1)⊕Z4-(1) Z1+(1)⊕Z2-(1) Z1-(1)⊕Z2+(1) Z3-(1)⊕Z4+(1) Z3+(1)⊕Z4-(1) Z1+(1)⊕Z2+(1)⊕Z3+(1)⊕Z4+(1) Z1-(1)⊕Z2-(1)⊕Z3-(1)⊕Z4-(1) Z1-(1)⊕Z2-(1)⊕Z3-(1)⊕Z4-(1) Z1+(1)⊕Z2+(1)⊕Z3+(1)⊕Z4+(1) Z5(2)⊕Z6(2) Z5(2)⊕Z6(2) - - - -
+
+
+for sg 63
+Wyckoff pos.
+4a(2/m) 4a(2/m) 4a(2/m) 4a(2/m) 4b(2/m) 4b(2/m) 4b(2/m) 4b(2/m) 4c(mm2) 4c(mm2) 4c(mm2) 4c(mm2) 8d(1) 8d(1) 4a(2/m) 4a(2/m) 4b(2/m) 4b(2/m) 4c(mm2) 8d(1) 8d(1)
+Band-Rep.
+Ag↑G(2) Au↑G(2) Bg↑G(2) Bu↑G(2) Ag↑G(2) Au↑G(2) Bg↑G(2) Bu↑G(2) A1↑G(2) A2↑G(2) B1↑G(2) B2↑G(2) Ag↑G(4) Au↑G(4) 1Eg2Eg↑G(4) 1Eu2Eu↑G(4) 1Eg2Eg↑G(4) 1Eu2Eu↑G(4) E↑G(4) AgAg↑G(8) AuAu↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Indecomposable Decomposable
+Γ:(0,0,0) Γ1+(1)⊕Γ3+(1) Γ1-(1)⊕Γ3-(1) Γ2+(1)⊕Γ4+(1) Γ2-(1)⊕Γ4-(1) Γ1+(1)⊕Γ3+(1) Γ1-(1)⊕Γ3-(1) Γ2+(1)⊕Γ4+(1) Γ2-(1)⊕Γ4-(1) Γ1+(1)⊕Γ4-(1) Γ1-(1)⊕Γ4+(1) Γ2+(1)⊕Γ3-(1) Γ2-(1)⊕Γ3+(1) Γ1+(1)⊕Γ2+(1)⊕Γ3+(1)⊕Γ4+(1) Γ1-(1)⊕Γ2-(1)⊕Γ3-(1)⊕Γ4-(1) 2Γ5(2) 2Γ6(2) 2Γ5(2) 2Γ6(2) Γ5(2)⊕Γ6(2) 4Γ5(2) 4Γ6(2)
+R:(1/2,1/2,1/2) R1+(2) R1-(2) R1+(2) R1-(2) R1-(2) R1+(2) R1-(2) R1+(2) R1+(2) R1-(2) R1+(2) R1-(2) R1-(2) R1+(2) R1-(2) R1+(2) R1+(2)⊕R1-(2) R1+(2)⊕R1-(2) R2R4(2)⊕R3R5(2) R6R8(2)⊕R7R9(2) R2R4(2)⊕R3R5(2)⊕R6R8(2)⊕R7R9(2)
+S:(1/2,1/2,0) S1(2) S1(2) S2(2) S2(2) S1(2) S1(2) S2(2) S2(2) S2(2) S2(2) S1(2) S1(2) S2(2) S2(2) S1(2) S1(2) S1(2)⊕S2(2) S1(2)⊕S2(2) S3S4(4) S3S4(4) 2S3S4(4)
+T:(0,1/2,1/2) T1(2) T2(2) T2(2) T1(2) T1(2) T2(2) T2(2) T1(2) T1(2) T2(2) T2(2) T1(2) T1(2) T2(2) T2(2) T1(2) T1(2)⊕T2(2) T1(2)⊕T2(2) T3T4(4) T3T4(4) 2T3T4(4)
+U:(1/2,0,1/2) U1+(2) U1-(2) U1+(2) U1-(2) U1-(2) U1+(2) U1-(2) U1+(2) U1-(2) U1+(2) U1-(2) U1+(2) U1+(2) U1-(2) U1+(2) U1-(2) U1+(2)⊕U1-(2) U1+(2)⊕U1-(2) U2U4(2)⊕U3U5(2) U6U8(2)⊕U7R9(2) U2U4(2)⊕U3U5(2)⊕U6U8(2)⊕U7R9(2)
+X:(1/2,0,0) X1(2) X1(2) X2(2) X2(2) X1(2) X1(2) X2(2) X2(2) X1(2) X1(2) X2(2) X2(2) X1(2) X1(2) X2(2) X2(2) X1(2)⊕X2(2) X1(2)⊕X2(2) X3X4(4) X3X4(4) 2X3X4(4)
+Y:(0,1/2,0) Y1+(1)⊕Y3+(1) Y1-(1)⊕Y3-(1) Y2+(1)⊕Y4+(1) Y2-(1)⊕Y4-(1) Y1+(1)⊕Y3+(1) Y1-(1)⊕Y3-(1) Y2+(1)⊕Y4+(1) Y2-(1)⊕Y4-(1) Y2-(1)⊕Y4-(1) Y2+(1)⊕Y4+(1) Y1-(1)⊕Y3-(1) Y1+(1)⊕Y3+(1) Y1-(1)⊕Y2-(1)⊕Y3-(1)⊕Y4-(1) Y1+(1)⊕Y2+(1)⊕Y3+(1)⊕Y4+(1) 2Y5(2) 2Y6(2) 2Y5(2) 2Y6(2) Y5(2)⊕Y6(2) 4Y6(2) 4Y5(2)
+Z:(0,0,1/2) Z1(2) Z2(2) Z2(2) Z1(2) Z1(2) Z2(2) Z2(2) Z1(2) Z1(2) Z2(2) Z2(2) Z1(2) Z1(2)⊕Z2(2) Z1(2)⊕Z2(2) Z3Z4(4) Z3Z4(4) Z3Z4(4) Z3Z4(4) Z3Z4(4) 2Z3Z4(4) 2Z3Z4(4)
+
+
+Wyckoff pos.
+4a(2/m)	4a(2/m)	4a(2/m)	4a(2/m)	4b(2/m)	4b(2/m)	4b(2/m)	4b(2/m)	4c(mm2)	4c(mm2)	4c(mm2)	4c(mm2)	8d(1)	8d(1)	4a(2/m)	4a(2/m)	4b(2/m)	4b(2/m)	4c(mm2)	8d(1)	8d(1)
+Band-Rep.
+Ag↑G(2)	Au↑G(2)	Bg↑G(2)	Bu↑G(2)	Ag↑G(2)	Au↑G(2)	Bg↑G(2)	Bu↑G(2)	A1↑G(2)	A2↑G(2)	B1↑G(2)	B2↑G(2)	Ag↑G(4)	Au↑G(4)	1Eg2Eg↑G(4)	1Eu2Eu↑G(4)	1Eg2Eg↑G(4)	1Eu2Eu↑G(4)	E↑G(4)	AgAg↑G(8)	AuAu↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable Decomposable
+Γ:(0,0,0)	  Γ1+(1) ⊕ Γ3+(1)  	  Γ1-(1) ⊕ Γ3-(1)  	  Γ2+(1) ⊕ Γ4+(1)  	  Γ2-(1) ⊕ Γ4-(1)  	  Γ1+(1) ⊕ Γ3+(1)  	  Γ1-(1) ⊕ Γ3-(1)  	  Γ2+(1) ⊕ Γ4+(1)  	  Γ2-(1) ⊕ Γ4-(1)  	  Γ1+(1) ⊕ Γ4-(1)  	  Γ1-(1) ⊕ Γ4+(1)  	  Γ2+(1) ⊕ Γ3-(1)  	  Γ2-(1) ⊕ Γ3+(1)  	  Γ1+(1) ⊕ Γ2+(1) ⊕ Γ3+(1) ⊕ Γ4+(1)  	  Γ1-(1) ⊕ Γ2-(1) ⊕ Γ3-(1) ⊕ Γ4-(1)  	  2 Γ5(2)  	  2 Γ6(2)  	  2 Γ5(2)  	  2 Γ6(2)  	  Γ5(2) ⊕ Γ6(2)  	  4 Γ5(2)  	  4 Γ6(2)  
+T:(1,0,1/2)	  T1(2)  	  T2(2)  	  T2(2)  	  T1(2)  	  T1(2)  	  T2(2)  	  T2(2)  	  T1(2)  	  T1(2)  	  T2(2)  	  T2(2)  	  T1(2)  	  T1(2) ⊕ T2(2)  	  T1(2) ⊕ T2(2)  	  T3T4(4)  	  T3T4(4)  	  T3T4(4)  	  T3T4(4)  	  T3T4(4)  	  2 T3T4(4)  	  2 T3T4(4)  
+Y:(1,0,0)	  Y1+(1) ⊕ Y3+(1)  	  Y1-(1) ⊕ Y3-(1)  	  Y2+(1) ⊕ Y4+(1)  	  Y2-(1) ⊕ Y4-(1)  	  Y1+(1) ⊕ Y3+(1)  	  Y1-(1) ⊕ Y3-(1)  	  Y2+(1) ⊕ Y4+(1)  	  Y2-(1) ⊕ Y4-(1)  	  Y1+(1) ⊕ Y4-(1)  	  Y1-(1) ⊕ Y4+(1)  	  Y2+(1) ⊕ Y3-(1)  	  Y2-(1) ⊕ Y3+(1)  	  Y1-(1) ⊕ Y2-(1) ⊕ Y3-(1) ⊕ Y4-(1)  	  Y1+(1) ⊕ Y2+(1) ⊕ Y3+(1) ⊕ Y4+(1)  	  2 Y5(2)  	  2 Y6(2)  	  2 Y5(2)  	  2 Y6(2)  	  Y5(2) ⊕ Y6(2)  	  4 Y6(2)  	  4 Y5(2)  
+Z:(0,0,1/2)	  Z1(2)  	  Z2(2)  	  Z2(2)  	  Z1(2)  	  Z1(2)  	  Z2(2)  	  Z2(2)  	  Z1(2)  	  Z1(2)  	  Z2(2)  	  Z2(2)  	  Z1(2)  	  Z1(2) ⊕ Z2(2)  	  Z1(2) ⊕ Z2(2)  	  Z3Z4(4)  	  Z3Z4(4)  	  Z3Z4(4)  	  Z3Z4(4)  	  Z3Z4(4)  	  2 Z3Z4(4)  	  2 Z3Z4(4)  
+R:(1/2,1/2,1/2)	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  2 R1(2)  	  2 R1(2)  	  R2R2(4)  	  R2R2(4)  	  R2R2(4)  	  R2R2(4)  	  R2R2(4)  	  2 R2R2(4)  	  2 R2R2(4)  
+S:(1/2,1/2,0)	  S1+(1) ⊕ S2+(1)  	  S1-(1) ⊕ S2-(1)  	  S1+(1) ⊕ S2+(1)  	  S1-(1) ⊕ S2-(1)  	  S1-(1) ⊕ S2-(1)  	  S1+(1) ⊕ S2+(1)  	  S1-(1) ⊕ S2-(1)  	  S1+(1) ⊕ S2+(1)  	  S1+(1) ⊕ S2-(1)  	  S1-(1) ⊕ S2+(1)  	  S1+(1) ⊕ S2-(1)  	  S1-(1) ⊕ S2+(1)  	  S1+(1) ⊕ S1-(1) ⊕ S2+(1) ⊕ S2-(1)  	  S1+(1) ⊕ S1-(1) ⊕ S2+(1) ⊕ S2-(1)  	  2 S3S4(2)  	  2 S5S6(2)  	  2 S5S6(2)  	  2 S3S4(2)  	  S3S4(2) ⊕ S5S6(2)  	  2 S3S4(2) ⊕ 2 S5S6(2)  	  2 S3S4(2) ⊕ 2 S5S6(2)  
+
+
+
+
+Wyckoff pos.
+4a(2/m)	4a(2/m)	4a(2/m)	4a(2/m)	4b(2/m)	4b(2/m)	4b(2/m)	4b(2/m)	8c(1)	8c(1)	8e(2)	8e(2)	4a(2/m)	4a(2/m)	4b(2/m)	4b(2/m)	8c(1)	8c(1)	8e(2)
+Band-Rep.
+Ag↑G(2)	Au↑G(2)	Bg↑G(2)	Bu↑G(2)	Ag↑G(2)	Au↑G(2)	Bg↑G(2)	Bu↑G(2)	Ag↑G(4)	Au↑G(4)	A↑G(4)	B↑G(4)	1Eg2Eg↑G(4)	1Eu2Eu↑G(4)	1Eg2Eg↑G(4)	1Eu2Eu↑G(4)	AgAg↑G(8)	AuAu↑G(8)	1E2E↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	
+
+
+sg 64
+Wyckoff pos.
+4a(2/m)	4a(2/m)	4a(2/m)	4a(2/m)	4b(2/m)	4b(2/m)	4b(2/m)	4b(2/m)	8c(1)	8c(1)	8e(2)	8e(2)	4a(2/m)	4a(2/m)	4b(2/m)	4b(2/m)	8c(1)	8c(1)	8e(2)
+Band-Rep.
+Ag↑G(2)	Au↑G(2)	Bg↑G(2)	Bu↑G(2)	Ag↑G(2)	Au↑G(2)	Bg↑G(2)	Bu↑G(2)	Ag↑G(4)	Au↑G(4)	A↑G(4)	B↑G(4)	1Eg2Eg↑G(4)	1Eu2Eu↑G(4)	1Eg2Eg↑G(4)	1Eu2Eu↑G(4)	AgAg↑G(8)	AuAu↑G(8)	1E2E↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable Decomposable Decomposable
+Γ:(0,0,0)	  Γ1+(1) ⊕ Γ3+(1)  	  Γ1-(1) ⊕ Γ3-(1)  	  Γ2+(1) ⊕ Γ4+(1)  	  Γ2-(1) ⊕ Γ4-(1)  	  Γ1+(1) ⊕ Γ3+(1)  	  Γ1-(1) ⊕ Γ3-(1)  	  Γ2+(1) ⊕ Γ4+(1)  	  Γ2-(1) ⊕ Γ4-(1)  	  Γ1+(1) ⊕ Γ2+(1) ⊕ Γ3+(1) ⊕ Γ4+(1)  	  Γ1-(1) ⊕ Γ2-(1) ⊕ Γ3-(1) ⊕ Γ4-(1)  	  Γ1+(1) ⊕ Γ1-(1) ⊕ Γ4+(1) ⊕ Γ4-(1)  	  Γ2+(1) ⊕ Γ2-(1) ⊕ Γ3+(1) ⊕ Γ3-(1)  	  2 Γ5(2)  	  2 Γ6(2)  	  2 Γ5(2)  	  2 Γ6(2)  	  4 Γ5(2)  	  4 Γ6(2)  	  2 Γ5(2) ⊕ 2 Γ6(2)  
+T:(1,0,1/2)	  T1(2)  	  T2(2)  	  T2(2)  	  T1(2)  	  T1(2)  	  T2(2)  	  T2(2)  	  T1(2)  	  T1(2) ⊕ T2(2)  	  T1(2) ⊕ T2(2)  	  T1(2) ⊕ T2(2)  	  T1(2) ⊕ T2(2)  	  T3T4(4)  	  T3T4(4)  	  T3T4(4)  	  T3T4(4)  	  2 T3T4(4)  	  2 T3T4(4)  	  2 T3T4(4)  
+Y:(1,0,0)	  Y1+(1) ⊕ Y3+(1)  	  Y1-(1) ⊕ Y3-(1)  	  Y2+(1) ⊕ Y4+(1)  	  Y2-(1) ⊕ Y4-(1)  	  Y1+(1) ⊕ Y3+(1)  	  Y1-(1) ⊕ Y3-(1)  	  Y2+(1) ⊕ Y4+(1)  	  Y2-(1) ⊕ Y4-(1)  	  Y1-(1) ⊕ Y2-(1) ⊕ Y3-(1) ⊕ Y4-(1)  	  Y1+(1) ⊕ Y2+(1) ⊕ Y3+(1) ⊕ Y4+(1)  	  Y1+(1) ⊕ Y1-(1) ⊕ Y4+(1) ⊕ Y4-(1)  	  Y2+(1) ⊕ Y2-(1) ⊕ Y3+(1) ⊕ Y3-(1)  	  2 Y5(2)  	  2 Y6(2)  	  2 Y5(2)  	  2 Y6(2)  	  4 Y6(2)  	  4 Y5(2)  	  2 Y5(2) ⊕ 2 Y6(2)  
+Z:(0,0,1/2)	  Z1(2)  	  Z2(2)  	  Z2(2)  	  Z1(2)  	  Z1(2)  	  Z2(2)  	  Z2(2)  	  Z1(2)  	  Z1(2) ⊕ Z2(2)  	  Z1(2) ⊕ Z2(2)  	  Z1(2) ⊕ Z2(2)  	  Z1(2) ⊕ Z2(2)  	  Z3Z4(4)  	  Z3Z4(4)  	  Z3Z4(4)  	  Z3Z4(4)  	  2 Z3Z4(4)  	  2 Z3Z4(4)  	  2 Z3Z4(4)  
+R:(1/2,1/2,1/2)	  R1+R2+(2)  	  R1-R2-(2)  	  R1+R2+(2)  	  R1-R2-(2)  	  R1-R2-(2)  	  R1+R2+(2)  	  R1-R2-(2)  	  R1+R2+(2)  	  R1+R2+(2) ⊕ R1-R2-(2)  	  R1+R2+(2) ⊕ R1-R2-(2)  	  R1+R2+(2) ⊕ R1-R2-(2)  	  R1+R2+(2) ⊕ R1-R2-(2)  	  R3R3(2) ⊕ R4R4(2)  	  R5R5(2) ⊕ R6R6(2)  	  R5R5(2) ⊕ R6R6(2)  	  R3R3(2) ⊕ R4R4(2)  	  R3R3(2) ⊕ R4R4(2) ⊕ R5R5(2) ⊕ R6R6(2)  	  R3R3(2) ⊕ R4R4(2) ⊕ R5R5(2) ⊕ R6R6(2)  	  R3R3(2) ⊕ R4R4(2) ⊕ R5R5(2) ⊕ R6R6(2)  
+S:(1/2,1/2,0)	  S1(2)  	  S1(2)  	  S1(2)  	  S1(2)  	  S1(2)  	  S1(2)  	  S1(2)  	  S1(2)  	  2 S1(2)  	  2 S1(2)  	  2 S1(2)  	  2 S1(2)  	  S2S2(4)  	  S2S2(4)  	  S2S2(4)  	  S2S2(4)  	  2 S2S2(4)  	  2 S2S2(4)  	  2 S2S2(4)  
+
+
+
+
+sg 65
+
+Wyckoff pos.
+2a(mmm)	2a(mmm)	2a(mmm)	2a(mmm)	2a(mmm)	2a(mmm)	2a(mmm)	2a(mmm)	2b(mmm)	2b(mmm)	2b(mmm)	2b(mmm)	2b(mmm)	2b(mmm)	2b(mmm)	2b(mmm)	2c(mmm)	2c(mmm)	2c(mmm)	2c(mmm)	2c(mmm)	2c(mmm)	2c(mmm)	2c(mmm)	2d(mmm)	2d(mmm)	2d(mmm)	2d(mmm)	2d(mmm)	2d(mmm)	2d(mmm)	2d(mmm)	4e(2/m)	4e(2/m)	4e(2/m)	4e(2/m)	4f(2/m)	4f(2/m)	4f(2/m)	4f(2/m)	2a(mmm)	2a(mmm)	2b(mmm)	2b(mmm)	2c(mmm)	2c(mmm)	2d(mmm)	2d(mmm)	4e(2/m)	4e(2/m)	4f(2/m)	4f(2/m)
+Band-Rep.
+Ag↑G(1)	Au↑G(1)	B1g↑G(1)	B1u↑G(1)	B2g↑G(1)	B2u↑G(1)	B3g↑G(1)	B3u↑G(1)	Ag↑G(1)	Au↑G(1)	B1g↑G(1)	B1u↑G(1)	B2g↑G(1)	B2u↑G(1)	B3g↑G(1)	B3u↑G(1)	Ag↑G(1)	Au↑G(1)	B1g↑G(1)	B1u↑G(1)	B2g↑G(1)	B2u↑G(1)	B3g↑G(1)	B3u↑G(1)	Ag↑G(1)	Au↑G(1)	B1g↑G(1)	B1u↑G(1)	B2g↑G(1)	B2u↑G(1)	B3g↑G(1)	B3u↑G(1)	Ag↑G(2)	Au↑G(2)	Bg↑G(2)	Bu↑G(2)	Ag↑G(2)	Au↑G(2)	Bg↑G(2)	Bu↑G(2)	Eg↑G(2)	Eu↑G(2)	Eg↑G(2)	Eu↑G(2)	Eg↑G(2)	Eu↑G(2)	Eg↑G(2)	Eu↑G(2)	1Eg2Eg↑G(4)	1Eu2Eu↑G(4)	1Eg2Eg↑G(4)	1Eu2Eu↑G(4)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable Decomposable Decomposable Decomposable Decomposable	
+Γ:(0,0,0)	  Γ1+(1)  	  Γ1-(1)  	  Γ2+(1)  	  Γ2-(1)  	  Γ4+(1)  	  Γ4-(1)  	  Γ3+(1)  	  Γ3-(1)  	  Γ1+(1)  	  Γ1-(1)  	  Γ2+(1)  	  Γ2-(1)  	  Γ4+(1)  	  Γ4-(1)  	  Γ3+(1)  	  Γ3-(1)  	  Γ1+(1)  	  Γ1-(1)  	  Γ2+(1)  	  Γ2-(1)  	  Γ4+(1)  	  Γ4-(1)  	  Γ3+(1)  	  Γ3-(1)  	  Γ1+(1)  	  Γ1-(1)  	  Γ2+(1)  	  Γ2-(1)  	  Γ4+(1)  	  Γ4-(1)  	  Γ3+(1)  	  Γ3-(1)  	  Γ1+(1) ⊕ Γ2+(1)  	  Γ1-(1) ⊕ Γ2-(1)  	  Γ3+(1) ⊕ Γ4+(1)  	  Γ3-(1) ⊕ Γ4-(1)  	  Γ1+(1) ⊕ Γ2+(1)  	  Γ1-(1) ⊕ Γ2-(1)  	  Γ3+(1) ⊕ Γ4+(1)  	  Γ3-(1) ⊕ Γ4-(1)  	  Γ5(2)  	  Γ6(2)  	  Γ5(2)  	  Γ6(2)  	  Γ5(2)  	  Γ6(2)  	  Γ5(2)  	  Γ6(2)  	  2 Γ5(2)  	  2 Γ6(2)  	  2 Γ5(2)  	  2 Γ6(2)  
+T:(1,0,1/2)	  T1+(1)  	  T1-(1)  	  T2+(1)  	  T2-(1)  	  T4+(1)  	  T4-(1)  	  T3+(1)  	  T3-(1)  	  T1+(1)  	  T1-(1)  	  T2+(1)  	  T2-(1)  	  T4+(1)  	  T4-(1)  	  T3+(1)  	  T3-(1)  	  T2-(1)  	  T2+(1)  	  T1-(1)  	  T1+(1)  	  T3-(1)  	  T3+(1)  	  T4-(1)  	  T4+(1)  	  T2-(1)  	  T2+(1)  	  T1-(1)  	  T1+(1)  	  T3-(1)  	  T3+(1)  	  T4-(1)  	  T4+(1)  	  T3-(1) ⊕ T4-(1)  	  T3+(1) ⊕ T4+(1)  	  T1-(1) ⊕ T2-(1)  	  T1+(1) ⊕ T2+(1)  	  T3+(1) ⊕ T4+(1)  	  T3-(1) ⊕ T4-(1)  	  T1+(1) ⊕ T2+(1)  	  T1-(1) ⊕ T2-(1)  	  T5(2)  	  T6(2)  	  T5(2)  	  T6(2)  	  T6(2)  	  T5(2)  	  T6(2)  	  T5(2)  	  2 T6(2)  	  2 T5(2)  	  2 T5(2)  	  2 T6(2)  
+Y:(1,0,0)	  Y1+(1)  	  Y1-(1)  	  Y2+(1)  	  Y2-(1)  	  Y4+(1)  	  Y4-(1)  	  Y3+(1)  	  Y3-(1)  	  Y1+(1)  	  Y1-(1)  	  Y2+(1)  	  Y2-(1)  	  Y4+(1)  	  Y4-(1)  	  Y3+(1)  	  Y3-(1)  	  Y1+(1)  	  Y1-(1)  	  Y2+(1)  	  Y2-(1)  	  Y4+(1)  	  Y4-(1)  	  Y3+(1)  	  Y3-(1)  	  Y1+(1)  	  Y1-(1)  	  Y2+(1)  	  Y2-(1)  	  Y4+(1)  	  Y4-(1)  	  Y3+(1)  	  Y3-(1)  	  Y3-(1) ⊕ Y4-(1)  	  Y3+(1) ⊕ Y4+(1)  	  Y1-(1) ⊕ Y2-(1)  	  Y1+(1) ⊕ Y2+(1)  	  Y3-(1) ⊕ Y4-(1)  	  Y3+(1) ⊕ Y4+(1)  	  Y1-(1) ⊕ Y2-(1)  	  Y1+(1) ⊕ Y2+(1)  	  Y5(2)  	  Y6(2)  	  Y5(2)  	  Y6(2)  	  Y5(2)  	  Y6(2)  	  Y5(2)  	  Y6(2)  	  2 Y6(2)  	  2 Y5(2)  	  2 Y6(2)  	  2 Y5(2)  
+Z:(0,0,1/2)	  Z1+(1)  	  Z1-(1)  	  Z2+(1)  	  Z2-(1)  	  Z4+(1)  	  Z4-(1)  	  Z3+(1)  	  Z3-(1)  	  Z1+(1)  	  Z1-(1)  	  Z2+(1)  	  Z2-(1)  	  Z4+(1)  	  Z4-(1)  	  Z3+(1)  	  Z3-(1)  	  Z2-(1)  	  Z2+(1)  	  Z1-(1)  	  Z1+(1)  	  Z3-(1)  	  Z3+(1)  	  Z4-(1)  	  Z4+(1)  	  Z2-(1)  	  Z2+(1)  	  Z1-(1)  	  Z1+(1)  	  Z3-(1)  	  Z3+(1)  	  Z4-(1)  	  Z4+(1)  	  Z1+(1) ⊕ Z2+(1)  	  Z1-(1) ⊕ Z2-(1)  	  Z3+(1) ⊕ Z4+(1)  	  Z3-(1) ⊕ Z4-(1)  	  Z1-(1) ⊕ Z2-(1)  	  Z1+(1) ⊕ Z2+(1)  	  Z3-(1) ⊕ Z4-(1)  	  Z3+(1) ⊕ Z4+(1)  	  Z5(2)  	  Z6(2)  	  Z5(2)  	  Z6(2)  	  Z6(2)  	  Z5(2)  	  Z6(2)  	  Z5(2)  	  2 Z5(2)  	  2 Z6(2)  	  2 Z6(2)  	  2 Z5(2)  
+R:(1/2,1/2,1/2)	  R1+(1)  	  R1-(1)  	  R1+(1)  	  R1-(1)  	  R2+(1)  	  R2-(1)  	  R2+(1)  	  R2-(1)  	  R2-(1)  	  R2+(1)  	  R2-(1)  	  R2+(1)  	  R1-(1)  	  R1+(1)  	  R1-(1)  	  R1+(1)  	  R2+(1)  	  R2-(1)  	  R2+(1)  	  R2-(1)  	  R1+(1)  	  R1-(1)  	  R1+(1)  	  R1-(1)  	  R1-(1)  	  R1+(1)  	  R1-(1)  	  R1+(1)  	  R2-(1)  	  R2+(1)  	  R2-(1)  	  R2+(1)  	  R1+(1) ⊕ R2-(1)  	  R1-(1) ⊕ R2+(1)  	  R1-(1) ⊕ R2+(1)  	  R1+(1) ⊕ R2-(1)  	  R1-(1) ⊕ R2+(1)  	  R1+(1) ⊕ R2-(1)  	  R1+(1) ⊕ R2-(1)  	  R1-(1) ⊕ R2+(1)  	  R3R4(2)  	  R5R6(2)  	  R5R6(2)  	  R3R4(2)  	  R3R4(2)  	  R5R6(2)  	  R5R6(2)  	  R3R4(2)  	  R3R4(2) ⊕ R5R6(2)  	  R3R4(2) ⊕ R5R6(2)  	  R3R4(2) ⊕ R5R6(2)  	  R3R4(2) ⊕ R5R6(2)  
+S:(1/2,1/2,0)	  S1+(1)  	  S1-(1)  	  S1+(1)  	  S1-(1)  	  S2+(1)  	  S2-(1)  	  S2+(1)  	  S2-(1)  	  S2-(1)  	  S2+(1)  	  S2-(1)  	  S2+(1)  	  S1-(1)  	  S1+(1)  	  S1-(1)  	  S1+(1)  	  S2-(1)  	  S2+(1)  	  S2-(1)  	  S2+(1)  	  S1-(1)  	  S1+(1)  	  S1-(1)  	  S1+(1)  	  S1+(1)  	  S1-(1)  	  S1+(1)  	  S1-(1)  	  S2+(1)  	  S2-(1)  	  S2+(1)  	  S2-(1)  	  S1+(1) ⊕ S2-(1)  	  S1-(1) ⊕ S2+(1)  	  S1-(1) ⊕ S2+(1)  	  S1+(1) ⊕ S2-(1)  	  S1+(1) ⊕ S2-(1)  	  S1-(1) ⊕ S2+(1)  	  S1-(1) ⊕ S2+(1)  	  S1+(1) ⊕ S2-(1)  	  S3S4(2)  	  S5S6(2)  	  S5S6(2)  	  S3S4(2)  	  S5S6(2)  	  S3S4(2)  	  S3S4(2)  	  S5S6(2)  	  S3S4(2) ⊕ S5S6(2)  	  S3S4(2) ⊕ S5S6(2)  	  S3S4(2) ⊕ S5S6(2)  	  S3S4(2) ⊕ S5S6(2)  
+
+
+sg 68
+Wyckoff pos.
+4a(222)	4a(222)	4a(222)	4a(222)	4b(222)	4b(222)	4b(222)	4b(222)	8c(1)	8c(1)	8d(1)	8d(1)	8h(2)	8h(2)	4a(222)	4b(222)	8c(1)	8c(1)	8d(1)	8d(1)	8h(2)
+Band-Rep.
+A↑G(2)	B1↑G(2)	B2↑G(2)	B3↑G(2)	A↑G(2)	B1↑G(2)	B2↑G(2)	B3↑G(2)	Ag↑G(4)	Au↑G(4)	Ag↑G(4)	Au↑G(4)	A↑G(4)	B↑G(4)	E↑G(4)	E↑G(4)	AgAg↑G(8)	AuAu↑G(8)	AgAg↑G(8)	AuAu↑G(8)	1E2E↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable Decomposable Decomposable Decomposable Decomposable
+Γ:(0,0,0)	  Γ1+(1) ⊕ Γ1-(1)  	  Γ2+(1) ⊕ Γ2-(1)  	  Γ4+(1) ⊕ Γ4-(1)  	  Γ3+(1) ⊕ Γ3-(1)  	  Γ1+(1) ⊕ Γ1-(1)  	  Γ2+(1) ⊕ Γ2-(1)  	  Γ4+(1) ⊕ Γ4-(1)  	  Γ3+(1) ⊕ Γ3-(1)  	  Γ1+(1) ⊕ Γ2+(1) ⊕ Γ3+(1) ⊕ Γ4+(1)  	  Γ1-(1) ⊕ Γ2-(1) ⊕ Γ3-(1) ⊕ Γ4-(1)  	  Γ1+(1) ⊕ Γ2+(1) ⊕ Γ3+(1) ⊕ Γ4+(1)  	  Γ1-(1) ⊕ Γ2-(1) ⊕ Γ3-(1) ⊕ Γ4-(1)  	  Γ1+(1) ⊕ Γ1-(1) ⊕ Γ2+(1) ⊕ Γ2-(1)  	  Γ3+(1) ⊕ Γ3-(1) ⊕ Γ4+(1) ⊕ Γ4-(1)  	  Γ5(2) ⊕ Γ6(2)  	  Γ5(2) ⊕ Γ6(2)  	  4 Γ5(2)  	  4 Γ6(2)  	  4 Γ5(2)  	  4 Γ6(2)  	  2 Γ5(2) ⊕ 2 Γ6(2)  
+T:(1,0,1/2)	  T1(2)  	  T1(2)  	  T2(2)  	  T2(2)  	  T1(2)  	  T1(2)  	  T2(2)  	  T2(2)  	  T1(2) ⊕ T2(2)  	  T1(2) ⊕ T2(2)  	  T1(2) ⊕ T2(2)  	  T1(2) ⊕ T2(2)  	  2 T2(2)  	  2 T1(2)  	  T3T4(4)  	  T3T4(4)  	  2 T3T4(4)  	  2 T3T4(4)  	  2 T3T4(4)  	  2 T3T4(4)  	  2 T3T4(4)  
+Y:(1,0,0)	  Y1+(1) ⊕ Y1-(1)  	  Y2+(1) ⊕ Y2-(1)  	  Y4+(1) ⊕ Y4-(1)  	  Y3+(1) ⊕ Y3-(1)  	  Y1+(1) ⊕ Y1-(1)  	  Y2+(1) ⊕ Y2-(1)  	  Y4+(1) ⊕ Y4-(1)  	  Y3+(1) ⊕ Y3-(1)  	  Y1+(1) ⊕ Y2+(1) ⊕ Y3+(1) ⊕ Y4+(1)  	  Y1-(1) ⊕ Y2-(1) ⊕ Y3-(1) ⊕ Y4-(1)  	  Y1-(1) ⊕ Y2-(1) ⊕ Y3-(1) ⊕ Y4-(1)  	  Y1+(1) ⊕ Y2+(1) ⊕ Y3+(1) ⊕ Y4+(1)  	  Y3+(1) ⊕ Y3-(1) ⊕ Y4+(1) ⊕ Y4-(1)  	  Y1+(1) ⊕ Y1-(1) ⊕ Y2+(1) ⊕ Y2-(1)  	  Y5(2) ⊕ Y6(2)  	  Y5(2) ⊕ Y6(2)  	  4 Y6(2)  	  4 Y5(2)  	  4 Y5(2)  	  4 Y6(2)  	  2 Y5(2) ⊕ 2 Y6(2)  
+Z:(0,0,1/2)	  Z1(2)  	  Z1(2)  	  Z2(2)  	  Z2(2)  	  Z1(2)  	  Z1(2)  	  Z2(2)  	  Z2(2)  	  Z1(2) ⊕ Z2(2)  	  Z1(2) ⊕ Z2(2)  	  Z1(2) ⊕ Z2(2)  	  Z1(2) ⊕ Z2(2)  	  2 Z1(2)  	  2 Z2(2)  	  Z3Z4(4)  	  Z3Z4(4)  	  2 Z3Z4(4)  	  2 Z3Z4(4)  	  2 Z3Z4(4)  	  2 Z3Z4(4)  	  2 Z3Z4(4)  
+R:(1/2,1/2,1/2)	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  2 R1(2)  	  2 R1(2)  	  2 R1(2)  	  2 R1(2)  	  2 R1(2)  	  2 R1(2)  	  R2R2(4)  	  R2R2(4)  	  2 R2R2(4)  	  2 R2R2(4)  	  2 R2R2(4)  	  2 R2R2(4)  	  2 R2R2(4)  
+S:(1/2,1/2,0)	  S1(2)  	  S1(2)  	  S1(2)  	  S1(2)  	  S1(2)  	  S1(2)  	  S1(2)  	  S1(2)  	  2 S1(2)  	  2 S1(2)  	  2 S1(2)  	  2 S1(2)  	  2 S1(2)  	  2 S1(2)  	  S2S2(4)  	  S2S2(4)  	  2 S2S2(4)  	  2 S2S2(4)  	  2 S2S2(4)  	  2 S2S2(4)  	  2 S2S2(4)  
+
+sg 69
+Wyckoff pos.
+4a(mmm)	4a(mmm)	4a(mmm)	4a(mmm)	4a(mmm)	4a(mmm)	4a(mmm)	4a(mmm)	4b(mmm)	4b(mmm)	4b(mmm)	4b(mmm)	4b(mmm)	4b(mmm)	4b(mmm)	4b(mmm)	8c(2/m)	8c(2/m)	8c(2/m)	8c(2/m)	8d(2/m)	8d(2/m)	8d(2/m)	8d(2/m)	8e(2/m)	8e(2/m)	8e(2/m)	8e(2/m)	8f(222)	8f(222)	8f(222)	8f(222)	4a(mmm)	4a(mmm)	4b(mmm)	4b(mmm)	8c(2/m)	8c(2/m)	8d(2/m)	8d(2/m)	8e(2/m)	8e(2/m)	8f(222)
+Band-Rep.
+Ag↑G(1)	Au↑G(1)	B1g↑G(1)	B1u↑G(1)	B2g↑G(1)	B2u↑G(1)	B3g↑G(1)	B3u↑G(1)	Ag↑G(1)	Au↑G(1)	B1g↑G(1)	B1u↑G(1)	B2g↑G(1)	B2u↑G(1)	B3g↑G(1)	B3u↑G(1)	Ag↑G(2)	Au↑G(2)	Bg↑G(2)	Bu↑G(2)	Ag↑G(2)	Au↑G(2)	Bg↑G(2)	Bu↑G(2)	Ag↑G(2)	Au↑G(2)	Bg↑G(2)	Bu↑G(2)	A↑G(2)	B1↑G(2)	B2↑G(2)	B3↑G(2)	Eg↑G(2)	Eu↑G(2)	Eg↑G(2)	Eu↑G(2)	1Eg2Eg↑G(4)	1Eu2Eu↑G(4)	1Eg2Eg↑G(4)	1Eu2Eu↑G(4)	1Eg2Eg↑G(4)	1Eu2Eu↑G(4)	E↑G(4)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable  Decomposable  Decomposable  Decomposable  Decomposable Decomposable Decomposable
+Γ:(0,0,0)	  Γ1+(1)  	  Γ1-(1)  	  Γ2+(1)  	  Γ2-(1)  	  Γ4+(1)  	  Γ4-(1)  	  Γ3+(1)  	  Γ3-(1)  	  Γ1+(1)  	  Γ1-(1)  	  Γ2+(1)  	  Γ2-(1)  	  Γ4+(1)  	  Γ4-(1)  	  Γ3+(1)  	  Γ3-(1)  	  Γ1+(1) ⊕ Γ3+(1)  	  Γ1-(1) ⊕ Γ3-(1)  	  Γ2+(1) ⊕ Γ4+(1)  	  Γ2-(1) ⊕ Γ4-(1)  	  Γ1+(1) ⊕ Γ4+(1)  	  Γ1-(1) ⊕ Γ4-(1)  	  Γ2+(1) ⊕ Γ3+(1)  	  Γ2-(1) ⊕ Γ3-(1)  	  Γ1+(1) ⊕ Γ2+(1)  	  Γ1-(1) ⊕ Γ2-(1)  	  Γ3+(1) ⊕ Γ4+(1)  	  Γ3-(1) ⊕ Γ4-(1)  	  Γ1+(1) ⊕ Γ1-(1)  	  Γ2+(1) ⊕ Γ2-(1)  	  Γ4+(1) ⊕ Γ4-(1)  	  Γ3+(1) ⊕ Γ3-(1)  	  Γ5(2)  	  Γ6(2)  	  Γ5(2)  	  Γ6(2)  	  2 Γ5(2)  	  2 Γ6(2)  	  2 Γ5(2)  	  2 Γ6(2)  	  2 Γ5(2)  	  2 Γ6(2)  	  Γ5(2) ⊕ Γ6(2)  
+T:(1,0,0)	  T1+(1)  	  T1-(1)  	  T2+(1)  	  T2-(1)  	  T4+(1)  	  T4-(1)  	  T3+(1)  	  T3-(1)  	  T1+(1)  	  T1-(1)  	  T2+(1)  	  T2-(1)  	  T4+(1)  	  T4-(1)  	  T3+(1)  	  T3-(1)  	  T1+(1) ⊕ T3+(1)  	  T1-(1) ⊕ T3-(1)  	  T2+(1) ⊕ T4+(1)  	  T2-(1) ⊕ T4-(1)  	  T2-(1) ⊕ T3-(1)  	  T2+(1) ⊕ T3+(1)  	  T1-(1) ⊕ T4-(1)  	  T1+(1) ⊕ T4+(1)  	  T3-(1) ⊕ T4-(1)  	  T3+(1) ⊕ T4+(1)  	  T1-(1) ⊕ T2-(1)  	  T1+(1) ⊕ T2+(1)  	  T3+(1) ⊕ T3-(1)  	  T4+(1) ⊕ T4-(1)  	  T2+(1) ⊕ T2-(1)  	  T1+(1) ⊕ T1-(1)  	  T5(2)  	  T6(2)  	  T5(2)  	  T6(2)  	  2 T5(2)  	  2 T6(2)  	  2 T6(2)  	  2 T5(2)  	  2 T6(2)  	  2 T5(2)  	  T5(2) ⊕ T6(2)  
+Y:(0,1,0)	  Y1+(1)  	  Y1-(1)  	  Y2+(1)  	  Y2-(1)  	  Y4+(1)  	  Y4-(1)  	  Y3+(1)  	  Y3-(1)  	  Y1+(1)  	  Y1-(1)  	  Y2+(1)  	  Y2-(1)  	  Y4+(1)  	  Y4-(1)  	  Y3+(1)  	  Y3-(1)  	  Y2-(1) ⊕ Y4-(1)  	  Y2+(1) ⊕ Y4+(1)  	  Y1-(1) ⊕ Y3-(1)  	  Y1+(1) ⊕ Y3+(1)  	  Y1+(1) ⊕ Y4+(1)  	  Y1-(1) ⊕ Y4-(1)  	  Y2+(1) ⊕ Y3+(1)  	  Y2-(1) ⊕ Y3-(1)  	  Y3-(1) ⊕ Y4-(1)  	  Y3+(1) ⊕ Y4+(1)  	  Y1-(1) ⊕ Y2-(1)  	  Y1+(1) ⊕ Y2+(1)  	  Y4+(1) ⊕ Y4-(1)  	  Y3+(1) ⊕ Y3-(1)  	  Y1+(1) ⊕ Y1-(1)  	  Y2+(1) ⊕ Y2-(1)  	  Y5(2)  	  Y6(2)  	  Y5(2)  	  Y6(2)  	  2 Y6(2)  	  2 Y5(2)  	  2 Y5(2)  	  2 Y6(2)  	  2 Y6(2)  	  2 Y5(2)  	  Y5(2) ⊕ Y6(2)  
+Z:(0,0,1)	  Z1+(1)  	  Z1-(1)  	  Z2+(1)  	  Z2-(1)  	  Z4+(1)  	  Z4-(1)  	  Z3+(1)  	  Z3-(1)  	  Z1+(1)  	  Z1-(1)  	  Z2+(1)  	  Z2-(1)  	  Z4+(1)  	  Z4-(1)  	  Z3+(1)  	  Z3-(1)  	  Z2-(1) ⊕ Z4-(1)  	  Z2+(1) ⊕ Z4+(1)  	  Z1-(1) ⊕ Z3-(1)  	  Z1+(1) ⊕ Z3+(1)  	  Z2-(1) ⊕ Z3-(1)  	  Z2+(1) ⊕ Z3+(1)  	  Z1-(1) ⊕ Z4-(1)  	  Z1+(1) ⊕ Z4+(1)  	  Z1+(1) ⊕ Z2+(1)  	  Z1-(1) ⊕ Z2-(1)  	  Z3+(1) ⊕ Z4+(1)  	  Z3-(1) ⊕ Z4-(1)  	  Z2+(1) ⊕ Z2-(1)  	  Z1+(1) ⊕ Z1-(1)  	  Z3+(1) ⊕ Z3-(1)  	  Z4+(1) ⊕ Z4-(1)  	  Z5(2)  	  Z6(2)  	  Z5(2)  	  Z6(2)  	  2 Z6(2)  	  2 Z5(2)  	  2 Z6(2)  	  2 Z5(2)  	  2 Z5(2)  	  2 Z6(2)  	  Z5(2) ⊕ Z6(2)  
+L:(1/2,1/2,1/2)	  L1+(1)  	  L1-(1)  	  L1+(1)  	  L1-(1)  	  L1+(1)  	  L1-(1)  	  L1+(1)  	  L1-(1)  	  L1-(1)  	  L1+(1)  	  L1-(1)  	  L1+(1)  	  L1-(1)  	  L1+(1)  	  L1-(1)  	  L1+(1)  	  L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ L1-(1)  	  L3L3(2)  	  L2L2(2)  	  L2L2(2)  	  L3L3(2)  	  L2L2(2) ⊕ L3L3(2)  	  L2L2(2) ⊕ L3L3(2)  	  L2L2(2) ⊕ L3L3(2)  	  L2L2(2) ⊕ L3L3(2)  	  L2L2(2) ⊕ L3L3(2)  	  L2L2(2) ⊕ L3L3(2)  	  L2L2(2) ⊕ L3L3(2)  
+
+
+
+sg 70
+Wyckoff pos.
+8a(222)	8a(222)	8a(222)	8a(222)	8b(222)	8b(222)	8b(222)	8b(222)	16c(1)	16c(1)	16d(1)	16d(1)	8a(222)	8b(222)	16c(1)	16c(1)	16d(1)	16d(1)
+Band-Rep.
+A↑G(2)	B1↑G(2)	B2↑G(2)	B3↑G(2)	A↑G(2)	B1↑G(2)	B2↑G(2)	B3↑G(2)	Ag↑G(4)	Au↑G(4)	Ag↑G(4)	Au↑G(4)	E↑G(4)	E↑G(4)	AgAg↑G(8)	AuAu↑G(8)	AgAg↑G(8)	AuAu↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable Decomposable Decomposable Decomposable
+Γ:(0,0,0)	  Γ1+(1) ⊕ Γ1-(1)  	  Γ2+(1) ⊕ Γ2-(1)  	  Γ4+(1) ⊕ Γ4-(1)  	  Γ3+(1) ⊕ Γ3-(1)  	  Γ1+(1) ⊕ Γ1-(1)  	  Γ2+(1) ⊕ Γ2-(1)  	  Γ4+(1) ⊕ Γ4-(1)  	  Γ3+(1) ⊕ Γ3-(1)  	  Γ1+(1) ⊕ Γ2+(1) ⊕ Γ3+(1) ⊕ Γ4+(1)  	  Γ1-(1) ⊕ Γ2-(1) ⊕ Γ3-(1) ⊕ Γ4-(1)  	  Γ1+(1) ⊕ Γ2+(1) ⊕ Γ3+(1) ⊕ Γ4+(1)  	  Γ1-(1) ⊕ Γ2-(1) ⊕ Γ3-(1) ⊕ Γ4-(1)  	  Γ5(2) ⊕ Γ6(2)  	  Γ5(2) ⊕ Γ6(2)  	  4 Γ5(2)  	  4 Γ6(2)  	  4 Γ5(2)  	  4 Γ6(2)  
+T:(1,0,0)	  T1(2)  	  T2(2)  	  T2(2)  	  T1(2)  	  T1(2)  	  T2(2)  	  T2(2)  	  T1(2)  	  T1(2) ⊕ T2(2)  	  T1(2) ⊕ T2(2)  	  T1(2) ⊕ T2(2)  	  T1(2) ⊕ T2(2)  	  T3T4(4)  	  T3T4(4)  	  2 T3T4(4)  	  2 T3T4(4)  	  2 T3T4(4)  	  2 T3T4(4)  
+Y:(0,1,0)	  Y1(2)  	  Y2(2)  	  Y1(2)  	  Y2(2)  	  Y1(2)  	  Y2(2)  	  Y1(2)  	  Y2(2)  	  Y1(2) ⊕ Y2(2)  	  Y1(2) ⊕ Y2(2)  	  Y1(2) ⊕ Y2(2)  	  Y1(2) ⊕ Y2(2)  	  Y3Y4(4)  	  Y3Y4(4)  	  2 Y3Y4(4)  	  2 Y3Y4(4)  	  2 Y3Y4(4)  	  2 Y3Y4(4)  
+Z:(0,0,1)	  Z1(2)  	  Z1(2)  	  Z2(2)  	  Z2(2)  	  Z1(2)  	  Z1(2)  	  Z2(2)  	  Z2(2)  	  Z1(2) ⊕ Z2(2)  	  Z1(2) ⊕ Z2(2)  	  Z1(2) ⊕ Z2(2)  	  Z1(2) ⊕ Z2(2)  	  Z3Z4(4)  	  Z3Z4(4)  	  2 Z3Z4(4)  	  2 Z3Z4(4)  	  2 Z3Z4(4)  	  2 Z3Z4(4)  
+L:(1/2,1/2,1/2)	  L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ 3 L1-(1)  	  3 L1+(1) ⊕ L1-(1)  	  3 L1+(1) ⊕ L1-(1)  	  L1+(1) ⊕ 3 L1-(1)  	  L2L2(2) ⊕ L3L3(2)  	  L2L2(2) ⊕ L3L3(2)  	  L2L2(2) ⊕ 3 L3L3(2)  	  3 L2L2(2) ⊕ L3L3(2)  	  3 L2L2(2) ⊕ L3L3(2)  	  L2L2(2) ⊕ 3 L3L3(2)
+
+
+sg 71
+Wyckoff pos.
+2a(mmm)	2a(mmm)	2a(mmm)	2a(mmm)	2a(mmm)	2a(mmm)	2a(mmm)	2a(mmm)	2b(mmm)	2b(mmm)	2b(mmm)	2b(mmm)	2b(mmm)	2b(mmm)	2b(mmm)	2b(mmm)	2c(mmm)	2c(mmm)	2c(mmm)	2c(mmm)	2c(mmm)	2c(mmm)	2c(mmm)	2c(mmm)	2d(mmm)	2d(mmm)	2d(mmm)	2d(mmm)	2d(mmm)	2d(mmm)	2d(mmm)	2d(mmm)	8k(1)	8k(1)	2a(mmm)	2a(mmm)	2b(mmm)	2b(mmm)	2c(mmm)	2c(mmm)	2d(mmm)	2d(mmm)	8k(1)	8k(1)
+Band-Rep.
+Ag↑G(1)	Au↑G(1)	B1g↑G(1)	B1u↑G(1)	B2g↑G(1)	B2u↑G(1)	B3g↑G(1)	B3u↑G(1)	Ag↑G(1)	Au↑G(1)	B1g↑G(1)	B1u↑G(1)	B2g↑G(1)	B2u↑G(1)	B3g↑G(1)	B3u↑G(1)	Ag↑G(1)	Au↑G(1)	B1g↑G(1)	B1u↑G(1)	B2g↑G(1)	B2u↑G(1)	B3g↑G(1)	B3u↑G(1)	Ag↑G(1)	Au↑G(1)	B1g↑G(1)	B1u↑G(1)	B2g↑G(1)	B2u↑G(1)	B3g↑G(1)	B3u↑G(1)	Ag↑G(4)	Au↑G(4)	Eg↑G(2)	Eu↑G(2)	Eg↑G(2)	Eu↑G(2)	Eg↑G(2)	Eu↑G(2)	Eg↑G(2)	Eu↑G(2)	AgAg↑G(8)	AuAu↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable Decomposable
+Γ:(0,0,0)	  Γ1+(1)  	  Γ1-(1)  	  Γ2+(1)  	  Γ2-(1)  	  Γ4+(1)  	  Γ4-(1)  	  Γ3+(1)  	  Γ3-(1)  	  Γ1+(1)  	  Γ1-(1)  	  Γ2+(1)  	  Γ2-(1)  	  Γ4+(1)  	  Γ4-(1)  	  Γ3+(1)  	  Γ3-(1)  	  Γ1+(1)  	  Γ1-(1)  	  Γ2+(1)  	  Γ2-(1)  	  Γ4+(1)  	  Γ4-(1)  	  Γ3+(1)  	  Γ3-(1)  	  Γ1+(1)  	  Γ1-(1)  	  Γ2+(1)  	  Γ2-(1)  	  Γ4+(1)  	  Γ4-(1)  	  Γ3+(1)  	  Γ3-(1)  	  Γ1+(1) ⊕ Γ2+(1) ⊕ Γ3+(1) ⊕ Γ4+(1)  	  Γ1-(1) ⊕ Γ2-(1) ⊕ Γ3-(1) ⊕ Γ4-(1)  	  Γ5(2)  	  Γ6(2)  	  Γ5(2)  	  Γ6(2)  	  Γ5(2)  	  Γ6(2)  	  Γ5(2)  	  Γ6(2)  	  4 Γ5(2)  	  4 Γ6(2)  
+X:(1,1,1)	  X1+(1)  	  X1-(1)  	  X2+(1)  	  X2-(1)  	  X4+(1)  	  X4-(1)  	  X3+(1)  	  X3-(1)  	  X1+(1)  	  X1-(1)  	  X2+(1)  	  X2-(1)  	  X4+(1)  	  X4-(1)  	  X3+(1)  	  X3-(1)  	  X1+(1)  	  X1-(1)  	  X2+(1)  	  X2-(1)  	  X4+(1)  	  X4-(1)  	  X3+(1)  	  X3-(1)  	  X1+(1)  	  X1-(1)  	  X2+(1)  	  X2-(1)  	  X4+(1)  	  X4-(1)  	  X3+(1)  	  X3-(1)  	  X1-(1) ⊕ X2-(1) ⊕ X3-(1) ⊕ X4-(1)  	  X1+(1) ⊕ X2+(1) ⊕ X3+(1) ⊕ X4+(1)  	  X5(2)  	  X6(2)  	  X5(2)  	  X6(2)  	  X5(2)  	  X6(2)  	  X5(2)  	  X6(2)  	  4 X6(2)  	  4 X5(2)  
+R:(1/2,0,1/2)	  R1+(1)  	  R1-(1)  	  R2+(1)  	  R2-(1)  	  R1+(1)  	  R1-(1)  	  R2+(1)  	  R2-(1)  	  R2-(1)  	  R2+(1)  	  R1-(1)  	  R1+(1)  	  R2-(1)  	  R2+(1)  	  R1-(1)  	  R1+(1)  	  R2-(1)  	  R2+(1)  	  R1-(1)  	  R1+(1)  	  R2-(1)  	  R2+(1)  	  R1-(1)  	  R1+(1)  	  R1+(1)  	  R1-(1)  	  R2+(1)  	  R2-(1)  	  R1+(1)  	  R1-(1)  	  R2+(1)  	  R2-(1)  	  R1+(1) ⊕ R1-(1) ⊕ R2+(1) ⊕ R2-(1)  	  R1+(1) ⊕ R1-(1) ⊕ R2+(1) ⊕ R2-(1)  	  R3R4(2)  	  R5R6(2)  	  R5R6(2)  	  R3R4(2)  	  R5R6(2)  	  R3R4(2)  	  R3R4(2)  	  R5R6(2)  	  2 R3R4(2) ⊕ 2 R5R6(2)  	  2 R3R4(2) ⊕ 2 R5R6(2)  
+S:(0,1/2,1/2)	  S1+(1)  	  S1-(1)  	  S2+(1)  	  S2-(1)  	  S2+(1)  	  S2-(1)  	  S1+(1)  	  S1-(1)  	  S1+(1)  	  S1-(1)  	  S2+(1)  	  S2-(1)  	  S2+(1)  	  S2-(1)  	  S1+(1)  	  S1-(1)  	  S2-(1)  	  S2+(1)  	  S1-(1)  	  S1+(1)  	  S1-(1)  	  S1+(1)  	  S2-(1)  	  S2+(1)  	  S2-(1)  	  S2+(1)  	  S1-(1)  	  S1+(1)  	  S1-(1)  	  S1+(1)  	  S2-(1)  	  S2+(1)  	  S1+(1) ⊕ S1-(1) ⊕ S2+(1) ⊕ S2-(1)  	  S1+(1) ⊕ S1-(1) ⊕ S2+(1) ⊕ S2-(1)  	  S3S4(2)  	  S5S6(2)  	  S3S4(2)  	  S5S6(2)  	  S5S6(2)  	  S3S4(2)  	  S5S6(2)  	  S3S4(2)  	  2 S3S4(2) ⊕ 2 S5S6(2)  	  2 S3S4(2) ⊕ 2 S5S6(2)  
+T:(1/2,1/2,0)	  T1+(1)  	  T1-(1)  	  T1+(1)  	  T1-(1)  	  T2+(1)  	  T2-(1)  	  T2+(1)  	  T2-(1)  	  T2-(1)  	  T2+(1)  	  T2-(1)  	  T2+(1)  	  T1-(1)  	  T1+(1)  	  T1-(1)  	  T1+(1)  	  T1+(1)  	  T1-(1)  	  T1+(1)  	  T1-(1)  	  T2+(1)  	  T2-(1)  	  T2+(1)  	  T2-(1)  	  T2-(1)  	  T2+(1)  	  T2-(1)  	  T2+(1)  	  T1-(1)  	  T1+(1)  	  T1-(1)  	  T1+(1)  	  T1+(1) ⊕ T1-(1) ⊕ T2+(1) ⊕ T2-(1)  	  T1+(1) ⊕ T1-(1) ⊕ T2+(1) ⊕ T2-(1)  	  T3T4(2)  	  T5T6(2)  	  T5T6(2)  	  T3T4(2)  	  T3T4(2)  	  T5T6(2)  	  T5T6(2)  	  T3T4(2)  	  2 T3T4(2) ⊕ 2 T5T6(2)  	  2 T3T4(2) ⊕ 2 T5T6(2)  
+W:(1/2,1/2,1/2)	  W1(1)  	  W1(1)  	  W2(1)  	  W2(1)  	  W4(1)  	  W4(1)  	  W3(1)  	  W3(1)  	  W3(1)  	  W3(1)  	  W4(1)  	  W4(1)  	  W2(1)  	  W2(1)  	  W1(1)  	  W1(1)  	  W2(1)  	  W2(1)  	  W1(1)  	  W1(1)  	  W3(1)  	  W3(1)  	  W4(1)  	  W4(1)  	  W4(1)  	  W4(1)  	  W3(1)  	  W3(1)  	  W1(1)  	  W1(1)  	  W2(1)  	  W2(1)  	  W1(1) ⊕ W2(1) ⊕ W3(1) ⊕ W4(1)  	  W1(1) ⊕ W2(1) ⊕ W3(1) ⊕ W4(1)  	  W5(2)  	  W5(2)  	  W5(2)  	  W5(2)  	  W5(2)  	  W5(2)  	  W5(2)  	  W5(2)  	  4 W5(2)  	  4 W5(2)  
+
+sg 72
+Wyckoff pos.
+4a(222)	4a(222)	4a(222)	4a(222)	4b(222)	4b(222)	4b(222)	4b(222)	4c(2/m)	4c(2/m)	4c(2/m)	4c(2/m)	4d(2/m)	4d(2/m)	4d(2/m)	4d(2/m)	8e(1)	8e(1)	4a(222)	4b(222)	4c(2/m)	4c(2/m)	4d(2/m)	4d(2/m)	8e(1)	8e(1)
+Band-Rep.
+A↑G(2)	B1↑G(2)	B2↑G(2)	B3↑G(2)	A↑G(2)	B1↑G(2)	B2↑G(2)	B3↑G(2)	Ag↑G(2)	Au↑G(2)	Bg↑G(2)	Bu↑G(2)	Ag↑G(2)	Au↑G(2)	Bg↑G(2)	Bu↑G(2)	Ag↑G(4)	Au↑G(4)	E↑G(4)	E↑G(4)	1Eg2Eg↑G(4)	1Eu2Eu↑G(4)	1Eg2Eg↑G(4)	1Eu2Eu↑G(4)	AgAg↑G(8)	AuAu↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable Decomposable
+Γ:(0,0,0)	  Γ1+(1) ⊕ Γ1-(1)  	  Γ2+(1) ⊕ Γ2-(1)  	  Γ4+(1) ⊕ Γ4-(1)  	  Γ3+(1) ⊕ Γ3-(1)  	  Γ1+(1) ⊕ Γ1-(1)  	  Γ2+(1) ⊕ Γ2-(1)  	  Γ4+(1) ⊕ Γ4-(1)  	  Γ3+(1) ⊕ Γ3-(1)  	  Γ1+(1) ⊕ Γ2+(1)  	  Γ1-(1) ⊕ Γ2-(1)  	  Γ3+(1) ⊕ Γ4+(1)  	  Γ3-(1) ⊕ Γ4-(1)  	  Γ1+(1) ⊕ Γ2+(1)  	  Γ1-(1) ⊕ Γ2-(1)  	  Γ3+(1) ⊕ Γ4+(1)  	  Γ3-(1) ⊕ Γ4-(1)  	  Γ1+(1) ⊕ Γ2+(1) ⊕ Γ3+(1) ⊕ Γ4+(1)  	  Γ1-(1) ⊕ Γ2-(1) ⊕ Γ3-(1) ⊕ Γ4-(1)  	  Γ5(2) ⊕ Γ6(2)  	  Γ5(2) ⊕ Γ6(2)  	  2 Γ5(2)  	  2 Γ6(2)  	  2 Γ5(2)  	  2 Γ6(2)  	  4 Γ5(2)  	  4 Γ6(2)  
+X:(1,1,1)	  X1+(1) ⊕ X1-(1)  	  X2+(1) ⊕ X2-(1)  	  X4+(1) ⊕ X4-(1)  	  X3+(1) ⊕ X3-(1)  	  X1+(1) ⊕ X1-(1)  	  X2+(1) ⊕ X2-(1)  	  X4+(1) ⊕ X4-(1)  	  X3+(1) ⊕ X3-(1)  	  X1+(1) ⊕ X2+(1)  	  X1-(1) ⊕ X2-(1)  	  X3+(1) ⊕ X4+(1)  	  X3-(1) ⊕ X4-(1)  	  X1+(1) ⊕ X2+(1)  	  X1-(1) ⊕ X2-(1)  	  X3+(1) ⊕ X4+(1)  	  X3-(1) ⊕ X4-(1)  	  X1-(1) ⊕ X2-(1) ⊕ X3-(1) ⊕ X4-(1)  	  X1+(1) ⊕ X2+(1) ⊕ X3+(1) ⊕ X4+(1)  	  X5(2) ⊕ X6(2)  	  X5(2) ⊕ X6(2)  	  2 X5(2)  	  2 X6(2)  	  2 X5(2)  	  2 X6(2)  	  4 X6(2)  	  4 X5(2)  
+R:(1/2,0,1/2)	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  2 R1(2)  	  2 R1(2)  	  R2R2(4)  	  R2R2(4)  	  R2R2(4)  	  R2R2(4)  	  R2R2(4)  	  R2R2(4)  	  2 R2R2(4)  	  2 R2R2(4)  
+S:(0,1/2,1/2)	  S1(2)  	  S1(2)  	  S1(2)  	  S1(2)  	  S1(2)  	  S1(2)  	  S1(2)  	  S1(2)  	  S1(2)  	  S1(2)  	  S1(2)  	  S1(2)  	  S1(2)  	  S1(2)  	  S1(2)  	  S1(2)  	  2 S1(2)  	  2 S1(2)  	  S2S2(4)  	  S2S2(4)  	  S2S2(4)  	  S2S2(4)  	  S2S2(4)  	  S2S2(4)  	  2 S2S2(4)  	  2 S2S2(4)  
+T:(1/2,1/2,0)	  T1+(1) ⊕ T1-(1)  	  T1+(1) ⊕ T1-(1)  	  T2+(1) ⊕ T2-(1)  	  T2+(1) ⊕ T2-(1)  	  T2+(1) ⊕ T2-(1)  	  T2+(1) ⊕ T2-(1)  	  T1+(1) ⊕ T1-(1)  	  T1+(1) ⊕ T1-(1)  	  2 T1+(1)  	  2 T1-(1)  	  2 T2+(1)  	  2 T2-(1)  	  2 T2-(1)  	  2 T2+(1)  	  2 T1-(1)  	  2 T1+(1)  	  T1+(1) ⊕ T1-(1) ⊕ T2+(1) ⊕ T2-(1)  	  T1+(1) ⊕ T1-(1) ⊕ T2+(1) ⊕ T2-(1)  	  T3T4(2) ⊕ T5T6(2)  	  T3T4(2) ⊕ T5T6(2)  	  2 T3T4(2)  	  2 T5T6(2)  	  2 T5T6(2)  	  2 T3T4(2)  	  2 T3T4(2) ⊕ 2 T5T6(2)  	  2 T3T4(2) ⊕ 2 T5T6(2)  
+W:(1/2,1/2,1/2)	  W1W2(2)  	  W1W2(2)  	  W3W4(2)  	  W3W4(2)  	  W3W4(2)  	  W3W4(2)  	  W1W2(2)  	  W1W2(2)  	  W1W2(2)  	  W1W2(2)  	  W3W4(2)  	  W3W4(2)  	  W3W4(2)  	  W3W4(2)  	  W1W2(2)  	  W1W2(2)  	  W1W2(2) ⊕ W3W4(2)  	  W1W2(2) ⊕ W3W4(2)  	  W5W5(4)  	  W5W5(4)  	  W5W5(4)  	  W5W5(4)  	  W5W5(4)  	  W5W5(4)  	  2 W5W5(4)  	  2 W5W5(4)  
+
+sg 75
+Wyckoff pos.
+1a(4)	1a(4)	1a(4)	1b(4)	1b(4)	1b(4)	2c(2)	2c(2)	1a(4)	1a(4)	1b(4)	1b(4)	2c(2)
+Band-Rep.
+A↑G(1)	B↑G(1)	1E2E↑G(2)	A↑G(1)	B↑G(1)	1E2E↑G(2)	A↑G(2)	B↑G(2)	1E12E1↑G(2)	1E22E2↑G(2)	1E12E1↑G(2)	1E22E2↑G(2)	1E2E↑G(4)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable
+A:(1/2,1/2,1/2)	  A1(1)  	  A2(1)  	  A3A4(2)  	  A2(1)  	  A1(1)  	  A3A4(2)  	  A3A4(2)  	  A1(1) ⊕ A2(1)  	  A6A8(2)  	  A5A7(2)  	  A5A7(2)  	  A6A8(2)  	  A5A7(2) ⊕ A6A8(2)  
+Γ:(0,0,0)	  Γ1(1)  	  Γ2(1)  	  Γ3Γ4(2)  	  Γ1(1)  	  Γ2(1)  	  Γ3Γ4(2)  	  Γ1(1) ⊕ Γ2(1)  	  Γ3Γ4(2)  	  Γ6Γ8(2)  	  Γ5Γ7(2)  	  Γ6Γ8(2)  	  Γ5Γ7(2)  	  Γ5Γ7(2) ⊕ Γ6Γ8(2)  
+M:(1/2,1/2,0)	  M1(1)  	  M2(1)  	  M3M4(2)  	  M2(1)  	  M1(1)  	  M3M4(2)  	  M3M4(2)  	  M1(1) ⊕ M2(1)  	  M6M8(2)  	  M5M7(2)  	  M5M7(2)  	  M6M8(2)  	  M5M7(2) ⊕ M6M8(2)  
+Z:(0,0,1/2)	  Z1(1)  	  Z2(1)  	  Z3Z4(2)  	  Z1(1)  	  Z2(1)  	  Z3Z4(2)  	  Z1(1) ⊕ Z2(1)  	  Z3Z4(2)  	  Z6Z8(2)  	  Z5Z7(2)  	  Z6Z8(2)  	  Z5Z7(2)  	  Z5Z7(2) ⊕ Z6Z8(2)  
+R:(0,1/2,1/2)	  R1(1)  	  R1(1)  	  2 R2(1)  	  R2(1)  	  R2(1)  	  2 R1(1)  	  R1(1) ⊕ R2(1)  	  R1(1) ⊕ R2(1)  	  R3R4(2)  	  R3R4(2)  	  R3R4(2)  	  R3R4(2)  	  2 R3R4(2)  
+X:(0,1/2,0)	  X1(1)  	  X1(1)  	  2 X2(1)  	  X2(1)  	  X2(1)  	  2 X1(1)  	  X1(1) ⊕ X2(1)  	  X1(1) ⊕ X2(1)  	  X3X4(2)  	  X3X4(2)  	  X3X4(2)  	  X3X4(2)  	  2 X3X4(2)  
+
+sg 79
+Wyckoff pos.
+2a(4)	2a(4)	2a(4)	4b(2)	4b(2)	2a(4)	2a(4)	4b(2)
+Band-Rep.
+A↑G(1)	B↑G(1)	1E2E↑G(2)	A↑G(2)	B↑G(2)	1E12E1↑G(2)	1E22E2↑G(2)	1E2E↑G(4)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable
+Γ:(0,0,0)	  Γ1(1)  	  Γ2(1)  	  Γ3Γ4(2)  	  Γ1(1) ⊕ Γ2(1)  	  Γ3Γ4(2)  	  Γ6Γ8(2)  	  Γ5Γ7(2)  	  Γ5Γ7(2) ⊕ Γ6Γ8(2)  
+M:(1,1,1)	  M1(1)  	  M2(1)  	  M3M4(2)  	  M1(1) ⊕ M2(1)  	  M3M4(2)  	  M6M8(2)  	  M5M7(2)  	  M5M7(2) ⊕ M6M8(2)  
+P:(1/2,1/2,1/2)	  P1(1)  	  P1(1)  	  P2P2(2)  	  P2P2(2)  	  2 P1(1)  	  P3P4(2)  	  P3P4(2)  	  2 P3P4(2)  
+X:(1/2,1/2,0)	  X1(1)  	  X1(1)  	  2 X2(1)  	  2 X2(1)  	  2 X1(1)  	  X3X4(2)  	  X3X4(2)  	  2 X3X4(2)  
+N:(1/2,0,1/2)	  N1(1)  	  N1(1)  	  2 N1(1)  	  2 N1(1)  	  2 N1(1)  	  N2N2(2)  	  N2N2(2)  	  2 N2N2(2) 
+
+sg 81
+Wyckoff pos.
+1a(4)	1a(4)	1a(4)	1b(4)	1b(4)	1b(4)	1c(4)	1c(4)	1c(4)	1d(4)	1d(4)	1d(4)	2g(2)	2g(2)	1a(4)	1a(4)	1b(4)	1b(4)	1c(4)	1c(4)	1d(4)	1d(4)	2g(2)
+Band-Rep.
+A↑G(1)	B↑G(1)	1E2E↑G(2)	A↑G(1)	B↑G(1)	1E2E↑G(2)	A↑G(1)	B↑G(1)	1E2E↑G(2)	A↑G(1)	B↑G(1)	1E2E↑G(2)	A↑G(2)	B↑G(2)	1E12E1↑G(2)	1E22E2↑G(2)	1E12E1↑G(2)	1E22E2↑G(2)	1E12E1↑G(2)	1E22E2↑G(2)	1E12E1↑G(2)	1E22E2↑G(2)	1E2E↑G(4)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable
+A:(1/2,1/2,1/2)	  A1(1)  	  A2(1)  	  A3A4(2)  	  A2(1)  	  A1(1)  	  A3A4(2)  	  A2(1)  	  A1(1)  	  A3A4(2)  	  A1(1)  	  A2(1)  	  A3A4(2)  	  A3A4(2)  	  A1(1) ⊕ A2(1)  	  A6A8(2)  	  A5A7(2)  	  A5A7(2)  	  A6A8(2)  	  A5A7(2)  	  A6A8(2)  	  A6A8(2)  	  A5A7(2)  	  A5A7(2) ⊕ A6A8(2)  
+Γ:(0,0,0)	  Γ1(1)  	  Γ2(1)  	  Γ3Γ4(2)  	  Γ1(1)  	  Γ2(1)  	  Γ3Γ4(2)  	  Γ1(1)  	  Γ2(1)  	  Γ3Γ4(2)  	  Γ1(1)  	  Γ2(1)  	  Γ3Γ4(2)  	  Γ1(1) ⊕ Γ2(1)  	  Γ3Γ4(2)  	  Γ6Γ8(2)  	  Γ5Γ7(2)  	  Γ6Γ8(2)  	  Γ5Γ7(2)  	  Γ6Γ8(2)  	  Γ5Γ7(2)  	  Γ6Γ8(2)  	  Γ5Γ7(2)  	  Γ5Γ7(2) ⊕ Γ6Γ8(2)  
+M:(1/2,1/2,0)	  M1(1)  	  M2(1)  	  M3M4(2)  	  M1(1)  	  M2(1)  	  M3M4(2)  	  M2(1)  	  M1(1)  	  M3M4(2)  	  M2(1)  	  M1(1)  	  M3M4(2)  	  M3M4(2)  	  M1(1) ⊕ M2(1)  	  M6M8(2)  	  M5M7(2)  	  M6M8(2)  	  M5M7(2)  	  M5M7(2)  	  M6M8(2)  	  M5M7(2)  	  M6M8(2)  	  M5M7(2) ⊕ M6M8(2)  
+Z:(0,0,1/2)	  Z1(1)  	  Z2(1)  	  Z3Z4(2)  	  Z2(1)  	  Z1(1)  	  Z3Z4(2)  	  Z1(1)  	  Z2(1)  	  Z3Z4(2)  	  Z2(1)  	  Z1(1)  	  Z3Z4(2)  	  Z1(1) ⊕ Z2(1)  	  Z3Z4(2)  	  Z6Z8(2)  	  Z5Z7(2)  	  Z5Z7(2)  	  Z6Z8(2)  	  Z6Z8(2)  	  Z5Z7(2)  	  Z5Z7(2)  	  Z6Z8(2)  	  Z5Z7(2) ⊕ Z6Z8(2)  
+R:(0,1/2,1/2)	  R1(1)  	  R1(1)  	  2 R2(1)  	  R1(1)  	  R1(1)  	  2 R2(1)  	  R2(1)  	  R2(1)  	  2 R1(1)  	  R2(1)  	  R2(1)  	  2 R1(1)  	  R1(1) ⊕ R2(1)  	  R1(1) ⊕ R2(1)  	  R3R4(2)  	  R3R4(2)  	  R3R4(2)  	  R3R4(2)  	  R3R4(2)  	  R3R4(2)  	  R3R4(2)  	  R3R4(2)  	  2 R3R4(2)  
+X:(0,1/2,0)	  X1(1)  	  X1(1)  	  2 X2(1)  	  X1(1)  	  X1(1)  	  2 X2(1)  	  X2(1)  	  X2(1)  	  2 X1(1)  	  X2(1)  	  X2(1)  	  2 X1(1)  	  X1(1) ⊕ X2(1)  	  X1(1) ⊕ X2(1)  	  X3X4(2)  	  X3X4(2)  	  X3X4(2)  	  X3X4(2)  	  X3X4(2)  	  X3X4(2)  	  X3X4(2)  	  X3X4(2)  	  2 X3X4(2) 
+
+
+sg 83
+Wyckoff pos.
+1a(4/m)	1a(4/m)	1a(4/m)	1a(4/m)	1a(4/m)	1a(4/m)	1b(4/m)	1b(4/m)	1b(4/m)	1b(4/m)	1b(4/m)	1b(4/m)	1c(4/m)	1c(4/m)	1c(4/m)	1c(4/m)	1c(4/m)	1c(4/m)	1d(4/m)	1d(4/m)	1d(4/m)	1d(4/m)	1d(4/m)	1d(4/m)	2e(2/m)	2e(2/m)	2e(2/m)	2e(2/m)	2f(2/m)	2f(2/m)	2f(2/m)	2f(2/m)	1a(4/m)	1a(4/m)	1a(4/m)	1a(4/m)	1b(4/m)	1b(4/m)	1b(4/m)	1b(4/m)	1c(4/m)	1c(4/m)	1c(4/m)	1c(4/m)	1d(4/m)	1d(4/m)	1d(4/m)	1d(4/m)	2e(2/m)	2e(2/m)	2f(2/m)	2f(2/m)
+Band-Rep.
+Ag↑G(1)	Au↑G(1)	Bg↑G(1)	Bu↑G(1)	1Eg2Eg↑G(2)	1Eu2Eu↑G(2)	Ag↑G(1)	Au↑G(1)	Bg↑G(1)	Bu↑G(1)	1Eg2Eg↑G(2)	1Eu2Eu↑G(2)	Ag↑G(1)	Au↑G(1)	Bg↑G(1)	Bu↑G(1)	1Eg2Eg↑G(2)	1Eu2Eu↑G(2)	Ag↑G(1)	Au↑G(1)	Bg↑G(1)	Bu↑G(1)	1Eg2Eg↑G(2)	1Eu2Eu↑G(2)	Ag↑G(2)	Au↑G(2)	Bg↑G(2)	Bu↑G(2)	Ag↑G(2)	Au↑G(2)	Bg↑G(2)	Bu↑G(2)	1E1g2E1g↑G(2)	1E1u2E1u↑G(2)	1E2g2E2g↑G(2)	1E2u2E2u↑G(2)	1E1g2E1g↑G(2)	1E1u2E1u↑G(2)	1E2g2E2g↑G(2)	1E2u2E2u↑G(2)	1E1g2E1g↑G(2)	1E1u2E1u↑G(2)	1E2g2E2g↑G(2)	1E2u2E2u↑G(2)	1E1g2E1g↑G(2)	1E1u2E1u↑G(2)	1E2g2E2g↑G(2)	1E2u2E2u↑G(2)	1Eg2Eg↑G(4)	1Eu2Eu↑G(4)	1Eg2Eg↑G(4)	1Eu2Eu↑G(4)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable Decomposable Decomposable Decomposable Decomposable
+A:(1/2,1/2,1/2)	  A1+(1)  	  A1-(1)  	  A2+(1)  	  A2-(1)  	  A3+A4+(2)  	  A3-A4-(2)  	  A1-(1)  	  A1+(1)  	  A2-(1)  	  A2+(1)  	  A3-A4-(2)  	  A3+A4+(2)  	  A2+(1)  	  A2-(1)  	  A1+(1)  	  A1-(1)  	  A3+A4+(2)  	  A3-A4-(2)  	  A2-(1)  	  A2+(1)  	  A1-(1)  	  A1+(1)  	  A3-A4-(2)  	  A3+A4+(2)  	  A3-A4-(2)  	  A3+A4+(2)  	  A1-(1) ⊕ A2-(1)  	  A1+(1) ⊕ A2+(1)  	  A3+A4+(2)  	  A3-A4-(2)  	  A1+(1) ⊕ A2+(1)  	  A1-(1) ⊕ A2-(1)  	  A6A8(2)  	  A10A12(2)  	  A5A7(2)  	  A11A9(2)  	  A10A12(2)  	  A6A8(2)  	  A11A9(2)  	  A5A7(2)  	  A5A7(2)  	  A11A9(2)  	  A6A8(2)  	  A10A12(2)  	  A11A9(2)  	  A5A7(2)  	  A10A12(2)  	  A6A8(2)  	  A10A12(2) ⊕ A11A9(2)  	  A5A7(2) ⊕ A6A8(2)  	  A5A7(2) ⊕ A6A8(2)  	  A10A12(2) ⊕ A11A9(2)  
+Γ:(0,0,0)	  Γ1+(1)  	  Γ1-(1)  	  Γ2+(1)  	  Γ2-(1)  	  Γ3+Γ4+(2)  	  Γ3-Γ4-(2)  	  Γ1+(1)  	  Γ1-(1)  	  Γ2+(1)  	  Γ2-(1)  	  Γ3+Γ4+(2)  	  Γ3-Γ4-(2)  	  Γ1+(1)  	  Γ1-(1)  	  Γ2+(1)  	  Γ2-(1)  	  Γ3+Γ4+(2)  	  Γ3-Γ4-(2)  	  Γ1+(1)  	  Γ1-(1)  	  Γ2+(1)  	  Γ2-(1)  	  Γ3+Γ4+(2)  	  Γ3-Γ4-(2)  	  Γ1+(1) ⊕ Γ2+(1)  	  Γ1-(1) ⊕ Γ2-(1)  	  Γ3+Γ4+(2)  	  Γ3-Γ4-(2)  	  Γ1+(1) ⊕ Γ2+(1)  	  Γ1-(1) ⊕ Γ2-(1)  	  Γ3+Γ4+(2)  	  Γ3-Γ4-(2)  	  Γ6Γ8(2)  	  Γ10Γ12(2)  	  Γ5Γ7(2)  	  Γ11Γ9(2)  	  Γ6Γ8(2)  	  Γ10Γ12(2)  	  Γ5Γ7(2)  	  Γ11Γ9(2)  	  Γ6Γ8(2)  	  Γ10Γ12(2)  	  Γ5Γ7(2)  	  Γ11Γ9(2)  	  Γ6Γ8(2)  	  Γ10Γ12(2)  	  Γ5Γ7(2)  	  Γ11Γ9(2)  	  Γ5Γ7(2) ⊕ Γ6Γ8(2)  	  Γ10Γ12(2) ⊕ Γ11Γ9(2)  	  Γ5Γ7(2) ⊕ Γ6Γ8(2)  	  Γ10Γ12(2) ⊕ Γ11Γ9(2)  
+M:(1/2,1/2,0)	  M1+(1)  	  M1-(1)  	  M2+(1)  	  M2-(1)  	  M3+M4+(2)  	  M3-M4-(2)  	  M1+(1)  	  M1-(1)  	  M2+(1)  	  M2-(1)  	  M3+M4+(2)  	  M3-M4-(2)  	  M2+(1)  	  M2-(1)  	  M1+(1)  	  M1-(1)  	  M3+M4+(2)  	  M3-M4-(2)  	  M2+(1)  	  M2-(1)  	  M1+(1)  	  M1-(1)  	  M3+M4+(2)  	  M3-M4-(2)  	  M3-M4-(2)  	  M3+M4+(2)  	  M1-(1) ⊕ M2-(1)  	  M1+(1) ⊕ M2+(1)  	  M3-M4-(2)  	  M3+M4+(2)  	  M1-(1) ⊕ M2-(1)  	  M1+(1) ⊕ M2+(1)  	  M6M8(2)  	  M10M12(2)  	  M5M7(2)  	  M11M9(2)  	  M6M8(2)  	  M10M12(2)  	  M5M7(2)  	  M11M9(2)  	  M5M7(2)  	  M11M9(2)  	  M6M8(2)  	  M10M12(2)  	  M5M7(2)  	  M11M9(2)  	  M6M8(2)  	  M10M12(2)  	  M10M12(2) ⊕ M11M9(2)  	  M5M7(2) ⊕ M6M8(2)  	  M10M12(2) ⊕ M11M9(2)  	  M5M7(2) ⊕ M6M8(2)  
+Z:(0,0,1/2)	  Z1+(1)  	  Z1-(1)  	  Z2+(1)  	  Z2-(1)  	  Z3+Z4+(2)  	  Z3-Z4-(2)  	  Z1-(1)  	  Z1+(1)  	  Z2-(1)  	  Z2+(1)  	  Z3-Z4-(2)  	  Z3+Z4+(2)  	  Z1+(1)  	  Z1-(1)  	  Z2+(1)  	  Z2-(1)  	  Z3+Z4+(2)  	  Z3-Z4-(2)  	  Z1-(1)  	  Z1+(1)  	  Z2-(1)  	  Z2+(1)  	  Z3-Z4-(2)  	  Z3+Z4+(2)  	  Z1+(1) ⊕ Z2+(1)  	  Z1-(1) ⊕ Z2-(1)  	  Z3+Z4+(2)  	  Z3-Z4-(2)  	  Z1-(1) ⊕ Z2-(1)  	  Z1+(1) ⊕ Z2+(1)  	  Z3-Z4-(2)  	  Z3+Z4+(2)  	  Z6Z8(2)  	  Z10Z12(2)  	  Z5Z7(2)  	  Z11Z9(2)  	  Z10Z12(2)  	  Z6Z8(2)  	  Z11Z9(2)  	  Z5Z7(2)  	  Z6Z8(2)  	  Z10Z12(2)  	  Z5Z7(2)  	  Z11Z9(2)  	  Z10Z12(2)  	  Z6Z8(2)  	  Z11Z9(2)  	  Z5Z7(2)  	  Z5Z7(2) ⊕ Z6Z8(2)  	  Z10Z12(2) ⊕ Z11Z9(2)  	  Z10Z12(2) ⊕ Z11Z9(2)  	  Z5Z7(2) ⊕ Z6Z8(2)  
+R:(0,1/2,1/2)	  R1+(1)  	  R1-(1)  	  R1+(1)  	  R1-(1)  	  2 R2+(1)  	  2 R2-(1)  	  R1-(1)  	  R1+(1)  	  R1-(1)  	  R1+(1)  	  2 R2-(1)  	  2 R2+(1)  	  R2-(1)  	  R2+(1)  	  R2-(1)  	  R2+(1)  	  2 R1-(1)  	  2 R1+(1)  	  R2+(1)  	  R2-(1)  	  R2+(1)  	  R2-(1)  	  2 R1+(1)  	  2 R1-(1)  	  R1+(1) ⊕ R2-(1)  	  R1-(1) ⊕ R2+(1)  	  R1-(1) ⊕ R2+(1)  	  R1+(1) ⊕ R2-(1)  	  R1-(1) ⊕ R2+(1)  	  R1+(1) ⊕ R2-(1)  	  R1+(1) ⊕ R2-(1)  	  R1-(1) ⊕ R2+(1)  	  R3R4(2)  	  R5R6(2)  	  R3R4(2)  	  R5R6(2)  	  R5R6(2)  	  R3R4(2)  	  R5R6(2)  	  R3R4(2)  	  R5R6(2)  	  R3R4(2)  	  R5R6(2)  	  R3R4(2)  	  R3R4(2)  	  R5R6(2)  	  R3R4(2)  	  R5R6(2)  	  R3R4(2) ⊕ R5R6(2)  	  R3R4(2) ⊕ R5R6(2)  	  R3R4(2) ⊕ R5R6(2)  	  R3R4(2) ⊕ R5R6(2)  
+X:(0,1/2,0)	  X1+(1)  	  X1-(1)  	  X1+(1)  	  X1-(1)  	  2 X2+(1)  	  2 X2-(1)  	  X1+(1)  	  X1-(1)  	  X1+(1)  	  X1-(1)  	  2 X2+(1)  	  2 X2-(1)  	  X2-(1)  	  X2+(1)  	  X2-(1)  	  X2+(1)  	  2 X1-(1)  	  2 X1+(1)  	  X2-(1)  	  X2+(1)  	  X2-(1)  	  X2+(1)  	  2 X1-(1)  	  2 X1+(1)  	  X1+(1) ⊕ X2-(1)  	  X1-(1) ⊕ X2+(1)  	  X1-(1) ⊕ X2+(1)  	  X1+(1) ⊕ X2-(1)  	  X1+(1) ⊕ X2-(1)  	  X1-(1) ⊕ X2+(1)  	  X1-(1) ⊕ X2+(1)  	  X1+(1) ⊕ X2-(1)  	  X3X4(2)  	  X5X6(2)  	  X3X4(2)  	  X5X6(2)  	  X3X4(2)  	  X5X6(2)  	  X3X4(2)  	  X5X6(2)  	  X5X6(2)  	  X3X4(2)  	  X5X6(2)  	  X3X4(2)  	  X5X6(2)  	  X3X4(2)  	  X5X6(2)  	  X3X4(2)  	  X3X4(2) ⊕ X5X6(2)  	  X3X4(2) ⊕ X5X6(2)  	  X3X4(2) ⊕ X5X6(2)  	  X3X4(2) ⊕ X5X6(2)
+
+
+sg 85
+Wyckoff pos.
+2a(4)	2a(4)	2a(4)	2b(4)	2b(4)	2b(4)	2c(4)	2c(4)	2c(4)	4d(1)	4d(1)	4e(1)	4e(1)	2a(4)	2a(4)	2b(4)	2b(4)	2c(4)	2c(4)	4d(1)	4d(1)	4e(1)	4e(1)
+Band-Rep.
+A↑G(2)	B↑G(2)	1E2E↑G(4)	A↑G(2)	B↑G(2)	1E2E↑G(4)	A↑G(2)	B↑G(2)	1E2E↑G(4)	Ag↑G(4)	Au↑G(4)	Ag↑G(4)	Au↑G(4)	1E12E1↑G(4)	1E22E2↑G(4)	1E12E1↑G(4)	1E22E2↑G(4)	1E12E1↑G(4)	1E22E2↑G(4)	AgAg↑G(8)	AuAu↑G(8)	AgAg↑G(8)	AuAu↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable Decomposable Decomposable Decomposable
+A:(1/2,1/2,1/2)	  A1(2)  	  A1(2)  	  2 A2(2)  	  A1(2)  	  A1(2)  	  2 A2(2)  	  A2(2)  	  A2(2)  	  2 A1(2)  	  A1(2) ⊕ A2(2)  	  A1(2) ⊕ A2(2)  	  A1(2) ⊕ A2(2)  	  A1(2) ⊕ A2(2)  	  A3A4(4)  	  A3A4(4)  	  A3A4(4)  	  A3A4(4)  	  A3A4(4)  	  A3A4(4)  	  2 A3A4(4)  	  2 A3A4(4)  	  2 A3A4(4)  	  2 A3A4(4)  
+Γ:(0,0,0)	  Γ1+(1) ⊕ Γ2-(1)  	  Γ1-(1) ⊕ Γ2+(1)  	  Γ3+Γ4+(2) ⊕ Γ3-Γ4-(2)  	  Γ1+(1) ⊕ Γ2-(1)  	  Γ1-(1) ⊕ Γ2+(1)  	  Γ3+Γ4+(2) ⊕ Γ3-Γ4-(2)  	  Γ1+(1) ⊕ Γ1-(1)  	  Γ2+(1) ⊕ Γ2-(1)  	  Γ3+Γ4+(2) ⊕ Γ3-Γ4-(2)  	  Γ1+(1) ⊕ Γ2+(1) ⊕ Γ3+Γ4+(2)  	  Γ1-(1) ⊕ Γ2-(1) ⊕ Γ3-Γ4-(2)  	  Γ1+(1) ⊕ Γ2+(1) ⊕ Γ3+Γ4+(2)  	  Γ1-(1) ⊕ Γ2-(1) ⊕ Γ3-Γ4-(2)  	  Γ6Γ8(2) ⊕ Γ11Γ9(2)  	  Γ5Γ7(2) ⊕ Γ10Γ12(2)  	  Γ6Γ8(2) ⊕ Γ11Γ9(2)  	  Γ5Γ7(2) ⊕ Γ10Γ12(2)  	  Γ6Γ8(2) ⊕ Γ10Γ12(2)  	  Γ5Γ7(2) ⊕ Γ11Γ9(2)  	  2 Γ5Γ7(2) ⊕ 2 Γ6Γ8(2)  	  2 Γ10Γ12(2) ⊕ 2 Γ11Γ9(2)  	  2 Γ5Γ7(2) ⊕ 2 Γ6Γ8(2)  	  2 Γ10Γ12(2) ⊕ 2 Γ11Γ9(2)  
+M:(1/2,1/2,0)	  M1(2)  	  M1(2)  	  2 M2(2)  	  M1(2)  	  M1(2)  	  2 M2(2)  	  M2(2)  	  M2(2)  	  2 M1(2)  	  M1(2) ⊕ M2(2)  	  M1(2) ⊕ M2(2)  	  M1(2) ⊕ M2(2)  	  M1(2) ⊕ M2(2)  	  M3M4(4)  	  M3M4(4)  	  M3M4(4)  	  M3M4(4)  	  M3M4(4)  	  M3M4(4)  	  2 M3M4(4)  	  2 M3M4(4)  	  2 M3M4(4)  	  2 M3M4(4)  
+Z:(0,0,1/2)	  Z1+(1) ⊕ Z2-(1)  	  Z1-(1) ⊕ Z2+(1)  	  Z3+Z4+(2) ⊕ Z3-Z4-(2)  	  Z1-(1) ⊕ Z2+(1)  	  Z1+(1) ⊕ Z2-(1)  	  Z3+Z4+(2) ⊕ Z3-Z4-(2)  	  Z1+(1) ⊕ Z1-(1)  	  Z2+(1) ⊕ Z2-(1)  	  Z3+Z4+(2) ⊕ Z3-Z4-(2)  	  Z1+(1) ⊕ Z2+(1) ⊕ Z3+Z4+(2)  	  Z1-(1) ⊕ Z2-(1) ⊕ Z3-Z4-(2)  	  Z1-(1) ⊕ Z2-(1) ⊕ Z3-Z4-(2)  	  Z1+(1) ⊕ Z2+(1) ⊕ Z3+Z4+(2)  	  Z6Z8(2) ⊕ Z11Z9(2)  	  Z5Z7(2) ⊕ Z10Z12(2)  	  Z5Z7(2) ⊕ Z10Z12(2)  	  Z6Z8(2) ⊕ Z11Z9(2)  	  Z6Z8(2) ⊕ Z10Z12(2)  	  Z5Z7(2) ⊕ Z11Z9(2)  	  2 Z5Z7(2) ⊕ 2 Z6Z8(2)  	  2 Z10Z12(2) ⊕ 2 Z11Z9(2)  	  2 Z10Z12(2) ⊕ 2 Z11Z9(2)  	  2 Z5Z7(2) ⊕ 2 Z6Z8(2)  
+R:(0,1/2,1/2)	  R1(2)  	  R1(2)  	  2 R1(2)  	  R1(2)  	  R1(2)  	  2 R1(2)  	  R1(2)  	  R1(2)  	  2 R1(2)  	  2 R1(2)  	  2 R1(2)  	  2 R1(2)  	  2 R1(2)  	  R2R2(4)  	  R2R2(4)  	  R2R2(4)  	  R2R2(4)  	  R2R2(4)  	  R2R2(4)  	  2 R2R2(4)  	  2 R2R2(4)  	  2 R2R2(4)  	  2 R2R2(4)  
+X:(0,1/2,0)	  X1(2)  	  X1(2)  	  2 X1(2)  	  X1(2)  	  X1(2)  	  2 X1(2)  	  X1(2)  	  X1(2)  	  2 X1(2)  	  2 X1(2)  	  2 X1(2)  	  2 X1(2)  	  2 X1(2)  	  X2X2(4)  	  X2X2(4)  	  X2X2(4)  	  X2X2(4)  	  X2X2(4)  	  X2X2(4)  	  2 X2X2(4)  	  2 X2X2(4)  	  2 X2X2(4)  	  2 X2X2(4)  
+
+
+sg 86
+Wyckoff pos.
+2a(4)	2a(4)	2a(4)	2b(4)	2b(4)	2b(4)	4c(1)	4c(1)	4d(1)	4d(1)	4e(2)	4e(2)	2a(4)	2a(4)	2b(4)	2b(4)	4c(1)	4c(1)	4d(1)	4d(1)	4e(2)
+Band-Rep.
+A↑G(2)	B↑G(2)	1E2E↑G(4)	A↑G(2)	B↑G(2)	1E2E↑G(4)	Ag↑G(4)	Au↑G(4)	Ag↑G(4)	Au↑G(4)	A↑G(4)	B↑G(4)	1E12E1↑G(4)	1E22E2↑G(4)	1E12E1↑G(4)	1E22E2↑G(4)	AgAg↑G(8)	AuAu↑G(8)	AgAg↑G(8)	AuAu↑G(8)	1E2E↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable Decomposable Decomposable Decomposable Decomposable
+A:(1/2,1/2,1/2)	  A1+(1) ⊕ A2-(1)  	  A1-(1) ⊕ A2+(1)  	  A3+A4+(2) ⊕ A3-A4-(2)  	  A1-(1) ⊕ A2+(1)  	  A1+(1) ⊕ A2-(1)  	  A3+A4+(2) ⊕ A3-A4-(2)  	  A1+(1) ⊕ A2+(1) ⊕ A3+A4+(2)  	  A1-(1) ⊕ A2-(1) ⊕ A3-A4-(2)  	  A1-(1) ⊕ A2-(1) ⊕ A3-A4-(2)  	  A1+(1) ⊕ A2+(1) ⊕ A3+A4+(2)  	  A3+A4+(2) ⊕ A3-A4-(2)  	  A1+(1) ⊕ A1-(1) ⊕ A2+(1) ⊕ A2-(1)  	  A6A8(2) ⊕ A11A9(2)  	  A5A7(2) ⊕ A10A12(2)  	  A5A7(2) ⊕ A10A12(2)  	  A6A8(2) ⊕ A11A9(2)  	  2 A5A7(2) ⊕ 2 A6A8(2)  	  2 A10A12(2) ⊕ 2 A11A9(2)  	  2 A10A12(2) ⊕ 2 A11A9(2)  	  2 A5A7(2) ⊕ 2 A6A8(2)  	  A5A7(2) ⊕ A6A8(2) ⊕ A10A12(2) ⊕ A11A9(2)  
+Γ:(0,0,0)	  Γ1+(1) ⊕ Γ2-(1)  	  Γ1-(1) ⊕ Γ2+(1)  	  Γ3+Γ4+(2) ⊕ Γ3-Γ4-(2)  	  Γ1+(1) ⊕ Γ2-(1)  	  Γ1-(1) ⊕ Γ2+(1)  	  Γ3+Γ4+(2) ⊕ Γ3-Γ4-(2)  	  Γ1+(1) ⊕ Γ2+(1) ⊕ Γ3+Γ4+(2)  	  Γ1-(1) ⊕ Γ2-(1) ⊕ Γ3-Γ4-(2)  	  Γ1+(1) ⊕ Γ2+(1) ⊕ Γ3+Γ4+(2)  	  Γ1-(1) ⊕ Γ2-(1) ⊕ Γ3-Γ4-(2)  	  Γ1+(1) ⊕ Γ1-(1) ⊕ Γ2+(1) ⊕ Γ2-(1)  	  Γ3+Γ4+(2) ⊕ Γ3-Γ4-(2)  	  Γ6Γ8(2) ⊕ Γ11Γ9(2)  	  Γ5Γ7(2) ⊕ Γ10Γ12(2)  	  Γ6Γ8(2) ⊕ Γ11Γ9(2)  	  Γ5Γ7(2) ⊕ Γ10Γ12(2)  	  2 Γ5Γ7(2) ⊕ 2 Γ6Γ8(2)  	  2 Γ10Γ12(2) ⊕ 2 Γ11Γ9(2)  	  2 Γ5Γ7(2) ⊕ 2 Γ6Γ8(2)  	  2 Γ10Γ12(2) ⊕ 2 Γ11Γ9(2)  	  Γ5Γ7(2) ⊕ Γ6Γ8(2) ⊕ Γ10Γ12(2) ⊕ Γ11Γ9(2)  
+M:(1/2,1/2,0)	  M1(2)  	  M1(2)  	  2 M2(2)  	  M1(2)  	  M1(2)  	  2 M2(2)  	  M1(2) ⊕ M2(2)  	  M1(2) ⊕ M2(2)  	  M1(2) ⊕ M2(2)  	  M1(2) ⊕ M2(2)  	  2 M2(2)  	  2 M1(2)  	  M3M4(4)  	  M3M4(4)  	  M3M4(4)  	  M3M4(4)  	  2 M3M4(4)  	  2 M3M4(4)  	  2 M3M4(4)  	  2 M3M4(4)  	  2 M3M4(4)  
+Z:(0,0,1/2)	  Z1(2)  	  Z1(2)  	  2 Z2(2)  	  Z1(2)  	  Z1(2)  	  2 Z2(2)  	  Z1(2) ⊕ Z2(2)  	  Z1(2) ⊕ Z2(2)  	  Z1(2) ⊕ Z2(2)  	  Z1(2) ⊕ Z2(2)  	  2 Z1(2)  	  2 Z2(2)  	  Z3Z4(4)  	  Z3Z4(4)  	  Z3Z4(4)  	  Z3Z4(4)  	  2 Z3Z4(4)  	  2 Z3Z4(4)  	  2 Z3Z4(4)  	  2 Z3Z4(4)  	  2 Z3Z4(4)  
+R:(0,1/2,1/2)	  R1(2)  	  R1(2)  	  2 R1(2)  	  R1(2)  	  R1(2)  	  2 R1(2)  	  2 R1(2)  	  2 R1(2)  	  2 R1(2)  	  2 R1(2)  	  2 R1(2)  	  2 R1(2)  	  R2R2(4)  	  R2R2(4)  	  R2R2(4)  	  R2R2(4)  	  2 R2R2(4)  	  2 R2R2(4)  	  2 R2R2(4)  	  2 R2R2(4)  	  2 R2R2(4)  
+X:(0,1/2,0)	  X1(2)  	  X1(2)  	  2 X1(2)  	  X1(2)  	  X1(2)  	  2 X1(2)  	  2 X1(2)  	  2 X1(2)  	  2 X1(2)  	  2 X1(2)  	  2 X1(2)  	  2 X1(2)  	  X2X2(4)  	  X2X2(4)  	  X2X2(4)  	  X2X2(4)  	  2 X2X2(4)  	  2 X2X2(4)  	  2 X2X2(4)  	  2 X2X2(4)  	  2 X2X2(4)  
+
+
+sg 87
+Wyckoff pos.
+2a(4/m)	2a(4/m)	2a(4/m)	2a(4/m)	2a(4/m)	2a(4/m)	2b(4/m)	2b(4/m)	2b(4/m)	2b(4/m)	2b(4/m)	2b(4/m)	4c(2/m)	4c(2/m)	4c(2/m)	4c(2/m)	4d(4)	4d(4)	8f(1)	8f(1)	2a(4/m)	2a(4/m)	2a(4/m)	2a(4/m)	2b(4/m)	2b(4/m)	2b(4/m)	2b(4/m)	4c(2/m)	4c(2/m)	4d(4)	4d(4)	8f(1)	8f(1)
+Band-Rep.
+Ag↑G(1)	Au↑G(1)	Bg↑G(1)	Bu↑G(1)	1Eg2Eg↑G(2)	1Eu2Eu↑G(2)	Ag↑G(1)	Au↑G(1)	Bg↑G(1)	Bu↑G(1)	1Eg2Eg↑G(2)	1Eu2Eu↑G(2)	Ag↑G(2)	Au↑G(2)	Bg↑G(2)	Bu↑G(2)	A↑G(2)	B↑G(2)	Ag↑G(4)	Au↑G(4)	1E1g2E1g↑G(2)	1E1u2E1u↑G(2)	1E2g2E2g↑G(2)	1E2u2E2u↑G(2)	1E1g2E1g↑G(2)	1E1u2E1u↑G(2)	1E2g2E2g↑G(2)	1E2u2E2u↑G(2)	1Eg2Eg↑G(4)	1Eu2Eu↑G(4)	1E12E1↑G(4)	1E22E2↑G(4)	AgAg↑G(8)	AuAu↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable Decomposable Decomposable Decomposable Decomposable Decomposable Decomposable
+Γ:(0,0,0)	  Γ1+(1)  	  Γ1-(1)  	  Γ2+(1)  	  Γ2-(1)  	  Γ3+Γ4+(2)  	  Γ3-Γ4-(2)  	  Γ1+(1)  	  Γ1-(1)  	  Γ2+(1)  	  Γ2-(1)  	  Γ3+Γ4+(2)  	  Γ3-Γ4-(2)  	  Γ1+(1) ⊕ Γ2+(1)  	  Γ1-(1) ⊕ Γ2-(1)  	  Γ3+Γ4+(2)  	  Γ3-Γ4-(2)  	  Γ1+(1) ⊕ Γ2-(1)  	  Γ1-(1) ⊕ Γ2+(1)  	  Γ1+(1) ⊕ Γ2+(1) ⊕ Γ3+Γ4+(2)  	  Γ1-(1) ⊕ Γ2-(1) ⊕ Γ3-Γ4-(2)  	  Γ6Γ8(2)  	  Γ10Γ12(2)  	  Γ5Γ7(2)  	  Γ11Γ9(2)  	  Γ6Γ8(2)  	  Γ10Γ12(2)  	  Γ5Γ7(2)  	  Γ11Γ9(2)  	  Γ5Γ7(2) ⊕ Γ6Γ8(2)  	  Γ10Γ12(2) ⊕ Γ11Γ9(2)  	  Γ6Γ8(2) ⊕ Γ11Γ9(2)  	  Γ5Γ7(2) ⊕ Γ10Γ12(2)  	  2 Γ5Γ7(2) ⊕ 2 Γ6Γ8(2)  	  2 Γ10Γ12(2) ⊕ 2 Γ11Γ9(2)  
+M:(1,1,1)	  M1+(1)  	  M1-(1)  	  M2+(1)  	  M2-(1)  	  M3+M4+(2)  	  M3-M4-(2)  	  M1+(1)  	  M1-(1)  	  M2+(1)  	  M2-(1)  	  M3+M4+(2)  	  M3-M4-(2)  	  M1+(1) ⊕ M2+(1)  	  M1-(1) ⊕ M2-(1)  	  M3+M4+(2)  	  M3-M4-(2)  	  M1-(1) ⊕ M2+(1)  	  M1+(1) ⊕ M2-(1)  	  M1-(1) ⊕ M2-(1) ⊕ M3-M4-(2)  	  M1+(1) ⊕ M2+(1) ⊕ M3+M4+(2)  	  M6M8(2)  	  M10M12(2)  	  M5M7(2)  	  M11M9(2)  	  M6M8(2)  	  M10M12(2)  	  M5M7(2)  	  M11M9(2)  	  M5M7(2) ⊕ M6M8(2)  	  M10M12(2) ⊕ M11M9(2)  	  M5M7(2) ⊕ M10M12(2)  	  M6M8(2) ⊕ M11M9(2)  	  2 M10M12(2) ⊕ 2 M11M9(2)  	  2 M5M7(2) ⊕ 2 M6M8(2)  
+P:(1/2,1/2,1/2)	  P1(1)  	  P2(1)  	  P2(1)  	  P1(1)  	  P3P4(2)  	  P3P4(2)  	  P2(1)  	  P1(1)  	  P1(1)  	  P2(1)  	  P3P4(2)  	  P3P4(2)  	  P3P4(2)  	  P3P4(2)  	  P1(1) ⊕ P2(1)  	  P1(1) ⊕ P2(1)  	  P3P4(2)  	  P3P4(2)  	  P1(1) ⊕ P2(1) ⊕ P3P4(2)  	  P1(1) ⊕ P2(1) ⊕ P3P4(2)  	  P6P8(2)  	  P5P7(2)  	  P5P7(2)  	  P6P8(2)  	  P5P7(2)  	  P6P8(2)  	  P6P8(2)  	  P5P7(2)  	  P5P7(2) ⊕ P6P8(2)  	  P5P7(2) ⊕ P6P8(2)  	  P5P7(2) ⊕ P6P8(2)  	  P5P7(2) ⊕ P6P8(2)  	  2 P5P7(2) ⊕ 2 P6P8(2)  	  2 P5P7(2) ⊕ 2 P6P8(2)  
+X:(1/2,1/2,0)	  X1+(1)  	  X1-(1)  	  X1+(1)  	  X1-(1)  	  2 X2+(1)  	  2 X2-(1)  	  X1+(1)  	  X1-(1)  	  X1+(1)  	  X1-(1)  	  2 X2+(1)  	  2 X2-(1)  	  2 X2-(1)  	  2 X2+(1)  	  2 X1-(1)  	  2 X1+(1)  	  X2+(1) ⊕ X2-(1)  	  X2+(1) ⊕ X2-(1)  	  X1+(1) ⊕ X1-(1) ⊕ X2+(1) ⊕ X2-(1)  	  X1+(1) ⊕ X1-(1) ⊕ X2+(1) ⊕ X2-(1)  	  X3X4(2)  	  X5X6(2)  	  X3X4(2)  	  X5X6(2)  	  X3X4(2)  	  X5X6(2)  	  X3X4(2)  	  X5X6(2)  	  2 X5X6(2)  	  2 X3X4(2)  	  X3X4(2) ⊕ X5X6(2)  	  X3X4(2) ⊕ X5X6(2)  	  2 X3X4(2) ⊕ 2 X5X6(2)  	  2 X3X4(2) ⊕ 2 X5X6(2)  
+N:(1/2,0,1/2)	  N1+(1)  	  N1-(1)  	  N1+(1)  	  N1-(1)  	  2 N1+(1)  	  2 N1-(1)  	  N1-(1)  	  N1+(1)  	  N1-(1)  	  N1+(1)  	  2 N1-(1)  	  2 N1+(1)  	  N1+(1) ⊕ N1-(1)  	  N1+(1) ⊕ N1-(1)  	  N1+(1) ⊕ N1-(1)  	  N1+(1) ⊕ N1-(1)  	  N1+(1) ⊕ N1-(1)  	  N1+(1) ⊕ N1-(1)  	  2 N1+(1) ⊕ 2 N1-(1)  	  2 N1+(1) ⊕ 2 N1-(1)  	  N3N3(2)  	  N2N2(2)  	  N3N3(2)  	  N2N2(2)  	  N2N2(2)  	  N3N3(2)  	  N2N2(2)  	  N3N3(2)  	  N2N2(2) ⊕ N3N3(2)  	  N2N2(2) ⊕ N3N3(2)  	  N2N2(2) ⊕ N3N3(2)  	  N2N2(2) ⊕ N3N3(2)  	  2 N2N2(2) ⊕ 2 N3N3(2)  	  2 N2N2(2) ⊕ 2 N3N3(2)
+
+sg 88
+Wyckoff pos.
+4a(4)	4a(4)	4a(4)	4b(4)	4b(4)	4b(4)	8c(1)	8c(1)	8d(1)	8d(1)	4a(4)	4a(4)	4b(4)	4b(4)	8c(1)	8c(1)	8d(1)	8d(1)
+Band-Rep.
+A↑G(2)	B↑G(2)	1E2E↑G(4)	A↑G(2)	B↑G(2)	1E2E↑G(4)	Ag↑G(4)	Au↑G(4)	Ag↑G(4)	Au↑G(4)	1E12E1↑G(4)	1E22E2↑G(4)	1E12E1↑G(4)	1E22E2↑G(4)	AgAg↑G(8)	AuAu↑G(8)	AgAg↑G(8)	AuAu↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable Decomposable Decomposable Decomposable
+Γ:(0,0,0)	  Γ1+(1) ⊕ Γ2-(1)  	  Γ1-(1) ⊕ Γ2+(1)  	  Γ3+Γ4+(2) ⊕ Γ3-Γ4-(2)  	  Γ1+(1) ⊕ Γ2-(1)  	  Γ1-(1) ⊕ Γ2+(1)  	  Γ3+Γ4+(2) ⊕ Γ3-Γ4-(2)  	  Γ1+(1) ⊕ Γ2+(1) ⊕ Γ3+Γ4+(2)  	  Γ1-(1) ⊕ Γ2-(1) ⊕ Γ3-Γ4-(2)  	  Γ1+(1) ⊕ Γ2+(1) ⊕ Γ3+Γ4+(2)  	  Γ1-(1) ⊕ Γ2-(1) ⊕ Γ3-Γ4-(2)  	  Γ6Γ8(2) ⊕ Γ11Γ9(2)  	  Γ5Γ7(2) ⊕ Γ10Γ12(2)  	  Γ6Γ8(2) ⊕ Γ11Γ9(2)  	  Γ5Γ7(2) ⊕ Γ10Γ12(2)  	  2 Γ5Γ7(2) ⊕ 2 Γ6Γ8(2)  	  2 Γ10Γ12(2) ⊕ 2 Γ11Γ9(2)  	  2 Γ5Γ7(2) ⊕ 2 Γ6Γ8(2)  	  2 Γ10Γ12(2) ⊕ 2 Γ11Γ9(2)  
+M:(1,1,1)	  M1(2)  	  M1(2)  	  2 M2(2)  	  M1(2)  	  M1(2)  	  2 M2(2)  	  M1(2) ⊕ M2(2)  	  M1(2) ⊕ M2(2)  	  M1(2) ⊕ M2(2)  	  M1(2) ⊕ M2(2)  	  M3M4(4)  	  M3M4(4)  	  M3M4(4)  	  M3M4(4)  	  2 M3M4(4)  	  2 M3M4(4)  	  2 M3M4(4)  	  2 M3M4(4)  
+P:(1/2,1/2,1/2)	  P1P4(2)  	  P2P3(2)  	  P1P4(2) ⊕ P2P3(2)  	  P2P3(2)  	  P1P4(2)  	  P1P4(2) ⊕ P2P3(2)  	  P1P4(2) ⊕ P2P3(2)  	  P1P4(2) ⊕ P2P3(2)  	  P1P4(2) ⊕ P2P3(2)  	  P1P4(2) ⊕ P2P3(2)  	  P5P6(2) ⊕ P8P8(2)  	  P5P6(2) ⊕ P7P7(2)  	  P5P6(2) ⊕ P7P7(2)  	  P5P6(2) ⊕ P8P8(2)  	  2 P5P6(2) ⊕ P7P7(2) ⊕ P8P8(2)  	  2 P5P6(2) ⊕ P7P7(2) ⊕ P8P8(2)  	  2 P5P6(2) ⊕ P7P7(2) ⊕ P8P8(2)  	  2 P5P6(2) ⊕ P7P7(2) ⊕ P8P8(2)  
+X:(1/2,1/2,0)	  X1(2)  	  X1(2)  	  2 X1(2)  	  X1(2)  	  X1(2)  	  2 X1(2)  	  2 X1(2)  	  2 X1(2)  	  2 X1(2)  	  2 X1(2)  	  X2X2(4)  	  X2X2(4)  	  X2X2(4)  	  X2X2(4)  	  2 X2X2(4)  	  2 X2X2(4)  	  2 X2X2(4)  	  2 X2X2(4)  
+N:(1/2,0,1/2)	  N1+(1) ⊕ N1-(1)  	  N1+(1) ⊕ N1-(1)  	  2 N1+(1) ⊕ 2 N1-(1)  	  N1+(1) ⊕ N1-(1)  	  N1+(1) ⊕ N1-(1)  	  2 N1+(1) ⊕ 2 N1-(1)  	  3 N1+(1) ⊕ N1-(1)  	  N1+(1) ⊕ 3 N1-(1)  	  N1+(1) ⊕ 3 N1-(1)  	  3 N1+(1) ⊕ N1-(1)  	  N2N2(2) ⊕ N3N3(2)  	  N2N2(2) ⊕ N3N3(2)  	  N2N2(2) ⊕ N3N3(2)  	  N2N2(2) ⊕ N3N3(2)  	  3 N2N2(2) ⊕ N3N3(2)  	  N2N2(2) ⊕ 3 N3N3(2)  	  N2N2(2) ⊕ 3 N3N3(2)  	  3 N2N2(2) ⊕ N3N3(2)  
+
+
+sg 89
+Wyckoff pos.
+1a(422)	1a(422)	1a(422)	1a(422)	1a(422)	1b(422)	1b(422)	1b(422)	1b(422)	1b(422)	1c(422)	1c(422)	1c(422)	1c(422)	1c(422)	1d(422)	1d(422)	1d(422)	1d(422)	1d(422)	2e(222)	2e(222)	2e(222)	2e(222)	2f(222)	2f(222)	2f(222)	2f(222)	1a(422)	1a(422)	1b(422)	1b(422)	1c(422)	1c(422)	1d(422)	1d(422)	2e(222)	2f(222)
+Band-Rep.
+A1↑G(1)	A2↑G(1)	B1↑G(1)	B2↑G(1)	E↑G(2)	A1↑G(1)	A2↑G(1)	B1↑G(1)	B2↑G(1)	E↑G(2)	A1↑G(1)	A2↑G(1)	B1↑G(1)	B2↑G(1)	E↑G(2)	A1↑G(1)	A2↑G(1)	B1↑G(1)	B2↑G(1)	E↑G(2)	A↑G(2)	B1↑G(2)	B2↑G(2)	B3↑G(2)	A↑G(2)	B1↑G(2)	B2↑G(2)	B3↑G(2)	E1↑G(2)	E2↑G(2)	E1↑G(2)	E2↑G(2)	E1↑G(2)	E2↑G(2)	E1↑G(2)	E2↑G(2)	E↑G(4)	E↑G(4)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable Decomposable
+A:(1/2,1/2,1/2)	  A1(1)  	  A3(1)  	  A2(1)  	  A4(1)  	  A5(2)  	  A3(1)  	  A1(1)  	  A4(1)  	  A2(1)  	  A5(2)  	  A4(1)  	  A2(1)  	  A3(1)  	  A1(1)  	  A5(2)  	  A2(1)  	  A4(1)  	  A1(1)  	  A3(1)  	  A5(2)  	  A5(2)  	  A5(2)  	  A3(1) ⊕ A4(1)  	  A1(1) ⊕ A2(1)  	  A5(2)  	  A5(2)  	  A1(1) ⊕ A2(1)  	  A3(1) ⊕ A4(1)  	  A7(2)  	  A6(2)  	  A7(2)  	  A6(2)  	  A6(2)  	  A7(2)  	  A6(2)  	  A7(2)  	  A6(2) ⊕ A7(2)  	  A6(2) ⊕ A7(2)  
+Γ:(0,0,0)	  Γ1(1)  	  Γ3(1)  	  Γ2(1)  	  Γ4(1)  	  Γ5(2)  	  Γ1(1)  	  Γ3(1)  	  Γ2(1)  	  Γ4(1)  	  Γ5(2)  	  Γ1(1)  	  Γ3(1)  	  Γ2(1)  	  Γ4(1)  	  Γ5(2)  	  Γ1(1)  	  Γ3(1)  	  Γ2(1)  	  Γ4(1)  	  Γ5(2)  	  Γ1(1) ⊕ Γ2(1)  	  Γ3(1) ⊕ Γ4(1)  	  Γ5(2)  	  Γ5(2)  	  Γ1(1) ⊕ Γ2(1)  	  Γ3(1) ⊕ Γ4(1)  	  Γ5(2)  	  Γ5(2)  	  Γ7(2)  	  Γ6(2)  	  Γ7(2)  	  Γ6(2)  	  Γ7(2)  	  Γ6(2)  	  Γ7(2)  	  Γ6(2)  	  Γ6(2) ⊕ Γ7(2)  	  Γ6(2) ⊕ Γ7(2)  
+M:(1/2,1/2,0)	  M1(1)  	  M3(1)  	  M2(1)  	  M4(1)  	  M5(2)  	  M1(1)  	  M3(1)  	  M2(1)  	  M4(1)  	  M5(2)  	  M4(1)  	  M2(1)  	  M3(1)  	  M1(1)  	  M5(2)  	  M4(1)  	  M2(1)  	  M3(1)  	  M1(1)  	  M5(2)  	  M5(2)  	  M5(2)  	  M3(1) ⊕ M4(1)  	  M1(1) ⊕ M2(1)  	  M5(2)  	  M5(2)  	  M3(1) ⊕ M4(1)  	  M1(1) ⊕ M2(1)  	  M7(2)  	  M6(2)  	  M7(2)  	  M6(2)  	  M6(2)  	  M7(2)  	  M6(2)  	  M7(2)  	  M6(2) ⊕ M7(2)  	  M6(2) ⊕ M7(2)  
+Z:(0,0,1/2)	  Z1(1)  	  Z3(1)  	  Z2(1)  	  Z4(1)  	  Z5(2)  	  Z3(1)  	  Z1(1)  	  Z4(1)  	  Z2(1)  	  Z5(2)  	  Z1(1)  	  Z3(1)  	  Z2(1)  	  Z4(1)  	  Z5(2)  	  Z3(1)  	  Z1(1)  	  Z4(1)  	  Z2(1)  	  Z5(2)  	  Z1(1) ⊕ Z2(1)  	  Z3(1) ⊕ Z4(1)  	  Z5(2)  	  Z5(2)  	  Z3(1) ⊕ Z4(1)  	  Z1(1) ⊕ Z2(1)  	  Z5(2)  	  Z5(2)  	  Z7(2)  	  Z6(2)  	  Z7(2)  	  Z6(2)  	  Z7(2)  	  Z6(2)  	  Z7(2)  	  Z6(2)  	  Z6(2) ⊕ Z7(2)  	  Z6(2) ⊕ Z7(2)  
+R:(0,1/2,1/2)	  R1(1)  	  R2(1)  	  R1(1)  	  R2(1)  	  R3(1) ⊕ R4(1)  	  R2(1)  	  R1(1)  	  R2(1)  	  R1(1)  	  R3(1) ⊕ R4(1)  	  R4(1)  	  R3(1)  	  R4(1)  	  R3(1)  	  R1(1) ⊕ R2(1)  	  R3(1)  	  R4(1)  	  R3(1)  	  R4(1)  	  R1(1) ⊕ R2(1)  	  R1(1) ⊕ R4(1)  	  R2(1) ⊕ R3(1)  	  R2(1) ⊕ R4(1)  	  R1(1) ⊕ R3(1)  	  R2(1) ⊕ R3(1)  	  R1(1) ⊕ R4(1)  	  R1(1) ⊕ R3(1)  	  R2(1) ⊕ R4(1)  	  R5(2)  	  R5(2)  	  R5(2)  	  R5(2)  	  R5(2)  	  R5(2)  	  R5(2)  	  R5(2)  	  2 R5(2)  	  2 R5(2)  
+X:(0,1/2,0)	  X1(1)  	  X2(1)  	  X1(1)  	  X2(1)  	  X3(1) ⊕ X4(1)  	  X1(1)  	  X2(1)  	  X1(1)  	  X2(1)  	  X3(1) ⊕ X4(1)  	  X4(1)  	  X3(1)  	  X4(1)  	  X3(1)  	  X1(1) ⊕ X2(1)  	  X4(1)  	  X3(1)  	  X4(1)  	  X3(1)  	  X1(1) ⊕ X2(1)  	  X1(1) ⊕ X4(1)  	  X2(1) ⊕ X3(1)  	  X2(1) ⊕ X4(1)  	  X1(1) ⊕ X3(1)  	  X1(1) ⊕ X4(1)  	  X2(1) ⊕ X3(1)  	  X2(1) ⊕ X4(1)  	  X1(1) ⊕ X3(1)  	  X5(2)  	  X5(2)  	  X5(2)  	  X5(2)  	  X5(2)  	  X5(2)  	  X5(2)  	  X5(2)  	  2 X5(2)  	  2 X5(2)  
+
+sg 94
+Wyckoff pos.
+2a(222)	2a(222)	2a(222)	2a(222)	2b(222)	2b(222)	2b(222)	2b(222)	4d(2)	4d(2)	2a(222)	2b(222)	4d(2)
+Band-Rep.
+A↑G(2)	B1↑G(2)	B2↑G(2)	B3↑G(2)	A↑G(2)	B1↑G(2)	B2↑G(2)	B3↑G(2)	A↑G(4)	B↑G(4)	E↑G(4)	E↑G(4)	1E2E↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable
+A:(1/2,1/2,1/2)	  A5(2)  	  A5(2)  	  A1A4(2)  	  A2A3(2)  	  A5(2)  	  A5(2)  	  A2A3(2)  	  A1A4(2)  	  A1A4(2) ⊕ A2A3(2)  	  2 A5(2)  	  A6A7(4)  	  A6A7(4)  	  2 A6A7(4)  
+Γ:(0,0,0)	  Γ1(1) ⊕ Γ4(1)  	  Γ2(1) ⊕ Γ3(1)  	  Γ5(2)  	  Γ5(2)  	  Γ1(1) ⊕ Γ4(1)  	  Γ2(1) ⊕ Γ3(1)  	  Γ5(2)  	  Γ5(2)  	  Γ1(1) ⊕ Γ2(1) ⊕ Γ3(1) ⊕ Γ4(1)  	  2 Γ5(2)  	  Γ6(2) ⊕ Γ7(2)  	  Γ6(2) ⊕ Γ7(2)  	  2 Γ6(2) ⊕ 2 Γ7(2)  
+M:(1/2,1/2,0)	  M1M4(2)  	  M2M3(2)  	  M5(2)  	  M5(2)  	  M1M4(2)  	  M2M3(2)  	  M5(2)  	  M5(2)  	  2 M5(2)  	  M1M4(2) ⊕ M2M3(2)  	  M6M7(4)  	  M6M7(4)  	  2 M6M7(4)  
+Z:(0,0,1/2)	  Z5(2)  	  Z5(2)  	  Z1(1) ⊕ Z4(1)  	  Z2(1) ⊕ Z3(1)  	  Z5(2)  	  Z5(2)  	  Z2(1) ⊕ Z3(1)  	  Z1(1) ⊕ Z4(1)  	  2 Z5(2)  	  Z1(1) ⊕ Z2(1) ⊕ Z3(1) ⊕ Z4(1)  	  Z6(2) ⊕ Z7(2)  	  Z6(2) ⊕ Z7(2)  	  2 Z6(2) ⊕ 2 Z7(2)  
+R:(0,1/2,1/2)	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  2 R1(2)  	  2 R1(2)  	  R2R5(2) ⊕ R3R4(2)  	  R2R5(2) ⊕ R3R4(2)  	  2 R2R5(2) ⊕ 2 R3R4(2)  
+X:(0,1/2,0)	  X1(2)  	  X1(2)  	  X1(2)  	  X1(2)  	  X1(2)  	  X1(2)  	  X1(2)  	  X1(2)  	  2 X1(2)  	  2 X1(2)  	  X2X5(2) ⊕ X3X4(2)  	  X2X5(2) ⊕ X3X4(2)  	  2 X2X5(2) ⊕ 2 X3X4(2)
+
+
+sg 97
+Wyckoff pos.
+2a(422)	2a(422)	2a(422)	2a(422)	2a(422)	2b(422)	2b(422)	2b(422)	2b(422)	2b(422)	4c(222)	4c(222)	4c(222)	4c(222)	4d(222)	4d(222)	4d(222)	4d(222)	2a(422)	2a(422)	2b(422)	2b(422)	4c(222)	4d(222)
+Band-Rep.
+A1↑G(1)	A2↑G(1)	B1↑G(1)	B2↑G(1)	E↑G(2)	A1↑G(1)	A2↑G(1)	B1↑G(1)	B2↑G(1)	E↑G(2)	A↑G(2)	B1↑G(2)	B2↑G(2)	B3↑G(2)	A↑G(2)	B1↑G(2)	B2↑G(2)	B3↑G(2)	E1↑G(2)	E2↑G(2)	E1↑G(2)	E2↑G(2)	E↑G(4)	E↑G(4)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable Decomposable
+Γ:(0,0,0)	  Γ1(1)  	  Γ3(1)  	  Γ2(1)  	  Γ4(1)  	  Γ5(2)  	  Γ1(1)  	  Γ3(1)  	  Γ2(1)  	  Γ4(1)  	  Γ5(2)  	  Γ1(1) ⊕ Γ2(1)  	  Γ3(1) ⊕ Γ4(1)  	  Γ5(2)  	  Γ5(2)  	  Γ1(1) ⊕ Γ4(1)  	  Γ2(1) ⊕ Γ3(1)  	  Γ5(2)  	  Γ5(2)  	  Γ7(2)  	  Γ6(2)  	  Γ7(2)  	  Γ6(2)  	  Γ6(2) ⊕ Γ7(2)  	  Γ6(2) ⊕ Γ7(2)  
+M:(1,1,1)	  M1(1)  	  M3(1)  	  M2(1)  	  M4(1)  	  M5(2)  	  M1(1)  	  M3(1)  	  M2(1)  	  M4(1)  	  M5(2)  	  M1(1) ⊕ M2(1)  	  M3(1) ⊕ M4(1)  	  M5(2)  	  M5(2)  	  M2(1) ⊕ M3(1)  	  M1(1) ⊕ M4(1)  	  M5(2)  	  M5(2)  	  M7(2)  	  M6(2)  	  M7(2)  	  M6(2)  	  M6(2) ⊕ M7(2)  	  M6(2) ⊕ M7(2)  
+P:(1/2,1/2,1/2)	  P1(1)  	  P2(1)  	  P1(1)  	  P2(1)  	  P3P4(2)  	  P2(1)  	  P1(1)  	  P2(1)  	  P1(1)  	  P3P4(2)  	  P3P4(2)  	  P3P4(2)  	  2 P1(1)  	  2 P2(1)  	  P3P4(2)  	  P3P4(2)  	  P1(1) ⊕ P2(1)  	  P1(1) ⊕ P2(1)  	  P5(2)  	  P5(2)  	  P5(2)  	  P5(2)  	  2 P5(2)  	  2 P5(2)  
+X:(1/2,1/2,0)	  X1(1)  	  X2(1)  	  X2(1)  	  X1(1)  	  X3(1) ⊕ X4(1)  	  X1(1)  	  X2(1)  	  X2(1)  	  X1(1)  	  X3(1) ⊕ X4(1)  	  X3(1) ⊕ X4(1)  	  X3(1) ⊕ X4(1)  	  X1(1) ⊕ X2(1)  	  X1(1) ⊕ X2(1)  	  2 X3(1)  	  2 X4(1)  	  X1(1) ⊕ X2(1)  	  X1(1) ⊕ X2(1)  	  X5(2)  	  X5(2)  	  X5(2)  	  X5(2)  	  2 X5(2)  	  2 X5(2)  
+N:(1/2,0,1/2)	  N1(1)  	  N2(1)  	  N1(1)  	  N2(1)  	  N1(1) ⊕ N2(1)  	  N2(1)  	  N1(1)  	  N2(1)  	  N1(1)  	  N1(1) ⊕ N2(1)  	  N1(1) ⊕ N2(1)  	  N1(1) ⊕ N2(1)  	  2 N1(1)  	  2 N2(1)  	  N1(1) ⊕ N2(1)  	  N1(1) ⊕ N2(1)  	  N1(1) ⊕ N2(1)  	  N1(1) ⊕ N2(1)  	  N3N4(2)  	  N3N4(2)  	  N3N4(2)  	  N3N4(2)  	  2 N3N4(2)  	  2 N3N4(2) 
+
+sg 98
+Wyckoff pos.
+4a(222)	4a(222)	4a(222)	4a(222)	4b(222)	4b(222)	4b(222)	4b(222)	8f(2)	8f(2)	4a(222)	4b(222)	8f(2)
+Band-Rep.
+A↑G(2)	B1↑G(2)	B2↑G(2)	B3↑G(2)	A↑G(2)	B1↑G(2)	B2↑G(2)	B3↑G(2)	A↑G(4)	B↑G(4)	E↑G(4)	E↑G(4)	1E2E↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable
+Γ:(0,0,0)	  Γ1(1) ⊕ Γ4(1)  	  Γ2(1) ⊕ Γ3(1)  	  Γ5(2)  	  Γ5(2)  	  Γ1(1) ⊕ Γ4(1)  	  Γ2(1) ⊕ Γ3(1)  	  Γ5(2)  	  Γ5(2)  	  Γ1(1) ⊕ Γ2(1) ⊕ Γ5(2)  	  Γ3(1) ⊕ Γ4(1) ⊕ Γ5(2)  	  Γ6(2) ⊕ Γ7(2)  	  Γ6(2) ⊕ Γ7(2)  	  2 Γ6(2) ⊕ 2 Γ7(2)  
+M:(1,1,1)	  M5(2)  	  M5(2)  	  M1(1) ⊕ M4(1)  	  M2(1) ⊕ M3(1)  	  M5(2)  	  M5(2)  	  M1(1) ⊕ M4(1)  	  M2(1) ⊕ M3(1)  	  M1(1) ⊕ M2(1) ⊕ M5(2)  	  M3(1) ⊕ M4(1) ⊕ M5(2)  	  M6(2) ⊕ M7(2)  	  M6(2) ⊕ M7(2)  	  2 M6(2) ⊕ 2 M7(2)  
+P:(1/2,1/2,1/2)	  P1(2)  	  P1(2)  	  P1(2)  	  P1(2)  	  P1(2)  	  P1(2)  	  P1(2)  	  P1(2)  	  2 P1(2)  	  2 P1(2)  	  P2P4(2) ⊕ P3(1) ⊕ P5(1)  	  P2P4(2) ⊕ P3(1) ⊕ P5(1)  	  2 P2P4(2) ⊕ 2 P3(1) ⊕ 2 P5(1)  
+X:(1/2,1/2,0)	  X1(1) ⊕ X3(1)  	  X2(1) ⊕ X4(1)  	  X1(1) ⊕ X4(1)  	  X2(1) ⊕ X3(1)  	  X1(1) ⊕ X3(1)  	  X2(1) ⊕ X4(1)  	  X1(1) ⊕ X4(1)  	  X2(1) ⊕ X3(1)  	  X1(1) ⊕ X2(1) ⊕ X3(1) ⊕ X4(1)  	  X1(1) ⊕ X2(1) ⊕ X3(1) ⊕ X4(1)  	  2 X5(2)  	  2 X5(2)  	  4 X5(2)  
+N:(1/2,0,1/2)	  N1(1) ⊕ N2(1)  	  N1(1) ⊕ N2(1)  	  N1(1) ⊕ N2(1)  	  N1(1) ⊕ N2(1)  	  N1(1) ⊕ N2(1)  	  N1(1) ⊕ N2(1)  	  N1(1) ⊕ N2(1)  	  N1(1) ⊕ N2(1)  	  2 N1(1) ⊕ 2 N2(1)  	  2 N1(1) ⊕ 2 N2(1)  	  2 N3N4(2)  	  2 N3N4(2)  	  4 N3N4(2) 
+
+
+sg 99
+Wyckoff pos.
+1a(4mm)	1a(4mm)	1a(4mm)	1a(4mm)	1a(4mm)	1b(4mm)	1b(4mm)	1b(4mm)	1b(4mm)	1b(4mm)	2c(mm2)	2c(mm2)	2c(mm2)	2c(mm2)	1a(4mm)	1a(4mm)	1b(4mm)	1b(4mm)	2c(mm2)
+Band-Rep.
+A1↑G(1)	A2↑G(1)	B1↑G(1)	B2↑G(1)	E↑G(2)	A1↑G(1)	A2↑G(1)	B1↑G(1)	B2↑G(1)	E↑G(2)	A1↑G(2)	A2↑G(2)	B1↑G(2)	B2↑G(2)	E1↑G(2)	E2↑G(2)	E1↑G(2)	E2↑G(2)	E↑G(4)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable
+A:(1/2,1/2,1/2)	  A1(1)  	  A4(1)  	  A2(1)  	  A3(1)  	  A5(2)  	  A3(1)  	  A2(1)  	  A4(1)  	  A1(1)  	  A5(2)  	  A5(2)  	  A5(2)  	  A1(1) ⊕ A2(1)  	  A3(1) ⊕ A4(1)  	  A7(2)  	  A6(2)  	  A6(2)  	  A7(2)  	  A6(2) ⊕ A7(2)  
+Γ:(0,0,0)	  Γ1(1)  	  Γ4(1)  	  Γ2(1)  	  Γ3(1)  	  Γ5(2)  	  Γ1(1)  	  Γ4(1)  	  Γ2(1)  	  Γ3(1)  	  Γ5(2)  	  Γ1(1) ⊕ Γ2(1)  	  Γ3(1) ⊕ Γ4(1)  	  Γ5(2)  	  Γ5(2)  	  Γ7(2)  	  Γ6(2)  	  Γ7(2)  	  Γ6(2)  	  Γ6(2) ⊕ Γ7(2)  
+M:(1/2,1/2,0)	  M1(1)  	  M4(1)  	  M2(1)  	  M3(1)  	  M5(2)  	  M3(1)  	  M2(1)  	  M4(1)  	  M1(1)  	  M5(2)  	  M5(2)  	  M5(2)  	  M1(1) ⊕ M2(1)  	  M3(1) ⊕ M4(1)  	  M7(2)  	  M6(2)  	  M6(2)  	  M7(2)  	  M6(2) ⊕ M7(2)  
+Z:(0,0,1/2)	  Z1(1)  	  Z4(1)  	  Z2(1)  	  Z3(1)  	  Z5(2)  	  Z1(1)  	  Z4(1)  	  Z2(1)  	  Z3(1)  	  Z5(2)  	  Z1(1) ⊕ Z2(1)  	  Z3(1) ⊕ Z4(1)  	  Z5(2)  	  Z5(2)  	  Z7(2)  	  Z6(2)  	  Z7(2)  	  Z6(2)  	  Z6(2) ⊕ Z7(2)  
+R:(0,1/2,1/2)	  R1(1)  	  R2(1)  	  R1(1)  	  R2(1)  	  R3(1) ⊕ R4(1)  	  R3(1)  	  R4(1)  	  R3(1)  	  R4(1)  	  R1(1) ⊕ R2(1)  	  R1(1) ⊕ R3(1)  	  R2(1) ⊕ R4(1)  	  R1(1) ⊕ R4(1)  	  R2(1) ⊕ R3(1)  	  R5(2)  	  R5(2)  	  R5(2)  	  R5(2)  	  2 R5(2)  
+X:(0,1/2,0)	  X1(1)  	  X2(1)  	  X1(1)  	  X2(1)  	  X3(1) ⊕ X4(1)  	  X3(1)  	  X4(1)  	  X3(1)  	  X4(1)  	  X1(1) ⊕ X2(1)  	  X1(1) ⊕ X3(1)  	  X2(1) ⊕ X4(1)  	  X1(1) ⊕ X4(1)  	  X2(1) ⊕ X3(1)  	  X5(2)  	  X5(2)  	  X5(2)  	  X5(2)  	  2 X5(2)  
+
+sg 101
+Wyckoff pos.
+2a(mm2)	2a(mm2)	2a(mm2)	2a(mm2)	2b(mm2)	2b(mm2)	2b(mm2)	2b(mm2)	4c(2)	4c(2)	2a(mm2)	2b(mm2)	4c(2)
+Band-Rep.
+A1↑G(2)	A2↑G(2)	B1↑G(2)	B2↑G(2)	A1↑G(2)	A2↑G(2)	B1↑G(2)	B2↑G(2)	A↑G(4)	B↑G(4)	E↑G(4)	E↑G(4)	1E2E↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable
+A:(1/2,1/2,1/2)	  A1A3(2)  	  A2A4(2)  	  A5(2)  	  A5(2)  	  A1A3(2)  	  A2A4(2)  	  A5(2)  	  A5(2)  	  2 A5(2)  	  A1A3(2) ⊕ A2A4(2)  	  A6A7(4)  	  A6A7(4)  	  2 A6A7(4)  
+Γ:(0,0,0)	  Γ1(1) ⊕ Γ3(1)  	  Γ2(1) ⊕ Γ4(1)  	  Γ5(2)  	  Γ5(2)  	  Γ1(1) ⊕ Γ3(1)  	  Γ2(1) ⊕ Γ4(1)  	  Γ5(2)  	  Γ5(2)  	  Γ1(1) ⊕ Γ2(1) ⊕ Γ3(1) ⊕ Γ4(1)  	  2 Γ5(2)  	  Γ6(2) ⊕ Γ7(2)  	  Γ6(2) ⊕ Γ7(2)  	  2 Γ6(2) ⊕ 2 Γ7(2)  
+M:(1/2,1/2,0)	  M1(1) ⊕ M3(1)  	  M2(1) ⊕ M4(1)  	  M5(2)  	  M5(2)  	  M1(1) ⊕ M3(1)  	  M2(1) ⊕ M4(1)  	  M5(2)  	  M5(2)  	  2 M5(2)  	  M1(1) ⊕ M2(1) ⊕ M3(1) ⊕ M4(1)  	  M6(2) ⊕ M7(2)  	  M6(2) ⊕ M7(2)  	  2 M6(2) ⊕ 2 M7(2)  
+Z:(0,0,1/2)	  Z1Z3(2)  	  Z2Z4(2)  	  Z5(2)  	  Z5(2)  	  Z1Z3(2)  	  Z2Z4(2)  	  Z5(2)  	  Z5(2)  	  Z1Z3(2) ⊕ Z2Z4(2)  	  2 Z5(2)  	  Z6Z7(4)  	  Z6Z7(4)  	  2 Z6Z7(4)  
+R:(0,1/2,1/2)	  R1R2(2)  	  R1R2(2)  	  R3R4(2)  	  R3R4(2)  	  R3R4(2)  	  R3R4(2)  	  R1R2(2)  	  R1R2(2)  	  R1R2(2) ⊕ R3R4(2)  	  R1R2(2) ⊕ R3R4(2)  	  R5R5(4)  	  R5R5(4)  	  2 R5R5(4)  
+X:(0,1/2,0)	  X1(1) ⊕ X2(1)  	  X1(1) ⊕ X2(1)  	  X3(1) ⊕ X4(1)  	  X3(1) ⊕ X4(1)  	  X3(1) ⊕ X4(1)  	  X3(1) ⊕ X4(1)  	  X1(1) ⊕ X2(1)  	  X1(1) ⊕ X2(1)  	  X1(1) ⊕ X2(1) ⊕ X3(1) ⊕ X4(1)  	  X1(1) ⊕ X2(1) ⊕ X3(1) ⊕ X4(1)  	  2 X5(2)  	  2 X5(2)  	  4 X5(2)  
+
+sg 102
+Wyckoff pos.
+2a(mm2)	2a(mm2)	2a(mm2)	2a(mm2)	4b(2)	4b(2)	2a(mm2)	4b(2)
+Band-Rep.
+A1↑G(2)	A2↑G(2)	B1↑G(2)	B2↑G(2)	A↑G(4)	B↑G(4)	E↑G(4)	1E2E↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable
+A:(1/2,1/2,1/2)	  A1(1) ⊕ A3(1)  	  A2(1) ⊕ A4(1)  	  A5(2)  	  A5(2)  	  2 A5(2)  	  A1(1) ⊕ A2(1) ⊕ A3(1) ⊕ A4(1)  	  A6(2) ⊕ A7(2)  	  2 A6(2) ⊕ 2 A7(2)  
+Γ:(0,0,0)	  Γ1(1) ⊕ Γ3(1)  	  Γ2(1) ⊕ Γ4(1)  	  Γ5(2)  	  Γ5(2)  	  Γ1(1) ⊕ Γ2(1) ⊕ Γ3(1) ⊕ Γ4(1)  	  2 Γ5(2)  	  Γ6(2) ⊕ Γ7(2)  	  2 Γ6(2) ⊕ 2 Γ7(2)  
+M:(1/2,1/2,0)	  M1M3(2)  	  M2M4(2)  	  M5(2)  	  M5(2)  	  2 M5(2)  	  M1M3(2) ⊕ M2M4(2)  	  M6M7(4)  	  2 M6M7(4)  
+Z:(0,0,1/2)	  Z1Z3(2)  	  Z2Z4(2)  	  Z5(2)  	  Z5(2)  	  Z1Z3(2) ⊕ Z2Z4(2)  	  2 Z5(2)  	  Z6Z7(4)  	  2 Z6Z7(4)  
+R:(0,1/2,1/2)	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  2 R1(2)  	  2 R1(2)  	  R2R5(2) ⊕ R3R4(2)  	  2 R2R5(2) ⊕ 2 R3R4(2)  
+X:(0,1/2,0)	  X1(2)  	  X1(2)  	  X1(2)  	  X1(2)  	  2 X1(2)  	  2 X1(2)  	  X2X3(2) ⊕ X4X5(2)  	  2 X2X3(2) ⊕ 2 X4X5(2) \
+
+sg 103
+Wyckoff pos.
+2a(4)	2a(4)	2a(4)	2b(4)	2b(4)	2b(4)	4c(2)	4c(2)	2a(4)	2a(4)	2b(4)	2b(4)	4c(2)
+Band-Rep.
+A↑G(2)	B↑G(2)	1E2E↑G(4)	A↑G(2)	B↑G(2)	1E2E↑G(4)	A↑G(4)	B↑G(4)	1E12E1↑G(4)	1E22E2↑G(4)	1E12E1↑G(4)	1E22E2↑G(4)	1E2E↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable
+A:(1/2,1/2,1/2)	  A1A4(2)  	  A2A3(2)  	  A5A5(4)  	  A2A3(2)  	  A1A4(2)  	  A5A5(4)  	  A5A5(4)  	  A1A4(2) ⊕ A2A3(2)  	  A7A7(4)  	  A6A6(4)  	  A6A6(4)  	  A7A7(4)  	  A6A6(4) ⊕ A7A7(4)  
+Γ:(0,0,0)	  Γ1(1) ⊕ Γ4(1)  	  Γ2(1) ⊕ Γ3(1)  	  2 Γ5(2)  	  Γ1(1) ⊕ Γ4(1)  	  Γ2(1) ⊕ Γ3(1)  	  2 Γ5(2)  	  Γ1(1) ⊕ Γ2(1) ⊕ Γ3(1) ⊕ Γ4(1)  	  2 Γ5(2)  	  2 Γ7(2)  	  2 Γ6(2)  	  2 Γ7(2)  	  2 Γ6(2)  	  2 Γ6(2) ⊕ 2 Γ7(2)  
+M:(1/2,1/2,0)	  M1(1) ⊕ M4(1)  	  M2(1) ⊕ M3(1)  	  2 M5(2)  	  M2(1) ⊕ M3(1)  	  M1(1) ⊕ M4(1)  	  2 M5(2)  	  2 M5(2)  	  M1(1) ⊕ M2(1) ⊕ M3(1) ⊕ M4(1)  	  2 M7(2)  	  2 M6(2)  	  2 M6(2)  	  2 M7(2)  	  2 M6(2) ⊕ 2 M7(2)  
+Z:(0,0,1/2)	  Z1Z4(2)  	  Z2Z3(2)  	  Z5Z5(4)  	  Z1Z4(2)  	  Z2Z3(2)  	  Z5Z5(4)  	  Z1Z4(2) ⊕ Z2Z3(2)  	  Z5Z5(4)  	  Z7Z7(4)  	  Z6Z6(4)  	  Z7Z7(4)  	  Z6Z6(4)  	  Z6Z6(4) ⊕ Z7Z7(4)  
+R:(0,1/2,1/2)	  R1R2(2)  	  R1R2(2)  	  2 R3R4(2)  	  R3R4(2)  	  R3R4(2)  	  2 R1R2(2)  	  R1R2(2) ⊕ R3R4(2)  	  R1R2(2) ⊕ R3R4(2)  	  R5R5(4)  	  R5R5(4)  	  R5R5(4)  	  R5R5(4)  	  2 R5R5(4)  
+X:(0,1/2,0)	  X1(1) ⊕ X2(1)  	  X1(1) ⊕ X2(1)  	  2 X3(1) ⊕ 2 X4(1)  	  X3(1) ⊕ X4(1)  	  X3(1) ⊕ X4(1)  	  2 X1(1) ⊕ 2 X2(1)  	  X1(1) ⊕ X2(1) ⊕ X3(1) ⊕ X4(1)  	  X1(1) ⊕ X2(1) ⊕ X3(1) ⊕ X4(1)  	  2 X5(2)  	  2 X5(2)  	  2 X5(2)  	  2 X5(2)  	  4 X5(2)  
+
+sg 104
+Wyckoff pos.
+2a(4)	2a(4)	2a(4)	4b(2)	4b(2)	2a(4)	2a(4)	4b(2)
+Band-Rep.
+A↑G(2)	B↑G(2)	1E2E↑G(4)	A↑G(4)	B↑G(4)	1E12E1↑G(4)	1E22E2↑G(4)	1E2E↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable
+A:(1/2,1/2,1/2)	  A5(2)  	  A5(2)  	  A1A2(2) ⊕ A3A4(2)  	  A1A2(2) ⊕ A3A4(2)  	  2 A5(2)  	  A6A7(4)  	  A6A7(4)  	  2 A6A7(4)  
+Γ:(0,0,0)	  Γ1(1) ⊕ Γ4(1)  	  Γ2(1) ⊕ Γ3(1)  	  2 Γ5(2)  	  Γ1(1) ⊕ Γ2(1) ⊕ Γ3(1) ⊕ Γ4(1)  	  2 Γ5(2)  	  2 Γ7(2)  	  2 Γ6(2)  	  2 Γ6(2) ⊕ 2 Γ7(2)  
+M:(1/2,1/2,0)	  M5(2)  	  M5(2)  	  M1M3(2) ⊕ M2M4(2)  	  M1M3(2) ⊕ M2M4(2)  	  2 M5(2)  	  M6M7(4)  	  M6M7(4)  	  2 M6M7(4)  
+Z:(0,0,1/2)	  Z1Z4(2)  	  Z2Z3(2)  	  Z5Z5(4)  	  Z1Z4(2) ⊕ Z2Z3(2)  	  Z5Z5(4)  	  Z7Z7(4)  	  Z6Z6(4)  	  Z6Z6(4) ⊕ Z7Z7(4)  
+R:(0,1/2,1/2)	  R1(2)  	  R1(2)  	  2 R1(2)  	  2 R1(2)  	  2 R1(2)  	  R2R5(2) ⊕ R3R4(2)  	  R2R5(2) ⊕ R3R4(2)  	  2 R2R5(2) ⊕ 2 R3R4(2)  
+X:(0,1/2,0)	  X1(2)  	  X1(2)  	  2 X1(2)  	  2 X1(2)  	  2 X1(2)  	  X2X3(2) ⊕ X4X5(2)  	  X2X3(2) ⊕ X4X5(2)  	  2 X2X3(2) ⊕ 2 X4X5(2) 
+
+sg 107
+Wyckoff pos.
+2a(4mm)	2a(4mm)	2a(4mm)	2a(4mm)	2a(4mm)	4b(mm2)	4b(mm2)	4b(mm2)	4b(mm2)	2a(4mm)	2a(4mm)	4b(mm2)
+Band-Rep.
+A1↑G(1)	A2↑G(1)	B1↑G(1)	B2↑G(1)	E↑G(2)	A1↑G(2)	A2↑G(2)	B1↑G(2)	B2↑G(2)	E1↑G(2)	E2↑G(2)	E↑G(4)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable
+Γ:(0,0,0)	  Γ1(1)  	  Γ4(1)  	  Γ2(1)  	  Γ3(1)  	  Γ5(2)  	  Γ1(1) ⊕ Γ2(1)  	  Γ3(1) ⊕ Γ4(1)  	  Γ5(2)  	  Γ5(2)  	  Γ7(2)  	  Γ6(2)  	  Γ6(2) ⊕ Γ7(2)  
+M:(1,1,1)	  M1(1)  	  M4(1)  	  M2(1)  	  M3(1)  	  M5(2)  	  M1(1) ⊕ M2(1)  	  M3(1) ⊕ M4(1)  	  M5(2)  	  M5(2)  	  M7(2)  	  M6(2)  	  M6(2) ⊕ M7(2)  
+P:(1/2,1/2,1/2)	  P1(1)  	  P2(1)  	  P2(1)  	  P1(1)  	  P3P4(2)  	  P3P4(2)  	  P3P4(2)  	  P1(1) ⊕ P2(1)  	  P1(1) ⊕ P2(1)  	  P5(2)  	  P5(2)  	  2 P5(2)  
+X:(1/2,1/2,0)	  X1(1)  	  X2(1)  	  X2(1)  	  X1(1)  	  X3(1) ⊕ X4(1)  	  X3(1) ⊕ X4(1)  	  X3(1) ⊕ X4(1)  	  X1(1) ⊕ X2(1)  	  X1(1) ⊕ X2(1)  	  X5(2)  	  X5(2)  	  2 X5(2)  
+N:(1/2,0,1/2)	  N1(1)  	  N2(1)  	  N1(1)  	  N2(1)  	  N1(1) ⊕ N2(1)  	  2 N1(1)  	  2 N2(1)  	  N1(1) ⊕ N2(1)  	  N1(1) ⊕ N2(1)  	  N3N4(2)  	  N3N4(2)  	  2 N3N4(2)  
+
+sg 111
+Wyckoff pos.
+1a(42m)	1a(42m)	1a(42m)	1a(42m)	1a(42m)	1b(42m)	1b(42m)	1b(42m)	1b(42m)	1b(42m)	1c(42m)	1c(42m)	1c(42m)	1c(42m)	1c(42m)	1d(42m)	1d(42m)	1d(42m)	1d(42m)	1d(42m)	2e(222)	2e(222)	2e(222)	2e(222)	2f(222)	2f(222)	2f(222)	2f(222)	1a(42m)	1a(42m)	1b(42m)	1b(42m)	1c(42m)	1c(42m)	1d(42m)	1d(42m)	2e(222)	2f(222)
+Band-Rep.
+A1↑G(1)	A2↑G(1)	B1↑G(1)	B2↑G(1)	E↑G(2)	A1↑G(1)	A2↑G(1)	B1↑G(1)	B2↑G(1)	E↑G(2)	A1↑G(1)	A2↑G(1)	B1↑G(1)	B2↑G(1)	E↑G(2)	A1↑G(1)	A2↑G(1)	B1↑G(1)	B2↑G(1)	E↑G(2)	A↑G(2)	B1↑G(2)	B2↑G(2)	B3↑G(2)	A↑G(2)	B1↑G(2)	B2↑G(2)	B3↑G(2)	E1↑G(2)	E2↑G(2)	E1↑G(2)	E2↑G(2)	E1↑G(2)	E2↑G(2)	E1↑G(2)	E2↑G(2)	E↑G(4)	E↑G(4)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable Decomposable
+A:(1/2,1/2,1/2)	  A1(1)  	  A4(1)  	  A2(1)  	  A3(1)  	  A5(2)  	  A1(1)  	  A4(1)  	  A2(1)  	  A3(1)  	  A5(2)  	  A3(1)  	  A2(1)  	  A4(1)  	  A1(1)  	  A5(2)  	  A3(1)  	  A2(1)  	  A4(1)  	  A1(1)  	  A5(2)  	  A5(2)  	  A5(2)  	  A3(1) ⊕ A4(1)  	  A1(1) ⊕ A2(1)  	  A5(2)  	  A5(2)  	  A1(1) ⊕ A2(1)  	  A3(1) ⊕ A4(1)  	  A7(2)  	  A6(2)  	  A7(2)  	  A6(2)  	  A6(2)  	  A7(2)  	  A6(2)  	  A7(2)  	  A6(2) ⊕ A7(2)  	  A6(2) ⊕ A7(2)  
+Γ:(0,0,0)	  Γ1(1)  	  Γ4(1)  	  Γ2(1)  	  Γ3(1)  	  Γ5(2)  	  Γ1(1)  	  Γ4(1)  	  Γ2(1)  	  Γ3(1)  	  Γ5(2)  	  Γ1(1)  	  Γ4(1)  	  Γ2(1)  	  Γ3(1)  	  Γ5(2)  	  Γ1(1)  	  Γ4(1)  	  Γ2(1)  	  Γ3(1)  	  Γ5(2)  	  Γ1(1) ⊕ Γ2(1)  	  Γ3(1) ⊕ Γ4(1)  	  Γ5(2)  	  Γ5(2)  	  Γ1(1) ⊕ Γ2(1)  	  Γ3(1) ⊕ Γ4(1)  	  Γ5(2)  	  Γ5(2)  	  Γ7(2)  	  Γ6(2)  	  Γ7(2)  	  Γ6(2)  	  Γ7(2)  	  Γ6(2)  	  Γ7(2)  	  Γ6(2)  	  Γ6(2) ⊕ Γ7(2)  	  Γ6(2) ⊕ Γ7(2)  
+M:(1/2,1/2,0)	  M1(1)  	  M4(1)  	  M2(1)  	  M3(1)  	  M5(2)  	  M3(1)  	  M2(1)  	  M4(1)  	  M1(1)  	  M5(2)  	  M1(1)  	  M4(1)  	  M2(1)  	  M3(1)  	  M5(2)  	  M3(1)  	  M2(1)  	  M4(1)  	  M1(1)  	  M5(2)  	  M5(2)  	  M5(2)  	  M3(1) ⊕ M4(1)  	  M1(1) ⊕ M2(1)  	  M5(2)  	  M5(2)  	  M3(1) ⊕ M4(1)  	  M1(1) ⊕ M2(1)  	  M7(2)  	  M6(2)  	  M6(2)  	  M7(2)  	  M7(2)  	  M6(2)  	  M6(2)  	  M7(2)  	  M6(2) ⊕ M7(2)  	  M6(2) ⊕ M7(2)  
+Z:(0,0,1/2)	  Z1(1)  	  Z4(1)  	  Z2(1)  	  Z3(1)  	  Z5(2)  	  Z3(1)  	  Z2(1)  	  Z4(1)  	  Z1(1)  	  Z5(2)  	  Z3(1)  	  Z2(1)  	  Z4(1)  	  Z1(1)  	  Z5(2)  	  Z1(1)  	  Z4(1)  	  Z2(1)  	  Z3(1)  	  Z5(2)  	  Z1(1) ⊕ Z2(1)  	  Z3(1) ⊕ Z4(1)  	  Z5(2)  	  Z5(2)  	  Z3(1) ⊕ Z4(1)  	  Z1(1) ⊕ Z2(1)  	  Z5(2)  	  Z5(2)  	  Z7(2)  	  Z6(2)  	  Z6(2)  	  Z7(2)  	  Z6(2)  	  Z7(2)  	  Z7(2)  	  Z6(2)  	  Z6(2) ⊕ Z7(2)  	  Z6(2) ⊕ Z7(2)  
+R:(0,1/2,1/2)	  R1(1)  	  R2(1)  	  R1(1)  	  R2(1)  	  R3(1) ⊕ R4(1)  	  R3(1)  	  R4(1)  	  R3(1)  	  R4(1)  	  R1(1) ⊕ R2(1)  	  R2(1)  	  R1(1)  	  R2(1)  	  R1(1)  	  R3(1) ⊕ R4(1)  	  R4(1)  	  R3(1)  	  R4(1)  	  R3(1)  	  R1(1) ⊕ R2(1)  	  R1(1) ⊕ R4(1)  	  R2(1) ⊕ R3(1)  	  R2(1) ⊕ R4(1)  	  R1(1) ⊕ R3(1)  	  R2(1) ⊕ R3(1)  	  R1(1) ⊕ R4(1)  	  R1(1) ⊕ R3(1)  	  R2(1) ⊕ R4(1)  	  R5(2)  	  R5(2)  	  R5(2)  	  R5(2)  	  R5(2)  	  R5(2)  	  R5(2)  	  R5(2)  	  2 R5(2)  	  2 R5(2)  
+X:(0,1/2,0)	  X1(1)  	  X2(1)  	  X1(1)  	  X2(1)  	  X3(1) ⊕ X4(1)  	  X4(1)  	  X3(1)  	  X4(1)  	  X3(1)  	  X1(1) ⊕ X2(1)  	  X1(1)  	  X2(1)  	  X1(1)  	  X2(1)  	  X3(1) ⊕ X4(1)  	  X4(1)  	  X3(1)  	  X4(1)  	  X3(1)  	  X1(1) ⊕ X2(1)  	  X1(1) ⊕ X4(1)  	  X2(1) ⊕ X3(1)  	  X2(1) ⊕ X4(1)  	  X1(1) ⊕ X3(1)  	  X1(1) ⊕ X4(1)  	  X2(1) ⊕ X3(1)  	  X2(1) ⊕ X4(1)  	  X1(1) ⊕ X3(1)  	  X5(2)  	  X5(2)  	  X5(2)  	  X5(2)  	  X5(2)  	  X5(2)  	  X5(2)  	  X5(2)  	  2 X5(2)  	  2 X5(2)  
+
+sg 114
+Wyckoff pos.
+2a(4)	2a(4)	2a(4)	2b(4)	2b(4)	2b(4)	4d(2)	4d(2)	2a(4)	2a(4)	2b(4)	2b(4)	4d(2)
+Band-Rep.
+A↑G(2)	B↑G(2)	1E2E↑G(4)	A↑G(2)	B↑G(2)	1E2E↑G(4)	A↑G(4)	B↑G(4)	1E12E1↑G(4)	1E22E2↑G(4)	1E12E1↑G(4)	1E22E2↑G(4)	1E2E↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable
+A:(1/2,1/2,1/2)	  A1A4(2)  	  A2A3(2)  	  A5A5(4)  	  A2A3(2)  	  A1A4(2)  	  A5A5(4)  	  A5A5(4)  	  A1A4(2) ⊕ A2A3(2)  	  A7A7(4)  	  A6A6(4)  	  A6A6(4)  	  A7A7(4)  	  A6A6(4) ⊕ A7A7(4)  
+Γ:(0,0,0)	  Γ1(1) ⊕ Γ4(1)  	  Γ2(1) ⊕ Γ3(1)  	  2 Γ5(2)  	  Γ1(1) ⊕ Γ4(1)  	  Γ2(1) ⊕ Γ3(1)  	  2 Γ5(2)  	  Γ1(1) ⊕ Γ2(1) ⊕ Γ3(1) ⊕ Γ4(1)  	  2 Γ5(2)  	  2 Γ7(2)  	  2 Γ6(2)  	  2 Γ7(2)  	  2 Γ6(2)  	  2 Γ6(2) ⊕ 2 Γ7(2)  
+M:(1/2,1/2,0)	  M5(2)  	  M5(2)  	  M1M3(2) ⊕ M2M4(2)  	  M5(2)  	  M5(2)  	  M1M3(2) ⊕ M2M4(2)  	  M1M3(2) ⊕ M2M4(2)  	  2 M5(2)  	  M6M7(4)  	  M6M7(4)  	  M6M7(4)  	  M6M7(4)  	  2 M6M7(4)  
+Z:(0,0,1/2)	  Z5(2)  	  Z5(2)  	  Z1Z2(2) ⊕ Z3Z4(2)  	  Z5(2)  	  Z5(2)  	  Z1Z2(2) ⊕ Z3Z4(2)  	  2 Z5(2)  	  Z1Z2(2) ⊕ Z3Z4(2)  	  Z6Z7(4)  	  Z6Z7(4)  	  Z6Z7(4)  	  Z6Z7(4)  	  2 Z6Z7(4)  
+R:(0,1/2,1/2)	  R1(2)  	  R1(2)  	  2 R1(2)  	  R1(2)  	  R1(2)  	  2 R1(2)  	  2 R1(2)  	  2 R1(2)  	  R2R5(2) ⊕ R3R4(2)  	  R2R5(2) ⊕ R3R4(2)  	  R2R5(2) ⊕ R3R4(2)  	  R2R5(2) ⊕ R3R4(2)  	  2 R2R5(2) ⊕ 2 R3R4(2)  
+X:(0,1/2,0)	  X1(2)  	  X1(2)  	  2 X1(2)  	  X1(2)  	  X1(2)  	  2 X1(2)  	  2 X1(2)  	  2 X1(2)  	  X2X5(2) ⊕ X3X4(2)  	  X2X5(2) ⊕ X3X4(2)  	  X2X5(2) ⊕ X3X4(2)  	  X2X5(2) ⊕ X3X4(2)  	  2 X2X5(2) ⊕ 2 X3X4(2)
+
+sg 115
+Wyckoff pos.
+1a(4m2)	1a(4m2)	1a(4m2)	1a(4m2)	1a(4m2)	1b(4m2)	1b(4m2)	1b(4m2)	1b(4m2)	1b(4m2)	1c(4m2)	1c(4m2)	1c(4m2)	1c(4m2)	1c(4m2)	1d(4m2)	1d(4m2)	1d(4m2)	1d(4m2)	1d(4m2)	2g(mm2)	2g(mm2)	2g(mm2)	2g(mm2)	1a(4m2)	1a(4m2)	1b(4m2)	1b(4m2)	1c(4m2)	1c(4m2)	1d(4m2)	1d(4m2)	2g(mm2)
+Band-Rep.
+A1↑G(1)	A2↑G(1)	B1↑G(1)	B2↑G(1)	E↑G(2)	A1↑G(1)	A2↑G(1)	B1↑G(1)	B2↑G(1)	E↑G(2)	A1↑G(1)	A2↑G(1)	B1↑G(1)	B2↑G(1)	E↑G(2)	A1↑G(1)	A2↑G(1)	B1↑G(1)	B2↑G(1)	E↑G(2)	A1↑G(2)	A2↑G(2)	B1↑G(2)	B2↑G(2)	E1↑G(2)	E2↑G(2)	E1↑G(2)	E2↑G(2)	E1↑G(2)	E2↑G(2)	E1↑G(2)	E2↑G(2)	E↑G(4)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable
+A:(1/2,1/2,1/2)	  A1(1)  	  A4(1)  	  A2(1)  	  A3(1)  	  A5(2)  	  A4(1)  	  A1(1)  	  A3(1)  	  A2(1)  	  A5(2)  	  A3(1)  	  A2(1)  	  A4(1)  	  A1(1)  	  A5(2)  	  A2(1)  	  A3(1)  	  A1(1)  	  A4(1)  	  A5(2)  	  A5(2)  	  A5(2)  	  A3(1) ⊕ A4(1)  	  A1(1) ⊕ A2(1)  	  A7(2)  	  A6(2)  	  A6(2)  	  A7(2)  	  A7(2)  	  A6(2)  	  A6(2)  	  A7(2)  	  A6(2) ⊕ A7(2)  
+Γ:(0,0,0)	  Γ1(1)  	  Γ4(1)  	  Γ2(1)  	  Γ3(1)  	  Γ5(2)  	  Γ1(1)  	  Γ4(1)  	  Γ2(1)  	  Γ3(1)  	  Γ5(2)  	  Γ1(1)  	  Γ4(1)  	  Γ2(1)  	  Γ3(1)  	  Γ5(2)  	  Γ1(1)  	  Γ4(1)  	  Γ2(1)  	  Γ3(1)  	  Γ5(2)  	  Γ1(1) ⊕ Γ2(1)  	  Γ3(1) ⊕ Γ4(1)  	  Γ5(2)  	  Γ5(2)  	  Γ7(2)  	  Γ6(2)  	  Γ7(2)  	  Γ6(2)  	  Γ7(2)  	  Γ6(2)  	  Γ7(2)  	  Γ6(2)  	  Γ6(2) ⊕ Γ7(2)  
+M:(1/2,1/2,0)	  M1(1)  	  M4(1)  	  M2(1)  	  M3(1)  	  M5(2)  	  M4(1)  	  M1(1)  	  M3(1)  	  M2(1)  	  M5(2)  	  M4(1)  	  M1(1)  	  M3(1)  	  M2(1)  	  M5(2)  	  M1(1)  	  M4(1)  	  M2(1)  	  M3(1)  	  M5(2)  	  M5(2)  	  M5(2)  	  M3(1) ⊕ M4(1)  	  M1(1) ⊕ M2(1)  	  M7(2)  	  M6(2)  	  M6(2)  	  M7(2)  	  M6(2)  	  M7(2)  	  M7(2)  	  M6(2)  	  M6(2) ⊕ M7(2)  
+Z:(0,0,1/2)	  Z1(1)  	  Z4(1)  	  Z2(1)  	  Z3(1)  	  Z5(2)  	  Z1(1)  	  Z4(1)  	  Z2(1)  	  Z3(1)  	  Z5(2)  	  Z2(1)  	  Z3(1)  	  Z1(1)  	  Z4(1)  	  Z5(2)  	  Z2(1)  	  Z3(1)  	  Z1(1)  	  Z4(1)  	  Z5(2)  	  Z1(1) ⊕ Z2(1)  	  Z3(1) ⊕ Z4(1)  	  Z5(2)  	  Z5(2)  	  Z7(2)  	  Z6(2)  	  Z7(2)  	  Z6(2)  	  Z6(2)  	  Z7(2)  	  Z6(2)  	  Z7(2)  	  Z6(2) ⊕ Z7(2)  
+R:(0,1/2,1/2)	  R1(1)  	  R2(1)  	  R1(1)  	  R2(1)  	  R3(1) ⊕ R4(1)  	  R3(1)  	  R4(1)  	  R3(1)  	  R4(1)  	  R1(1) ⊕ R2(1)  	  R3(1)  	  R4(1)  	  R3(1)  	  R4(1)  	  R1(1) ⊕ R2(1)  	  R1(1)  	  R2(1)  	  R1(1)  	  R2(1)  	  R3(1) ⊕ R4(1)  	  R1(1) ⊕ R3(1)  	  R2(1) ⊕ R4(1)  	  R2(1) ⊕ R3(1)  	  R1(1) ⊕ R4(1)  	  R5(2)  	  R5(2)  	  R5(2)  	  R5(2)  	  R5(2)  	  R5(2)  	  R5(2)  	  R5(2)  	  2 R5(2)  
+X:(0,1/2,0)	  X1(1)  	  X2(1)  	  X1(1)  	  X2(1)  	  X3(1) ⊕ X4(1)  	  X3(1)  	  X4(1)  	  X3(1)  	  X4(1)  	  X1(1) ⊕ X2(1)  	  X3(1)  	  X4(1)  	  X3(1)  	  X4(1)  	  X1(1) ⊕ X2(1)  	  X1(1)  	  X2(1)  	  X1(1)  	  X2(1)  	  X3(1) ⊕ X4(1)  	  X1(1) ⊕ X3(1)  	  X2(1) ⊕ X4(1)  	  X2(1) ⊕ X3(1)  	  X1(1) ⊕ X4(1)  	  X5(2)  	  X5(2)  	  X5(2)  	  X5(2)  	  X5(2)  	  X5(2)  	  X5(2)  	  X5(2)  	  2 X5(2)  
+
+
+sg 116
+Wyckoff pos.
+2a(222)	2a(222)	2a(222)	2a(222)	2b(222)	2b(222)	2b(222)	2b(222)	2c(4)	2c(4)	2d(4)	2d(4)	4i(2)	4i(2)	2a(222)	2b(222)	2c(4)	2c(4)	2d(4)	2d(4)	4i(2)
+Band-Rep.
+A↑G(2)	B1↑G(2)	B2↑G(2)	B3↑G(2)	A↑G(2)	B1↑G(2)	B2↑G(2)	B3↑G(2)	A↑G(2)	B↑G(2)	A↑G(2)	B↑G(2)	A↑G(4)	B↑G(4)	E↑G(4)	E↑G(4)	1E12E1↑G(4)	1E22E2↑G(4)	1E12E1↑G(4)	1E22E2↑G(4)	1E2E↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable
+A:(1/2,1/2,1/2)	  A5(2)  	  A5(2)  	  A2A3(2)  	  A1A4(2)  	  A5(2)  	  A5(2)  	  A2A3(2)  	  A1A4(2)  	  A5(2)  	  A5(2)  	  A5(2)  	  A5(2)  	  A1A4(2) ⊕ A2A3(2)  	  2 A5(2)  	  A6A7(4)  	  A6A7(4)  	  A6A7(4)  	  A6A7(4)  	  A6A7(4)  	  A6A7(4)  	  2 A6A7(4)  
+Γ:(0,0,0)	  Γ1(1) ⊕ Γ4(1)  	  Γ2(1) ⊕ Γ3(1)  	  Γ5(2)  	  Γ5(2)  	  Γ1(1) ⊕ Γ4(1)  	  Γ2(1) ⊕ Γ3(1)  	  Γ5(2)  	  Γ5(2)  	  Γ1(1) ⊕ Γ3(1)  	  Γ2(1) ⊕ Γ4(1)  	  Γ1(1) ⊕ Γ3(1)  	  Γ2(1) ⊕ Γ4(1)  	  Γ1(1) ⊕ Γ2(1) ⊕ Γ3(1) ⊕ Γ4(1)  	  2 Γ5(2)  	  Γ6(2) ⊕ Γ7(2)  	  Γ6(2) ⊕ Γ7(2)  	  2 Γ7(2)  	  2 Γ6(2)  	  2 Γ7(2)  	  2 Γ6(2)  	  2 Γ6(2) ⊕ 2 Γ7(2)  
+M:(1/2,1/2,0)	  M1(1) ⊕ M4(1)  	  M2(1) ⊕ M3(1)  	  M5(2)  	  M5(2)  	  M1(1) ⊕ M4(1)  	  M2(1) ⊕ M3(1)  	  M5(2)  	  M5(2)  	  M1(1) ⊕ M3(1)  	  M2(1) ⊕ M4(1)  	  M2(1) ⊕ M4(1)  	  M1(1) ⊕ M3(1)  	  2 M5(2)  	  M1(1) ⊕ M2(1) ⊕ M3(1) ⊕ M4(1)  	  M6(2) ⊕ M7(2)  	  M6(2) ⊕ M7(2)  	  2 M7(2)  	  2 M6(2)  	  2 M6(2)  	  2 M7(2)  	  2 M6(2) ⊕ 2 M7(2)  
+Z:(0,0,1/2)	  Z5(2)  	  Z5(2)  	  Z2Z3(2)  	  Z1Z4(2)  	  Z5(2)  	  Z5(2)  	  Z2Z3(2)  	  Z1Z4(2)  	  Z5(2)  	  Z5(2)  	  Z5(2)  	  Z5(2)  	  2 Z5(2)  	  Z1Z4(2) ⊕ Z2Z3(2)  	  Z6Z7(4)  	  Z6Z7(4)  	  Z6Z7(4)  	  Z6Z7(4)  	  Z6Z7(4)  	  Z6Z7(4)  	  2 Z6Z7(4)  
+R:(0,1/2,1/2)	  R1R2(2)  	  R1R2(2)  	  R3R4(2)  	  R3R4(2)  	  R3R4(2)  	  R3R4(2)  	  R1R2(2)  	  R1R2(2)  	  R1R2(2)  	  R1R2(2)  	  R3R4(2)  	  R3R4(2)  	  R1R2(2) ⊕ R3R4(2)  	  R1R2(2) ⊕ R3R4(2)  	  R5R5(4)  	  R5R5(4)  	  R5R5(4)  	  R5R5(4)  	  R5R5(4)  	  R5R5(4)  	  2 R5R5(4)  
+X:(0,1/2,0)	  X1(1) ⊕ X2(1)  	  X1(1) ⊕ X2(1)  	  X3(1) ⊕ X4(1)  	  X3(1) ⊕ X4(1)  	  X3(1) ⊕ X4(1)  	  X3(1) ⊕ X4(1)  	  X1(1) ⊕ X2(1)  	  X1(1) ⊕ X2(1)  	  X1(1) ⊕ X2(1)  	  X1(1) ⊕ X2(1)  	  X3(1) ⊕ X4(1)  	  X3(1) ⊕ X4(1)  	  X1(1) ⊕ X2(1) ⊕ X3(1) ⊕ X4(1)  	  X1(1) ⊕ X2(1) ⊕ X3(1) ⊕ X4(1)  	  2 X5(2)  	  2 X5(2)  	  2 X5(2)  	  2 X5(2)  	  2 X5(2)  	  2 X5(2)  	  4 X5(2) 
+
+
+sg 121
+Wyckoff pos.
+2a(42m)	2a(42m)	2a(42m)	2a(42m)	2a(42m)	2b(42m)	2b(42m)	2b(42m)	2b(42m)	2b(42m)	4c(222)	4c(222)	4c(222)	4c(222)	4d(4)	4d(4)	2a(42m)	2a(42m)	2b(42m)	2b(42m)	4c(222)	4d(4)	4d(4)
+Band-Rep.
+A1↑G(1)	A2↑G(1)	B1↑G(1)	B2↑G(1)	E↑G(2)	A1↑G(1)	A2↑G(1)	B1↑G(1)	B2↑G(1)	E↑G(2)	A↑G(2)	B1↑G(2)	B2↑G(2)	B3↑G(2)	A↑G(2)	B↑G(2)	E1↑G(2)	E2↑G(2)	E1↑G(2)	E2↑G(2)	E↑G(4)	1E12E1↑G(4)	1E22E2↑G(4)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable Decomposable Decomposable
+Γ:(0,0,0)	  Γ1(1)  	  Γ4(1)  	  Γ2(1)  	  Γ3(1)  	  Γ5(2)  	  Γ1(1)  	  Γ4(1)  	  Γ2(1)  	  Γ3(1)  	  Γ5(2)  	  Γ1(1) ⊕ Γ2(1)  	  Γ3(1) ⊕ Γ4(1)  	  Γ5(2)  	  Γ5(2)  	  Γ1(1) ⊕ Γ4(1)  	  Γ2(1) ⊕ Γ3(1)  	  Γ7(2)  	  Γ6(2)  	  Γ7(2)  	  Γ6(2)  	  Γ6(2) ⊕ Γ7(2)  	  2 Γ7(2)  	  2 Γ6(2)  
+M:(1,1,1)	  M1(1)  	  M4(1)  	  M2(1)  	  M3(1)  	  M5(2)  	  M1(1)  	  M4(1)  	  M2(1)  	  M3(1)  	  M5(2)  	  M1(1) ⊕ M2(1)  	  M3(1) ⊕ M4(1)  	  M5(2)  	  M5(2)  	  M2(1) ⊕ M3(1)  	  M1(1) ⊕ M4(1)  	  M7(2)  	  M6(2)  	  M7(2)  	  M6(2)  	  M6(2) ⊕ M7(2)  	  2 M6(2)  	  2 M7(2)  
+P:(1/2,1/2,1/2)	  P1(1)  	  P4(1)  	  P2(1)  	  P3(1)  	  P5(2)  	  P3(1)  	  P2(1)  	  P4(1)  	  P1(1)  	  P5(2)  	  P5(2)  	  P5(2)  	  P1(1) ⊕ P2(1)  	  P3(1) ⊕ P4(1)  	  P5(2)  	  P5(2)  	  P7(2)  	  P6(2)  	  P6(2)  	  P7(2)  	  P6(2) ⊕ P7(2)  	  P6(2) ⊕ P7(2)  	  P6(2) ⊕ P7(2)  
+PA:(-1/2,-1/2,-1/2)	  PA1(1)  	  PA4(1)  	  PA2(1)  	  PA3(1)  	  PA5(2)  	  PA3(1)  	  PA2(1)  	  PA4(1)  	  PA1(1)  	  PA5(2)  	  PA5(2)  	  PA5(2)  	  PA1(1) ⊕ PA2(1)  	  PA3(1) ⊕ PA4(1)  	  PA5(2)  	  PA5(2)  	  PA7(2)  	  PA6(2)  	  PA6(2)  	  PA7(2)  	  PA6(2) ⊕ PA7(2)  	  PA6(2) ⊕ PA7(2)  	  PA6(2) ⊕ PA7(2)  
+X:(1/2,1/2,0)	  X1(1)  	  X2(1)  	  X2(1)  	  X1(1)  	  X3(1) ⊕ X4(1)  	  X1(1)  	  X2(1)  	  X2(1)  	  X1(1)  	  X3(1) ⊕ X4(1)  	  X3(1) ⊕ X4(1)  	  X3(1) ⊕ X4(1)  	  X1(1) ⊕ X2(1)  	  X1(1) ⊕ X2(1)  	  X3(1) ⊕ X4(1)  	  X3(1) ⊕ X4(1)  	  X5(2)  	  X5(2)  	  X5(2)  	  X5(2)  	  2 X5(2)  	  2 X5(2)  	  2 X5(2)  
+N:(1/2,0,1/2)	  N1(1)  	  N2(1)  	  N1(1)  	  N2(1)  	  N1(1) ⊕ N2(1)  	  N2(1)  	  N1(1)  	  N2(1)  	  N1(1)  	  N1(1) ⊕ N2(1)  	  N1(1) ⊕ N2(1)  	  N1(1) ⊕ N2(1)  	  2 N1(1)  	  2 N2(1)  	  N1(1) ⊕ N2(1)  	  N1(1) ⊕ N2(1)  	  N3N4(2)  	  N3N4(2)  	  N3N4(2)  	  N3N4(2)  	  2 N3N4(2)  	  2 N3N4(2)  	  2 N3N4(2)  
+
+sg 122
+
+Wyckoff pos.
+4a(4)	4a(4)	4a(4)	4b(4)	4b(4)	4b(4)	8d(2)	8d(2)	4a(4)	4a(4)	4b(4)	4b(4)	8d(2)
+Band-Rep.
+A↑G(2)	B↑G(2)	1E2E↑G(4)	A↑G(2)	B↑G(2)	1E2E↑G(4)	A↑G(4)	B↑G(4)	1E12E1↑G(4)	1E22E2↑G(4)	1E12E1↑G(4)	1E22E2↑G(4)	1E2E↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable
+Γ:(0,0,0)	  Γ1(1) ⊕ Γ4(1)  	  Γ2(1) ⊕ Γ3(1)  	  2 Γ5(2)  	  Γ1(1) ⊕ Γ4(1)  	  Γ2(1) ⊕ Γ3(1)  	  2 Γ5(2)  	  Γ1(1) ⊕ Γ2(1) ⊕ Γ5(2)  	  Γ3(1) ⊕ Γ4(1) ⊕ Γ5(2)  	  2 Γ7(2)  	  2 Γ6(2)  	  2 Γ7(2)  	  2 Γ6(2)  	  2 Γ6(2) ⊕ 2 Γ7(2)  
+M:(1,1,1)	  M5(2)  	  M5(2)  	  M1M2(2) ⊕ M3M4(2)  	  M5(2)  	  M5(2)  	  M1M2(2) ⊕ M3M4(2)  	  M1M2(2) ⊕ M5(2)  	  M3M4(2) ⊕ M5(2)  	  M6M7(4)  	  M6M7(4)  	  M6M7(4)  	  M6M7(4)  	  2 M6M7(4)  
+P:(1/2,1/2,1/2)	  P1(2)  	  P2(2)  	  P1(2) ⊕ P2(2)  	  P2(2)  	  P1(2)  	  P1(2) ⊕ P2(2)  	  P1(2) ⊕ P2(2)  	  P1(2) ⊕ P2(2)  	  P4(1) ⊕ P6(1) ⊕ P7(2)  	  P3(1) ⊕ P5(1) ⊕ P7(2)  	  P3(1) ⊕ P5(1) ⊕ P7(2)  	  P4(1) ⊕ P6(1) ⊕ P7(2)  	  P3(1) ⊕ P4(1) ⊕ P5(1) ⊕ P6(1) ⊕ 2 P7(2)  
+PA:(-1/2,-1/2,-1/2)	  PA1(2)  	  PA2(2)  	  PA1(2) ⊕ PA2(2)  	  PA2(2)  	  PA1(2)  	  PA1(2) ⊕ PA2(2)  	  PA1(2) ⊕ PA2(2)  	  PA1(2) ⊕ PA2(2)  	  PA4(1) ⊕ PA6(1) ⊕ PA7(2)  	  PA3(1) ⊕ PA5(1) ⊕ PA7(2)  	  PA3(1) ⊕ PA5(1) ⊕ PA7(2)  	  PA4(1) ⊕ PA6(1) ⊕ PA7(2)  	  PA3(1) ⊕ PA4(1) ⊕ PA5(1) ⊕ PA6(1) ⊕ 2 PA7(2)  
+X:(1/2,1/2,0)	  X1(2)  	  X1(2)  	  2 X1(2)  	  X1(2)  	  X1(2)  	  2 X1(2)  	  2 X1(2)  	  2 X1(2)  	  X2X3(2) ⊕ X4X5(2)  	  X2X3(2) ⊕ X4X5(2)  	  X2X3(2) ⊕ X4X5(2)  	  X2X3(2) ⊕ X4X5(2)  	  2 X2X3(2) ⊕ 2 X4X5(2)  
+N:(1/2,0,1/2)	  N1(1) ⊕ N2(1)  	  N1(1) ⊕ N2(1)  	  2 N1(1) ⊕ 2 N2(1)  	  N1(1) ⊕ N2(1)  	  N1(1) ⊕ N2(1)  	  2 N1(1) ⊕ 2 N2(1)  	  2 N1(1) ⊕ 2 N2(1)  	  2 N1(1) ⊕ 2 N2(1)  	  2 N3N4(2)  	  2 N3N4(2)  	  2 N3N4(2)  	  2 N3N4(2)  	  4 N3N4(2)  
+
+
+sg 123
+Wyckoff pos.
+1a(4/mmm)	1a(4/mmm)	1a(4/mmm)	1a(4/mmm)	1a(4/mmm)	1a(4/mmm)	1a(4/mmm)	1a(4/mmm)	1a(4/mmm)	1a(4/mmm)	1b(4/mmm)	1b(4/mmm)	1b(4/mmm)	1b(4/mmm)	1b(4/mmm)	1b(4/mmm)	1b(4/mmm)	1b(4/mmm)	1b(4/mmm)	1b(4/mmm)	1c(4/mmm)	1c(4/mmm)	1c(4/mmm)	1c(4/mmm)	1c(4/mmm)	1c(4/mmm)	1c(4/mmm)	1c(4/mmm)	1c(4/mmm)	1c(4/mmm)	1d(4/mmm)	1d(4/mmm)	1d(4/mmm)	1d(4/mmm)	1d(4/mmm)	1d(4/mmm)	1d(4/mmm)	1d(4/mmm)	1d(4/mmm)	1d(4/mmm)	2e(mmm)	2e(mmm)	2e(mmm)	2e(mmm)	2e(mmm)	2e(mmm)	2e(mmm)	2e(mmm)	2f(mmm)	2f(mmm)	2f(mmm)	2f(mmm)	2f(mmm)	2f(mmm)	2f(mmm)	2f(mmm)	1a(4/mmm)	1a(4/mmm)	1a(4/mmm)	1a(4/mmm)	1b(4/mmm)	1b(4/mmm)	1b(4/mmm)	1b(4/mmm)	1c(4/mmm)	1c(4/mmm)	1c(4/mmm)	1c(4/mmm)	1d(4/mmm)	1d(4/mmm)	1d(4/mmm)	1d(4/mmm)	2e(mmm)	2e(mmm)	2f(mmm)	2f(mmm)
+Band-Rep.
+A1g↑G(1)	A1u↑G(1)	A2g↑G(1)	A2u↑G(1)	B1g↑G(1)	B1u↑G(1)	B2g↑G(1)	B2u↑G(1)	Eg↑G(2)	Eu↑G(2)	A1g↑G(1)	A1u↑G(1)	A2g↑G(1)	A2u↑G(1)	B1g↑G(1)	B1u↑G(1)	B2g↑G(1)	B2u↑G(1)	Eg↑G(2)	Eu↑G(2)	A1g↑G(1)	A1u↑G(1)	A2g↑G(1)	A2u↑G(1)	B1g↑G(1)	B1u↑G(1)	B2g↑G(1)	B2u↑G(1)	Eg↑G(2)	Eu↑G(2)	A1g↑G(1)	A1u↑G(1)	A2g↑G(1)	A2u↑G(1)	B1g↑G(1)	B1u↑G(1)	B2g↑G(1)	B2u↑G(1)	Eg↑G(2)	Eu↑G(2)	Ag↑G(2)	Au↑G(2)	B1g↑G(2)	B1u↑G(2)	B2g↑G(2)	B2u↑G(2)	B3g↑G(2)	B3u↑G(2)	Ag↑G(2)	Au↑G(2)	B1g↑G(2)	B1u↑G(2)	B2g↑G(2)	B2u↑G(2)	B3g↑G(2)	B3u↑G(2)	E1g↑G(2)	E1u↑G(2)	E2g↑G(2)	E2u↑G(2)	E1g↑G(2)	E1u↑G(2)	E2g↑G(2)	E2u↑G(2)	E1g↑G(2)	E1u↑G(2)	E2g↑G(2)	E2u↑G(2)	E1g↑G(2)	E1u↑G(2)	E2g↑G(2)	E2u↑G(2)	Eg↑G(4)	Eu↑G(4)	Eg↑G(4)	Eu↑G(4)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable Decomposable Decomposable Decomposable
+A:(1/2,1/2,1/2)	  A1+(1)  	  A1-(1)  	  A3+(1)  	  A3-(1)  	  A2+(1)  	  A2-(1)  	  A4+(1)  	  A4-(1)  	  A5+(2)  	  A5-(2)  	  A3-(1)  	  A3+(1)  	  A1-(1)  	  A1+(1)  	  A4-(1)  	  A4+(1)  	  A2-(1)  	  A2+(1)  	  A5-(2)  	  A5+(2)  	  A4+(1)  	  A4-(1)  	  A2+(1)  	  A2-(1)  	  A3+(1)  	  A3-(1)  	  A1+(1)  	  A1-(1)  	  A5+(2)  	  A5-(2)  	  A2-(1)  	  A2+(1)  	  A4-(1)  	  A4+(1)  	  A1-(1)  	  A1+(1)  	  A3-(1)  	  A3+(1)  	  A5-(2)  	  A5+(2)  	  A5+(2)  	  A5-(2)  	  A5+(2)  	  A5-(2)  	  A3+(1) ⊕ A4+(1)  	  A3-(1) ⊕ A4-(1)  	  A1+(1) ⊕ A2+(1)  	  A1-(1) ⊕ A2-(1)  	  A5-(2)  	  A5+(2)  	  A5-(2)  	  A5+(2)  	  A1-(1) ⊕ A2-(1)  	  A1+(1) ⊕ A2+(1)  	  A3-(1) ⊕ A4-(1)  	  A3+(1) ⊕ A4+(1)  	  A7(2)  	  A9(2)  	  A6(2)  	  A8(2)  	  A9(2)  	  A7(2)  	  A8(2)  	  A6(2)  	  A6(2)  	  A8(2)  	  A7(2)  	  A9(2)  	  A8(2)  	  A6(2)  	  A9(2)  	  A7(2)  	  A6(2) ⊕ A7(2)  	  A8(2) ⊕ A9(2)  	  A8(2) ⊕ A9(2)  	  A6(2) ⊕ A7(2)  
+Γ:(0,0,0)	  Γ1+(1)  	  Γ1-(1)  	  Γ3+(1)  	  Γ3-(1)  	  Γ2+(1)  	  Γ2-(1)  	  Γ4+(1)  	  Γ4-(1)  	  Γ5+(2)  	  Γ5-(2)  	  Γ1+(1)  	  Γ1-(1)  	  Γ3+(1)  	  Γ3-(1)  	  Γ2+(1)  	  Γ2-(1)  	  Γ4+(1)  	  Γ4-(1)  	  Γ5+(2)  	  Γ5-(2)  	  Γ1+(1)  	  Γ1-(1)  	  Γ3+(1)  	  Γ3-(1)  	  Γ2+(1)  	  Γ2-(1)  	  Γ4+(1)  	  Γ4-(1)  	  Γ5+(2)  	  Γ5-(2)  	  Γ1+(1)  	  Γ1-(1)  	  Γ3+(1)  	  Γ3-(1)  	  Γ2+(1)  	  Γ2-(1)  	  Γ4+(1)  	  Γ4-(1)  	  Γ5+(2)  	  Γ5-(2)  	  Γ1+(1) ⊕ Γ2+(1)  	  Γ1-(1) ⊕ Γ2-(1)  	  Γ3+(1) ⊕ Γ4+(1)  	  Γ3-(1) ⊕ Γ4-(1)  	  Γ5+(2)  	  Γ5-(2)  	  Γ5+(2)  	  Γ5-(2)  	  Γ1+(1) ⊕ Γ2+(1)  	  Γ1-(1) ⊕ Γ2-(1)  	  Γ3+(1) ⊕ Γ4+(1)  	  Γ3-(1) ⊕ Γ4-(1)  	  Γ5+(2)  	  Γ5-(2)  	  Γ5+(2)  	  Γ5-(2)  	  Γ7(2)  	  Γ9(2)  	  Γ6(2)  	  Γ8(2)  	  Γ7(2)  	  Γ9(2)  	  Γ6(2)  	  Γ8(2)  	  Γ7(2)  	  Γ9(2)  	  Γ6(2)  	  Γ8(2)  	  Γ7(2)  	  Γ9(2)  	  Γ6(2)  	  Γ8(2)  	  Γ6(2) ⊕ Γ7(2)  	  Γ8(2) ⊕ Γ9(2)  	  Γ6(2) ⊕ Γ7(2)  	  Γ8(2) ⊕ Γ9(2)  
+M:(1/2,1/2,0)	  M1+(1)  	  M1-(1)  	  M3+(1)  	  M3-(1)  	  M2+(1)  	  M2-(1)  	  M4+(1)  	  M4-(1)  	  M5+(2)  	  M5-(2)  	  M1+(1)  	  M1-(1)  	  M3+(1)  	  M3-(1)  	  M2+(1)  	  M2-(1)  	  M4+(1)  	  M4-(1)  	  M5+(2)  	  M5-(2)  	  M4+(1)  	  M4-(1)  	  M2+(1)  	  M2-(1)  	  M3+(1)  	  M3-(1)  	  M1+(1)  	  M1-(1)  	  M5+(2)  	  M5-(2)  	  M4+(1)  	  M4-(1)  	  M2+(1)  	  M2-(1)  	  M3+(1)  	  M3-(1)  	  M1+(1)  	  M1-(1)  	  M5+(2)  	  M5-(2)  	  M5-(2)  	  M5+(2)  	  M5-(2)  	  M5+(2)  	  M1-(1) ⊕ M2-(1)  	  M1+(1) ⊕ M2+(1)  	  M3-(1) ⊕ M4-(1)  	  M3+(1) ⊕ M4+(1)  	  M5-(2)  	  M5+(2)  	  M5-(2)  	  M5+(2)  	  M1-(1) ⊕ M2-(1)  	  M1+(1) ⊕ M2+(1)  	  M3-(1) ⊕ M4-(1)  	  M3+(1) ⊕ M4+(1)  	  M7(2)  	  M9(2)  	  M6(2)  	  M8(2)  	  M7(2)  	  M9(2)  	  M6(2)  	  M8(2)  	  M6(2)  	  M8(2)  	  M7(2)  	  M9(2)  	  M6(2)  	  M8(2)  	  M7(2)  	  M9(2)  	  M8(2) ⊕ M9(2)  	  M6(2) ⊕ M7(2)  	  M8(2) ⊕ M9(2)  	  M6(2) ⊕ M7(2)  
+Z:(0,0,1/2)	  Z1+(1)  	  Z1-(1)  	  Z3+(1)  	  Z3-(1)  	  Z2+(1)  	  Z2-(1)  	  Z4+(1)  	  Z4-(1)  	  Z5+(2)  	  Z5-(2)  	  Z3-(1)  	  Z3+(1)  	  Z1-(1)  	  Z1+(1)  	  Z4-(1)  	  Z4+(1)  	  Z2-(1)  	  Z2+(1)  	  Z5-(2)  	  Z5+(2)  	  Z1+(1)  	  Z1-(1)  	  Z3+(1)  	  Z3-(1)  	  Z2+(1)  	  Z2-(1)  	  Z4+(1)  	  Z4-(1)  	  Z5+(2)  	  Z5-(2)  	  Z3-(1)  	  Z3+(1)  	  Z1-(1)  	  Z1+(1)  	  Z4-(1)  	  Z4+(1)  	  Z2-(1)  	  Z2+(1)  	  Z5-(2)  	  Z5+(2)  	  Z3-(1) ⊕ Z4-(1)  	  Z3+(1) ⊕ Z4+(1)  	  Z1-(1) ⊕ Z2-(1)  	  Z1+(1) ⊕ Z2+(1)  	  Z5-(2)  	  Z5+(2)  	  Z5-(2)  	  Z5+(2)  	  Z1+(1) ⊕ Z2+(1)  	  Z1-(1) ⊕ Z2-(1)  	  Z3+(1) ⊕ Z4+(1)  	  Z3-(1) ⊕ Z4-(1)  	  Z5+(2)  	  Z5-(2)  	  Z5+(2)  	  Z5-(2)  	  Z7(2)  	  Z9(2)  	  Z6(2)  	  Z8(2)  	  Z9(2)  	  Z7(2)  	  Z8(2)  	  Z6(2)  	  Z7(2)  	  Z9(2)  	  Z6(2)  	  Z8(2)  	  Z9(2)  	  Z7(2)  	  Z8(2)  	  Z6(2)  	  Z8(2) ⊕ Z9(2)  	  Z6(2) ⊕ Z7(2)  	  Z6(2) ⊕ Z7(2)  	  Z8(2) ⊕ Z9(2)  
+R:(0,1/2,1/2)	  R1+(1)  	  R1-(1)  	  R2+(1)  	  R2-(1)  	  R1+(1)  	  R1-(1)  	  R2+(1)  	  R2-(1)  	  R3+(1) ⊕ R4+(1)  	  R3-(1) ⊕ R4-(1)  	  R2-(1)  	  R2+(1)  	  R1-(1)  	  R1+(1)  	  R2-(1)  	  R2+(1)  	  R1-(1)  	  R1+(1)  	  R3-(1) ⊕ R4-(1)  	  R3+(1) ⊕ R4+(1)  	  R4-(1)  	  R4+(1)  	  R3-(1)  	  R3+(1)  	  R4-(1)  	  R4+(1)  	  R3-(1)  	  R3+(1)  	  R1-(1) ⊕ R2-(1)  	  R1+(1) ⊕ R2+(1)  	  R3+(1)  	  R3-(1)  	  R4+(1)  	  R4-(1)  	  R3+(1)  	  R3-(1)  	  R4+(1)  	  R4-(1)  	  R1+(1) ⊕ R2+(1)  	  R1-(1) ⊕ R2-(1)  	  R2-(1) ⊕ R3+(1)  	  R2+(1) ⊕ R3-(1)  	  R1-(1) ⊕ R4+(1)  	  R1+(1) ⊕ R4-(1)  	  R2+(1) ⊕ R4-(1)  	  R2-(1) ⊕ R4+(1)  	  R1+(1) ⊕ R3-(1)  	  R1-(1) ⊕ R3+(1)  	  R1+(1) ⊕ R4-(1)  	  R1-(1) ⊕ R4+(1)  	  R2+(1) ⊕ R3-(1)  	  R2-(1) ⊕ R3+(1)  	  R1-(1) ⊕ R3+(1)  	  R1+(1) ⊕ R3-(1)  	  R2-(1) ⊕ R4+(1)  	  R2+(1) ⊕ R4-(1)  	  R5(2)  	  R6(2)  	  R5(2)  	  R6(2)  	  R6(2)  	  R5(2)  	  R6(2)  	  R5(2)  	  R6(2)  	  R5(2)  	  R6(2)  	  R5(2)  	  R5(2)  	  R6(2)  	  R5(2)  	  R6(2)  	  R5(2) ⊕ R6(2)  	  R5(2) ⊕ R6(2)  	  R5(2) ⊕ R6(2)  	  R5(2) ⊕ R6(2)  
+X:(0,1/2,0)	  X1+(1)  	  X1-(1)  	  X2+(1)  	  X2-(1)  	  X1+(1)  	  X1-(1)  	  X2+(1)  	  X2-(1)  	  X3+(1) ⊕ X4+(1)  	  X3-(1) ⊕ X4-(1)  	  X1+(1)  	  X1-(1)  	  X2+(1)  	  X2-(1)  	  X1+(1)  	  X1-(1)  	  X2+(1)  	  X2-(1)  	  X3+(1) ⊕ X4+(1)  	  X3-(1) ⊕ X4-(1)  	  X4-(1)  	  X4+(1)  	  X3-(1)  	  X3+(1)  	  X4-(1)  	  X4+(1)  	  X3-(1)  	  X3+(1)  	  X1-(1) ⊕ X2-(1)  	  X1+(1) ⊕ X2+(1)  	  X4-(1)  	  X4+(1)  	  X3-(1)  	  X3+(1)  	  X4-(1)  	  X4+(1)  	  X3-(1)  	  X3+(1)  	  X1-(1) ⊕ X2-(1)  	  X1+(1) ⊕ X2+(1)  	  X1+(1) ⊕ X4-(1)  	  X1-(1) ⊕ X4+(1)  	  X2+(1) ⊕ X3-(1)  	  X2-(1) ⊕ X3+(1)  	  X1-(1) ⊕ X3+(1)  	  X1+(1) ⊕ X3-(1)  	  X2-(1) ⊕ X4+(1)  	  X2+(1) ⊕ X4-(1)  	  X1+(1) ⊕ X4-(1)  	  X1-(1) ⊕ X4+(1)  	  X2+(1) ⊕ X3-(1)  	  X2-(1) ⊕ X3+(1)  	  X1-(1) ⊕ X3+(1)  	  X1+(1) ⊕ X3-(1)  	  X2-(1) ⊕ X4+(1)  	  X2+(1) ⊕ X4-(1)  	  X5(2)  	  X6(2)  	  X5(2)  	  X6(2)  	  X5(2)  	  X6(2)  	  X5(2)  	  X6(2)  	  X6(2)  	  X5(2)  	  X6(2)  	  X5(2)  	  X6(2)  	  X5(2)  	  X6(2)  	  X5(2)  	  X5(2) ⊕ X6(2)  	  X5(2) ⊕ X6(2)  	  X5(2) ⊕ X6(2)  	  X5(2) ⊕ X6(2) 
+
+
+sg 124
+Wyckoff pos.
+2a(422)	2a(422)	2a(422)	2a(422)	2a(422)	2b(4/m)	2b(4/m)	2b(4/m)	2b(4/m)	2b(4/m)	2b(4/m)	2c(422)	2c(422)	2c(422)	2c(422)	2c(422)	2d(4/m)	2d(4/m)	2d(4/m)	2d(4/m)	2d(4/m)	2d(4/m)	4e(2/m)	4e(2/m)	4e(2/m)	4e(2/m)	4f(222)	4f(222)	4f(222)	4f(222)	2a(422)	2a(422)	2b(4/m)	2b(4/m)	2b(4/m)	2b(4/m)	2c(422)	2c(422)	2d(4/m)	2d(4/m)	2d(4/m)	2d(4/m)	4e(2/m)	4e(2/m)	4f(222)
+Band-Rep.
+A1↑G(2)	A2↑G(2)	B1↑G(2)	B2↑G(2)	E↑G(4)	Ag↑G(2)	Au↑G(2)	Bg↑G(2)	Bu↑G(2)	1Eg2Eg↑G(4)	1Eu2Eu↑G(4)	A1↑G(2)	A2↑G(2)	B1↑G(2)	B2↑G(2)	E↑G(4)	Ag↑G(2)	Au↑G(2)	Bg↑G(2)	Bu↑G(2)	1Eg2Eg↑G(4)	1Eu2Eu↑G(4)	Ag↑G(4)	Au↑G(4)	Bg↑G(4)	Bu↑G(4)	A↑G(4)	B1↑G(4)	B2↑G(4)	B3↑G(4)	E1↑G(4)	E2↑G(4)	1E1g2E1g↑G(4)	1E1u2E1u↑G(4)	1E2g2E2g↑G(4)	1E2u2E2u↑G(4)	E1↑G(4)	E2↑G(4)	1E1g2E1g↑G(4)	1E1u2E1u↑G(4)	1E2g2E2g↑G(4)	1E2u2E2u↑G(4)	1Eg2Eg↑G(8)	1Eu2Eu↑G(8)	E↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable Decomposable Decomposable
+A:(1/2,1/2,1/2)	  A2(2)  	  A2(2)  	  A1(2)  	  A1(2)  	  A3A4(4)  	  A2(2)  	  A2(2)  	  A1(2)  	  A1(2)  	  A3A4(4)  	  A3A4(4)  	  A1(2)  	  A1(2)  	  A2(2)  	  A2(2)  	  A3A4(4)  	  A1(2)  	  A1(2)  	  A2(2)  	  A2(2)  	  A3A4(4)  	  A3A4(4)  	  A3A4(4)  	  A3A4(4)  	  A1(2) ⊕ A2(2)  	  A1(2) ⊕ A2(2)  	  A3A4(4)  	  A3A4(4)  	  A1(2) ⊕ A2(2)  	  A1(2) ⊕ A2(2)  	  A6A8(4)  	  A5A7(4)  	  A6A8(4)  	  A6A8(4)  	  A5A7(4)  	  A5A7(4)  	  A5A7(4)  	  A6A8(4)  	  A5A7(4)  	  A5A7(4)  	  A6A8(4)  	  A6A8(4)  	  A5A7(4) ⊕ A6A8(4)  	  A5A7(4) ⊕ A6A8(4)  	  A5A7(4) ⊕ A6A8(4)  
+Γ:(0,0,0)	  Γ1+(1) ⊕ Γ1-(1)  	  Γ3+(1) ⊕ Γ3-(1)  	  Γ2+(1) ⊕ Γ2-(1)  	  Γ4+(1) ⊕ Γ4-(1)  	  Γ5+(2) ⊕ Γ5-(2)  	  Γ1+(1) ⊕ Γ3+(1)  	  Γ1-(1) ⊕ Γ3-(1)  	  Γ2+(1) ⊕ Γ4+(1)  	  Γ2-(1) ⊕ Γ4-(1)  	  2 Γ5+(2)  	  2 Γ5-(2)  	  Γ1+(1) ⊕ Γ1-(1)  	  Γ3+(1) ⊕ Γ3-(1)  	  Γ2+(1) ⊕ Γ2-(1)  	  Γ4+(1) ⊕ Γ4-(1)  	  Γ5+(2) ⊕ Γ5-(2)  	  Γ1+(1) ⊕ Γ3+(1)  	  Γ1-(1) ⊕ Γ3-(1)  	  Γ2+(1) ⊕ Γ4+(1)  	  Γ2-(1) ⊕ Γ4-(1)  	  2 Γ5+(2)  	  2 Γ5-(2)  	  Γ1+(1) ⊕ Γ2+(1) ⊕ Γ3+(1) ⊕ Γ4+(1)  	  Γ1-(1) ⊕ Γ2-(1) ⊕ Γ3-(1) ⊕ Γ4-(1)  	  2 Γ5+(2)  	  2 Γ5-(2)  	  Γ1+(1) ⊕ Γ1-(1) ⊕ Γ2+(1) ⊕ Γ2-(1)  	  Γ3+(1) ⊕ Γ3-(1) ⊕ Γ4+(1) ⊕ Γ4-(1)  	  Γ5+(2) ⊕ Γ5-(2)  	  Γ5+(2) ⊕ Γ5-(2)  	  Γ7(2) ⊕ Γ9(2)  	  Γ6(2) ⊕ Γ8(2)  	  2 Γ7(2)  	  2 Γ9(2)  	  2 Γ6(2)  	  2 Γ8(2)  	  Γ7(2) ⊕ Γ9(2)  	  Γ6(2) ⊕ Γ8(2)  	  2 Γ7(2)  	  2 Γ9(2)  	  2 Γ6(2)  	  2 Γ8(2)  	  2 Γ6(2) ⊕ 2 Γ7(2)  	  2 Γ8(2) ⊕ 2 Γ9(2)  	  Γ6(2) ⊕ Γ7(2) ⊕ Γ8(2) ⊕ Γ9(2)  
+M:(1/2,1/2,0)	  M1+(1) ⊕ M1-(1)  	  M3+(1) ⊕ M3-(1)  	  M2+(1) ⊕ M2-(1)  	  M4+(1) ⊕ M4-(1)  	  M5+(2) ⊕ M5-(2)  	  M1+(1) ⊕ M3+(1)  	  M1-(1) ⊕ M3-(1)  	  M2+(1) ⊕ M4+(1)  	  M2-(1) ⊕ M4-(1)  	  2 M5+(2)  	  2 M5-(2)  	  M4+(1) ⊕ M4-(1)  	  M2+(1) ⊕ M2-(1)  	  M3+(1) ⊕ M3-(1)  	  M1+(1) ⊕ M1-(1)  	  M5+(2) ⊕ M5-(2)  	  M2+(1) ⊕ M4+(1)  	  M2-(1) ⊕ M4-(1)  	  M1+(1) ⊕ M3+(1)  	  M1-(1) ⊕ M3-(1)  	  2 M5+(2)  	  2 M5-(2)  	  2 M5-(2)  	  2 M5+(2)  	  M1-(1) ⊕ M2-(1) ⊕ M3-(1) ⊕ M4-(1)  	  M1+(1) ⊕ M2+(1) ⊕ M3+(1) ⊕ M4+(1)  	  M5+(2) ⊕ M5-(2)  	  M5+(2) ⊕ M5-(2)  	  M1+(1) ⊕ M1-(1) ⊕ M2+(1) ⊕ M2-(1)  	  M3+(1) ⊕ M3-(1) ⊕ M4+(1) ⊕ M4-(1)  	  M7(2) ⊕ M9(2)  	  M6(2) ⊕ M8(2)  	  2 M7(2)  	  2 M9(2)  	  2 M6(2)  	  2 M8(2)  	  M6(2) ⊕ M8(2)  	  M7(2) ⊕ M9(2)  	  2 M6(2)  	  2 M8(2)  	  2 M7(2)  	  2 M9(2)  	  2 M8(2) ⊕ 2 M9(2)  	  2 M6(2) ⊕ 2 M7(2)  	  M6(2) ⊕ M7(2) ⊕ M8(2) ⊕ M9(2)  
+Z:(0,0,1/2)	  Z2(2)  	  Z2(2)  	  Z1(2)  	  Z1(2)  	  Z3Z4(4)  	  Z2(2)  	  Z2(2)  	  Z1(2)  	  Z1(2)  	  Z3Z4(4)  	  Z3Z4(4)  	  Z2(2)  	  Z2(2)  	  Z1(2)  	  Z1(2)  	  Z3Z4(4)  	  Z2(2)  	  Z2(2)  	  Z1(2)  	  Z1(2)  	  Z3Z4(4)  	  Z3Z4(4)  	  Z1(2) ⊕ Z2(2)  	  Z1(2) ⊕ Z2(2)  	  Z3Z4(4)  	  Z3Z4(4)  	  Z1(2) ⊕ Z2(2)  	  Z1(2) ⊕ Z2(2)  	  Z3Z4(4)  	  Z3Z4(4)  	  Z6Z8(4)  	  Z5Z7(4)  	  Z6Z8(4)  	  Z6Z8(4)  	  Z5Z7(4)  	  Z5Z7(4)  	  Z6Z8(4)  	  Z5Z7(4)  	  Z6Z8(4)  	  Z6Z8(4)  	  Z5Z7(4)  	  Z5Z7(4)  	  Z5Z7(4) ⊕ Z6Z8(4)  	  Z5Z7(4) ⊕ Z6Z8(4)  	  Z5Z7(4) ⊕ Z6Z8(4)  
+R:(0,1/2,1/2)	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  2 R2(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  R1(2)  	  2 R2(2)  	  2 R2(2)  	  R2(2)  	  R2(2)  	  R2(2)  	  R2(2)  	  2 R1(2)  	  R2(2)  	  R2(2)  	  R2(2)  	  R2(2)  	  2 R1(2)  	  2 R1(2)  	  R1(2) ⊕ R2(2)  	  R1(2) ⊕ R2(2)  	  R1(2) ⊕ R2(2)  	  R1(2) ⊕ R2(2)  	  R1(2) ⊕ R2(2)  	  R1(2) ⊕ R2(2)  	  R1(2) ⊕ R2(2)  	  R1(2) ⊕ R2(2)  	  R3R4(4)  	  R3R4(4)  	  R3R4(4)  	  R3R4(4)  	  R3R4(4)  	  R3R4(4)  	  R3R4(4)  	  R3R4(4)  	  R3R4(4)  	  R3R4(4)  	  R3R4(4)  	  R3R4(4)  	  2 R3R4(4)  	  2 R3R4(4)  	  2 R3R4(4)  
+X:(0,1/2,0)	  X1+(1) ⊕ X1-(1)  	  X2+(1) ⊕ X2-(1)  	  X1+(1) ⊕ X1-(1)  	  X2+(1) ⊕ X2-(1)  	  X3+(1) ⊕ X3-(1) ⊕ X4+(1) ⊕ X4-(1)  	  X1+(1) ⊕ X2+(1)  	  X1-(1) ⊕ X2-(1)  	  X1+(1) ⊕ X2+(1)  	  X1-(1) ⊕ X2-(1)  	  2 X3+(1) ⊕ 2 X4+(1)  	  2 X3-(1) ⊕ 2 X4-(1)  	  X4+(1) ⊕ X4-(1)  	  X3+(1) ⊕ X3-(1)  	  X4+(1) ⊕ X4-(1)  	  X3+(1) ⊕ X3-(1)  	  X1+(1) ⊕ X1-(1) ⊕ X2+(1) ⊕ X2-(1)  	  X3-(1) ⊕ X4-(1)  	  X3+(1) ⊕ X4+(1)  	  X3-(1) ⊕ X4-(1)  	  X3+(1) ⊕ X4+(1)  	  2 X1-(1) ⊕ 2 X2-(1)  	  2 X1+(1) ⊕ 2 X2+(1)  	  X1+(1) ⊕ X2+(1) ⊕ X3-(1) ⊕ X4-(1)  	  X1-(1) ⊕ X2-(1) ⊕ X3+(1) ⊕ X4+(1)  	  X1-(1) ⊕ X2-(1) ⊕ X3+(1) ⊕ X4+(1)  	  X1+(1) ⊕ X2+(1) ⊕ X3-(1) ⊕ X4-(1)  	  X1+(1) ⊕ X1-(1) ⊕ X4+(1) ⊕ X4-(1)  	  X2+(1) ⊕ X2-(1) ⊕ X3+(1) ⊕ X3-(1)  	  X1+(1) ⊕ X1-(1) ⊕ X3+(1) ⊕ X3-(1)  	  X2+(1) ⊕ X2-(1) ⊕ X4+(1) ⊕ X4-(1)  	  X5(2) ⊕ X6(2)  	  X5(2) ⊕ X6(2)  	  2 X5(2)  	  2 X6(2)  	  2 X5(2)  	  2 X6(2)  	  X5(2) ⊕ X6(2)  	  X5(2) ⊕ X6(2)  	  2 X6(2)  	  2 X5(2)  	  2 X6(2)  	  2 X5(2)  	  2 X5(2) ⊕ 2 X6(2)  	  2 X5(2) ⊕ 2 X6(2)  	  2 X5(2) ⊕ 2 X6(2)  
+
+sg 126
+Wyckoff pos.
+2a(422)	2a(422)	2a(422)	2a(422)	2a(422)	2b(422)	2b(422)	2b(422)	2b(422)	2b(422)	4c(222)	4c(222)	4c(222)	4c(222)	4d(4)	4d(4)	8f(1)	8f(1)	2a(422)	2a(422)	2b(422)	2b(422)	4c(222)	4d(4)	4d(4)	8f(1)	8f(1)
+Band-Rep.
+A1↑G(2)	A2↑G(2)	B1↑G(2)	B2↑G(2)	E↑G(4)	A1↑G(2)	A2↑G(2)	B1↑G(2)	B2↑G(2)	E↑G(4)	A↑G(4)	B1↑G(4)	B2↑G(4)	B3↑G(4)	A↑G(4)	B↑G(4)	Ag↑G(8)	Au↑G(8)	E1↑G(4)	E2↑G(4)	E1↑G(4)	E2↑G(4)	E↑G(8)	1E12E1↑G(8)	1E22E2↑G(8)	AgAg↑G(16)	AuAu↑G(16)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable Decomposable Decomposable Decomposable Decomposable
+A:(1/2,1/2,1/2)	  A1(2)  	  A2(2)  	  A1(2)  	  A2(2)  	  A3(2) ⊕ A4(2)  	  A2(2)  	  A1(2)  	  A2(2)  	  A1(2)  	  A3(2) ⊕ A4(2)  	  A3(2) ⊕ A4(2)  	  A3(2) ⊕ A4(2)  	  2 A2(2)  	  2 A1(2)  	  A3(2) ⊕ A4(2)  	  A3(2) ⊕ A4(2)  	  A1(2) ⊕ A2(2) ⊕ A3(2) ⊕ A4(2)  	  A1(2) ⊕ A2(2) ⊕ A3(2) ⊕ A4(2)  	  A5(4)  	  A5(4)  	  A5(4)  	  A5(4)  	  2 A5(4)  	  2 A5(4)  	  2 A5(4)  	  4 A5(4)  	  4 A5(4)  
+Γ:(0,0,0)	  Γ1+(1) ⊕ Γ1-(1)  	  Γ3+(1) ⊕ Γ3-(1)  	  Γ2+(1) ⊕ Γ2-(1)  	  Γ4+(1) ⊕ Γ4-(1)  	  Γ5+(2) ⊕ Γ5-(2)  	  Γ1+(1) ⊕ Γ1-(1)  	  Γ3+(1) ⊕ Γ3-(1)  	  Γ2+(1) ⊕ Γ2-(1)  	  Γ4+(1) ⊕ Γ4-(1)  	  Γ5+(2) ⊕ Γ5-(2)  	  Γ1+(1) ⊕ Γ1-(1) ⊕ Γ2+(1) ⊕ Γ2-(1)  	  Γ3+(1) ⊕ Γ3-(1) ⊕ Γ4+(1) ⊕ Γ4-(1)  	  Γ5+(2) ⊕ Γ5-(2)  	  Γ5+(2) ⊕ Γ5-(2)  	  Γ1+(1) ⊕ Γ2-(1) ⊕ Γ3+(1) ⊕ Γ4-(1)  	  Γ1-(1) ⊕ Γ2+(1) ⊕ Γ3-(1) ⊕ Γ4+(1)  	  Γ1+(1) ⊕ Γ2+(1) ⊕ Γ3+(1) ⊕ Γ4+(1) ⊕ 2 Γ5+(2)  	  Γ1-(1) ⊕ Γ2-(1) ⊕ Γ3-(1) ⊕ Γ4-(1) ⊕ 2 Γ5-(2)  	  Γ7(2) ⊕ Γ9(2)  	  Γ6(2) ⊕ Γ8(2)  	  Γ7(2) ⊕ Γ9(2)  	  Γ6(2) ⊕ Γ8(2)  	  Γ6(2) ⊕ Γ7(2) ⊕ Γ8(2) ⊕ Γ9(2)  	  2 Γ7(2) ⊕ 2 Γ8(2)  	  2 Γ6(2) ⊕ 2 Γ9(2)  	  4 Γ6(2) ⊕ 4 Γ7(2)  	  4 Γ8(2) ⊕ 4 Γ9(2)  
+M:(1/2,1/2,0)	  M1(2)  	  M2(2)  	  M2(2)  	  M1(2)  	  M3(2) ⊕ M4(2)  	  M1(2)  	  M2(2)  	  M2(2)  	  M1(2)  	  M3(2) ⊕ M4(2)  	  M3(2) ⊕ M4(2)  	  M3(2) ⊕ M4(2)  	  M1(2) ⊕ M2(2)  	  M1(2) ⊕ M2(2)  	  M3(2) ⊕ M4(2)  	  M3(2) ⊕ M4(2)  	  M1(2) ⊕ M2(2) ⊕ M3(2) ⊕ M4(2)  	  M1(2) ⊕ M2(2) ⊕ M3(2) ⊕ M4(2)  	  M5(4)  	  M5(4)  	  M5(4)  	  M5(4)  	  2 M5(4)  	  2 M5(4)  	  2 M5(4)  	  4 M5(4)  	  4 M5(4)  
+Z:(0,0,1/2)	  Z2(2)  	  Z2(2)  	  Z1(2)  	  Z1(2)  	  Z3Z4(4)  	  Z2(2)  	  Z2(2)  	  Z1(2)  	  Z1(2)  	  Z3Z4(4)  	  Z1(2) ⊕ Z2(2)  	  Z1(2) ⊕ Z2(2)  	  Z3Z4(4)  	  Z3Z4(4)  	  Z1(2) ⊕ Z2(2)  	  Z1(2) ⊕ Z2(2)  	  Z1(2) ⊕ Z2(2) ⊕ Z3Z4(4)  	  Z1(2) ⊕ Z2(2) ⊕ Z3Z4(4)  	  Z6Z8(4)  	  Z5Z7(4)  	  Z6Z8(4)  	  Z5Z7(4)  	  Z5Z7(4) ⊕ Z6Z8(4)  	  Z5Z7(4) ⊕ Z6Z8(4)  	  Z5Z7(4) ⊕ Z6Z8(4)  	  2 Z5Z7(4) ⊕ 2 Z6Z8(4)  	  2 Z5Z7(4) ⊕ 2 Z6Z8(4)  
+R:(0,1/2,1/2)	  R1(2)  	  R2(2)  	  R1(2)  	  R2(2)  	  R1(2) ⊕ R2(2)  	  R2(2)  	  R1(2)  	  R2(2)  	  R1(2)  	  R1(2) ⊕ R2(2)  	  R1(2) ⊕ R2(2)  	  R1(2) ⊕ R2(2)  	  2 R2(2)  	  2 R1(2)  	  R1(2) ⊕ R2(2)  	  R1(2) ⊕ R2(2)  	  2 R1(2) ⊕ 2 R2(2)  	  2 R1(2) ⊕ 2 R2(2)  	  R3R4(4)  	  R3R4(4)  	  R3R4(4)  	  R3R4(4)  	  2 R3R4(4)  	  2 R3R4(4)  	  2 R3R4(4)  	  4 R3R4(4)  	  4 R3R4(4)  
+X:(0,1/2,0)	  X1(2)  	  X2(2)  	  X1(2)  	  X2(2)  	  X1(2) ⊕ X2(2)  	  X1(2)  	  X2(2)  	  X1(2)  	  X2(2)  	  X1(2) ⊕ X2(2)  	  2 X1(2)  	  2 X2(2)  	  X1(2) ⊕ X2(2)  	  X1(2) ⊕ X2(2)  	  X1(2) ⊕ X2(2)  	  X1(2) ⊕ X2(2)  	  2 X1(2) ⊕ 2 X2(2)  	  2 X1(2) ⊕ 2 X2(2)  	  X3X4(4)  	  X3X4(4)  	  X3X4(4)  	  X3X4(4)  	  2 X3X4(4)  	  2 X3X4(4)  	  2 X3X4(4)  	  4 X3X4(4)  	  4 X3X4(4)  
+
+sg 128
+Wyckoff pos.
+2a(4/m)	2a(4/m)	2a(4/m)	2a(4/m)	2a(4/m)	2a(4/m)	2b(4/m)	2b(4/m)	2b(4/m)	2b(4/m)	2b(4/m)	2b(4/m)	4c(2/m)	4c(2/m)	4c(2/m)	4c(2/m)	4d(222)	4d(222)	4d(222)	4d(222)	2a(4/m)	2a(4/m)	2a(4/m)	2a(4/m)	2b(4/m)	2b(4/m)	2b(4/m)	2b(4/m)	4c(2/m)	4c(2/m)	4d(222)
+Band-Rep.
+Ag↑G(2)	Au↑G(2)	Bg↑G(2)	Bu↑G(2)	1Eg2Eg↑G(4)	1Eu2Eu↑G(4)	Ag↑G(2)	Au↑G(2)	Bg↑G(2)	Bu↑G(2)	1Eg2Eg↑G(4)	1Eu2Eu↑G(4)	Ag↑G(4)	Au↑G(4)	Bg↑G(4)	Bu↑G(4)	A↑G(4)	B1↑G(4)	B2↑G(4)	B3↑G(4)	1E1g2E1g↑G(4)	1E1u2E1u↑G(4)	1E2g2E2g↑G(4)	1E2u2E2u↑G(4)	1E1g2E1g↑G(4)	1E1u2E1u↑G(4)	1E2g2E2g↑G(4)	1E2u2E2u↑G(4)	1Eg2Eg↑G(8)	1Eu2Eu↑G(8)	E↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable Decomposable Decomposable
+A:(1/2,1/2,1/2)	  A1(2)  	  A2(2)  	  A2(2)  	  A1(2)  	  A3A4(4)  	  A3A4(4)  	  A2(2)  	  A1(2)  	  A1(2)  	  A2(2)  	  A3A4(4)  	  A3A4(4)  	  A3A4(4)  	  A3A4(4)  	  A1(2) ⊕ A2(2)  	  A1(2) ⊕ A2(2)  	  A3A4(4)  	  A3A4(4)  	  A1(2) ⊕ A2(2)  	  A1(2) ⊕ A2(2)  	  A6A8(4)  	  A5A7(4)  	  A5A7(4)  	  A6A8(4)  	  A5A7(4)  	  A6A8(4)  	  A6A8(4)  	  A5A7(4)  	  A5A7(4) ⊕ A6A8(4)  	  A5A7(4) ⊕ A6A8(4)  	  A5A7(4) ⊕ A6A8(4)  
+Γ:(0,0,0)	  Γ1+(1) ⊕ Γ3+(1)  	  Γ1-(1) ⊕ Γ3-(1)  	  Γ2+(1) ⊕ Γ4+(1)  	  Γ2-(1) ⊕ Γ4-(1)  	  2 Γ5+(2)  	  2 Γ5-(2)  	  Γ1+(1) ⊕ Γ3+(1)  	  Γ1-(1) ⊕ Γ3-(1)  	  Γ2+(1) ⊕ Γ4+(1)  	  Γ2-(1) ⊕ Γ4-(1)  	  2 Γ5+(2)  	  2 Γ5-(2)  	  Γ1+(1) ⊕ Γ2+(1) ⊕ Γ3+(1) ⊕ Γ4+(1)  	  Γ1-(1) ⊕ Γ2-(1) ⊕ Γ3-(1) ⊕ Γ4-(1)  	  2 Γ5+(2)  	  2 Γ5-(2)  	  Γ1+(1) ⊕ Γ1-(1) ⊕ Γ4+(1) ⊕ Γ4-(1)  	  Γ2+(1) ⊕ Γ2-(1) ⊕ Γ3+(1) ⊕ Γ3-(1)  	  Γ5+(2) ⊕ Γ5-(2)  	  Γ5+(2) ⊕ Γ5-(2)  	  2 Γ7(2)  	  2 Γ9(2)  	  2 Γ6(2)  	  2 Γ8(2)  	  2 Γ7(2)  	  2 Γ9(2)  	  2 Γ6(2)  	  2 Γ8(2)  	  2 Γ6(2) ⊕ 2 Γ7(2)  	  2 Γ8(2) ⊕ 2 Γ9(2)  	  Γ6(2) ⊕ Γ7(2) ⊕ Γ8(2) ⊕ Γ9(2)  
+M:(1/2,1/2,0)	  M5+(2)  	  M5-(2)  	  M5+(2)  	  M5-(2)  	  M1+M4+(2) ⊕ M2+M3+(2)  	  M1-M4-(2) ⊕ M2-M3-(2)  	  M5+(2)  	  M5-(2)  	  M5+(2)  	  M5-(2)  	  M1+M4+(2) ⊕ M2+M3+(2)  	  M1-M4-(2) ⊕ M2-M3-(2)  	  M1-M4-(2) ⊕ M2-M3-(2)  	  M1+M4+(2) ⊕ M2+M3+(2)  	  2 M5-(2)  	  2 M5+(2)  	  M2+M3+(2) ⊕ M2-M3-(2)  	  M1+M4+(2) ⊕ M1-M4-(2)  	  M5+(2) ⊕ M5-(2)  	  M5+(2) ⊕ M5-(2)  	  M6M7(4)  	  M8M9(4)  	  M6M7(4)  	  M8M9(4)  	  M6M7(4)  	  M8M9(4)  	  M6M7(4)  	  M8M9(4)  	  2 M8M9(4)  	  2 M6M7(4)  	  M6M7(4) ⊕ M8M9(4)  
+Z:(0,0,1/2)	  Z2(2)  	  Z2(2)  	  Z1(2)  	  Z1(2)  	  Z3Z4(4)  	  Z3Z4(4)  	  Z2(2)  	  Z2(2)  	  Z1(2)  	  Z1(2)  	  Z3Z4(4)  	  Z3Z4(4)  	  Z1(2) ⊕ Z2(2)  	  Z1(2) ⊕ Z2(2)  	  Z3Z4(4)  	  Z3Z4(4)  	  Z1(2) ⊕ Z2(2)  	  Z1(2) ⊕ Z2(2)  	  Z3Z4(4)  	  Z3Z4(4)  	  Z6Z8(4)  	  Z6Z8(4)  	  Z5Z7(4)  	  Z5Z7(4)  	  Z6Z8(4)  	  Z6Z8(4)  	  Z5Z7(4)  	  Z5Z7(4)  	  Z5Z7(4) ⊕ Z6Z8(4)  	  Z5Z7(4) ⊕ Z6Z8(4)  	  Z5Z7(4) ⊕ Z6Z8(4)  
+R:(0,1/2,1/2)	  R1+(2)  	  R1-(2)  	  R1+(2)  	  R1-(2)  	  2 R1+(2)  	  2 R1-(2)  	  R1-(2)  	  R1+(2)  	  R1-(2)  	  R1+(2)  	  2 R1-(2)  	  2 R1+(2)  	  R1+(2) ⊕ R1-(2)  	  R1+(2) ⊕ R1-(2)  	  R1+(2) ⊕ R1-(2)  	  R1+(2) ⊕ R1-(2)  	  R1+(2) ⊕ R1-(2)  	  R1+(2) ⊕ R1-(2)  	  R1+(2) ⊕ R1-(2)  	  R1+(2) ⊕ R1-(2)  	  R2R5(2) ⊕ R3R4(2)  	  R6R9(2) ⊕ R7R8(2)  	  R2R5(2) ⊕ R3R4(2)  	  R6R9(2) ⊕ R7R8(2)  	  R6R9(2) ⊕ R7R8(2)  	  R2R5(2) ⊕ R3R4(2)  	  R6R9(2) ⊕ R7R8(2)  	  R2R5(2) ⊕ R3R4(2)  	  R2R5(2) ⊕ R3R4(2) ⊕ R6R9(2) ⊕ R7R8(2)  	  R2R5(2) ⊕ R3R4(2) ⊕ R6R9(2) ⊕ R7R8(2)  	  R2R5(2) ⊕ R3R4(2) ⊕ R6R9(2) ⊕ R7R8(2)  
+X:(0,1/2,0)	  X2(2)  	  X1(2)  	  X2(2)  	  X1(2)  	  2 X1(2)  	  2 X2(2)  	  X2(2)  	  X1(2)  	  X2(2)  	  X1(2)  	  2 X1(2)  	  2 X2(2)  	  2 X2(2)  	  2 X1(2)  	  2 X1(2)  	  2 X2(2)  	  X1(2) ⊕ X2(2)  	  X1(2) ⊕ X2(2)  	  X1(2) ⊕ X2(2)  	  X1(2) ⊕ X2(2)  	  X3X4(4)  	  X3X4(4)  	  X3X4(4)  	  X3X4(4)  	  X3X4(4)  	  X3X4(4)  	  X3X4(4)  	  X3X4(4)  	  2 X3X4(4)  	  2 X3X4(4)  	  2 X3X4(4) 
+
+
+sg 129
+Wyckoff pos.
+2a(4m2)	2a(4m2)	2a(4m2)	2a(4m2)	2a(4m2)	2b(4m2)	2b(4m2)	2b(4m2)	2b(4m2)	2b(4m2)	2c(4mm)	2c(4mm)	2c(4mm)	2c(4mm)	2c(4mm)	4d(2/m)	4d(2/m)	4d(2/m)	4d(2/m)	4e(2/m)	4e(2/m)	4e(2/m)	4e(2/m)	2a(4m2)	2a(4m2)	2b(4m2)	2b(4m2)	2c(4mm)	2c(4mm)	4d(2/m)	4d(2/m)	4e(2/m)	4e(2/m)
+Band-Rep.
+A1↑G(2)	A2↑G(2)	B1↑G(2)	B2↑G(2)	E↑G(4)	A1↑G(2)	A2↑G(2)	B1↑G(2)	B2↑G(2)	E↑G(4)	A1↑G(2)	A2↑G(2)	B1↑G(2)	B2↑G(2)	E↑G(4)	Ag↑G(4)	Au↑G(4)	Bg↑G(4)	Bu↑G(4)	Ag↑G(4)	Au↑G(4)	Bg↑G(4)	Bu↑G(4)	E1↑G(4)	E2↑G(4)	E1↑G(4)	E2↑G(4)	E1↑G(4)	E2↑G(4)	1Eg2Eg↑G(8)	1Eu2Eu↑G(8)	1Eg2Eg↑G(8)	1Eu2Eu↑G(8)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable Decomposable Decomposable Decomposable
+A:(1/2,1/2,1/2)	  A2(2)  	  A2(2)  	  A1(2)  	  A1(2)  	  A3(2) ⊕ A4(2)  	  A1(2)  	  A1(2)  	  A2(2)  	  A2(2)  	  A3(2) ⊕ A4(2)  	  A3(2)  	  A4(2)  	  A4(2)  	  A3(2)  	  A1(2) ⊕ A2(2)  	  A2(2) ⊕ A3(2)  	  A2(2) ⊕ A4(2)  	  A1(2) ⊕ A4(2)  	  A1(2) ⊕ A3(2)  	  A1(2) ⊕ A3(2)  	  A1(2) ⊕ A4(2)  	  A2(2) ⊕ A4(2)  	  A2(2) ⊕ A3(2)  	  A5(4)  	  A5(4)  	  A5(4)  	  A5(4)  	  A5(4)  	  A5(4)  	  2 A5(4)  	  2 A5(4)  	  2 A5(4)  	  2 A5(4)  
+Γ:(0,0,0)	  Γ1+(1) ⊕ Γ4-(1)  	  Γ1-(1) ⊕ Γ4+(1)  	  Γ2+(1) ⊕ Γ3-(1)  	  Γ2-(1) ⊕ Γ3+(1)  	  Γ5+(2) ⊕ Γ5-(2)  	  Γ1+(1) ⊕ Γ4-(1)  	  Γ1-(1) ⊕ Γ4+(1)  	  Γ2+(1) ⊕ Γ3-(1)  	  Γ2-(1) ⊕ Γ3+(1)  	  Γ5+(2) ⊕ Γ5-(2)  	  Γ1+(1) ⊕ Γ3-(1)  	  Γ1-(1) ⊕ Γ3+(1)  	  Γ2+(1) ⊕ Γ4-(1)  	  Γ2-(1) ⊕ Γ4+(1)  	  Γ5+(2) ⊕ Γ5-(2)  	  Γ1+(1) ⊕ Γ4+(1) ⊕ Γ5+(2)  	  Γ1-(1) ⊕ Γ4-(1) ⊕ Γ5-(2)  	  Γ2+(1) ⊕ Γ3+(1) ⊕ Γ5+(2)  	  Γ2-(1) ⊕ Γ3-(1) ⊕ Γ5-(2)  	  Γ1+(1) ⊕ Γ4+(1) ⊕ Γ5+(2)  	  Γ1-(1) ⊕ Γ4-(1) ⊕ Γ5-(2)  	  Γ2+(1) ⊕ Γ3+(1) ⊕ Γ5+(2)  	  Γ2-(1) ⊕ Γ3-(1) ⊕ Γ5-(2)  	  Γ7(2) ⊕ Γ8(2)  	  Γ6(2) ⊕ Γ9(2)  	  Γ7(2) ⊕ Γ8(2)  	  Γ6(2) ⊕ Γ9(2)  	  Γ7(2) ⊕ Γ9(2)  	  Γ6(2) ⊕ Γ8(2)  	  2 Γ6(2) ⊕ 2 Γ7(2)  	  2 Γ8(2) ⊕ 2 Γ9(2)  	  2 Γ6(2) ⊕ 2 Γ7(2)  	  2 Γ8(2) ⊕ 2 Γ9(2)  
+M:(1/2,1/2,0)	  M2(2)  	  M2(2)  	  M1(2)  	  M1(2)  	  M3(2) ⊕ M4(2)  	  M2(2)  	  M2(2)  	  M1(2)  	  M1(2)  	  M3(2) ⊕ M4(2)  	  M3(2)  	  M4(2)  	  M4(2)  	  M3(2)  	  M1(2) ⊕ M2(2)  	  M2(2) ⊕ M3(2)  	  M2(2) ⊕ M4(2)  	  M1(2) ⊕ M4(2)  	  M1(2) ⊕ M3(2)  	  M2(2) ⊕ M3(2)  	  M2(2) ⊕ M4(2)  	  M1(2) ⊕ M4(2)  	  M1(2) ⊕ M3(2)  	  M5(4)  	  M5(4)  	  M5(4)  	  M5(4)  	  M5(4)  	  M5(4)  	  2 M5(4)  	  2 M5(4)  	  2 M5(4)  	  2 M5(4)  
+Z:(0,0,1/2)	  Z1+(1) ⊕ Z4-(1)  	  Z1-(1) ⊕ Z4+(1)  	  Z2+(1) ⊕ Z3-(1)  	  Z2-(1) ⊕ Z3+(1)  	  Z5+(2) ⊕ Z5-(2)  	  Z2+(1) ⊕ Z3-(1)  	  Z2-(1) ⊕ Z3+(1)  	  Z1+(1) ⊕ Z4-(1)  	  Z1-(1) ⊕ Z4+(1)  	  Z5+(2) ⊕ Z5-(2)  	  Z1+(1) ⊕ Z3-(1)  	  Z1-(1) ⊕ Z3+(1)  	  Z2+(1) ⊕ Z4-(1)  	  Z2-(1) ⊕ Z4+(1)  	  Z5+(2) ⊕ Z5-(2)  	  Z1+(1) ⊕ Z4+(1) ⊕ Z5+(2)  	  Z1-(1) ⊕ Z4-(1) ⊕ Z5-(2)  	  Z2+(1) ⊕ Z3+(1) ⊕ Z5+(2)  	  Z2-(1) ⊕ Z3-(1) ⊕ Z5-(2)  	  Z2-(1) ⊕ Z3-(1) ⊕ Z5-(2)  	  Z2+(1) ⊕ Z3+(1) ⊕ Z5+(2)  	  Z1-(1) ⊕ Z4-(1) ⊕ Z5-(2)  	  Z1+(1) ⊕ Z4+(1) ⊕ Z5+(2)  	  Z7(2) ⊕ Z8(2)  	  Z6(2) ⊕ Z9(2)  	  Z6(2) ⊕ Z9(2)  	  Z7(2) ⊕ Z8(2)  	  Z7(2) ⊕ Z9(2)  	  Z6(2) ⊕ Z8(2)  	  2 Z6(2) ⊕ 2 Z7(2)  	  2 Z8(2) ⊕ 2 Z9(2)  	  2 Z8(2) ⊕ 2 Z9(2)  	  2 Z6(2) ⊕ 2 Z7(2)  
+R:(0,1/2,1/2)	  R1(2)  	  R2(2)  	  R1(2)  	  R2(2)  	  R1(2) ⊕ R2(2)  	  R1(2)  	  R2(2)  	  R1(2)  	  R2(2)  	  R1(2) ⊕ R2(2)  	  R1(2)  	  R2(2)  	  R1(2)  	  R2(2)  	  R1(2) ⊕ R2(2)  	  R1(2) ⊕ R2(2)  	  R1(2) ⊕ R2(2)  	  R1(2) ⊕ R2(2)  	  R1(2) ⊕ R2(2)  	  R1(2) ⊕ R2(2)  	  R1(2) ⊕ R2(2)  	  R1(2) ⊕ R2(2)  	  R1(2) ⊕ R2(2)  	  R3R4(4)  	  R3R4(4)  	  R3R4(4)  	  R3R4(4)  	  R3R4(4)  	  R3R4(4)  	  2 R3R4(4)  	  2 R3R4(4)  	  2 R3R4(4)  	  2 R3R4(4)  
+X:(0,1/2,0)	  X1(2)  	  X2(2)  	  X1(2)  	  X2(2)  	  X1(2) ⊕ X2(2)  	  X1(2)  	  X2(2)  	  X1(2)  	  X2(2)  	  X1(2) ⊕ X2(2)  	  X1(2)  	  X2(2)  	  X1(2)  	  X2(2)  	  X1(2) ⊕ X2(2)  	  X1(2) ⊕ X2(2)  	  X1(2) ⊕ X2(2)  	  X1(2) ⊕ X2(2)  	  X1(2) ⊕ X2(2)  	  X1(2) ⊕ X2(2)  	  X1(2) ⊕ X2(2)  	  X1(2) ⊕ X2(2)  	  X1(2) ⊕ X2(2)  	  X3X4(4)  	  X3X4(4)  	  X3X4(4)  	  X3X4(4)  	  X3X4(4)  	  X3X4(4)  	  2 X3X4(4)  	  2 X3X4(4)  	  2 X3X4(4)  	  2 X3X4(4) 
+
+
+sg 130
+Wyckoff pos.
+4a(222)	4a(222)	4a(222)	4a(222)	4b(4)	4b(4)	4c(4)	4c(4)	4c(4)	8d(1)	8d(1)	4a(222)	4b(4)	4b(4)	4c(4)	4c(4)	8d(1)	8d(1)
+Band-Rep.
+A↑G(4)	B1↑G(4)	B2↑G(4)	B3↑G(4)	A↑G(4)	B↑G(4)	A↑G(4)	B↑G(4)	1E2E↑G(8)	Ag↑G(8)	Au↑G(8)	E↑G(8)	1E12E1↑G(8)	1E22E2↑G(8)	1E12E1↑G(8)	1E22E2↑G(8)	AgAg↑G(16)	AuAu↑G(16)
+Decomposable\
+Indecomposable
+Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable  Decomposable  Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Indecomposable	Decomposable Decomposable
+A:(1/2,1/2,1/2)	  A1A2(4)  	  A1A2(4)  	  A3A4(4)  	  A3A4(4)  	  A1A2(4)  	  A1A2(4)  	  A3A4(4)  	  A3A4(4)  	  2 A1A2(4)  	  A1A2(4) ⊕ A3A4(4)  	  A1A2(4) ⊕ A3A4(4)  	  A5A5(8)  	  A5A5(8)  	  A5A5(8)  	  A5A5(8)  	  A5A5(8)  	  2 A5A5(8)  	  2 A5A5(8)  
+Γ:(0,0,0)	  Γ1+(1) ⊕ Γ1-(1) ⊕ Γ4+(1) ⊕ Γ4-(1)  	  Γ2+(1) ⊕ Γ2-(1) ⊕ Γ3+(1) ⊕ Γ3-(1)  	  Γ5+(2) ⊕ Γ5-(2)  	  Γ5+(2) ⊕ Γ5-(2)  	  Γ1+(1) ⊕ Γ2-(1) ⊕ Γ3+(1) ⊕ Γ4-(1)  	  Γ1-(1) ⊕ Γ2+(1) ⊕ Γ3-(1) ⊕ Γ4+(1)  	  Γ1+(1) ⊕ Γ1-(1) ⊕ Γ3+(1) ⊕ Γ3-(1)  	  Γ2+(1) ⊕ Γ2-(1) ⊕ Γ4+(1) ⊕ Γ4-(1)  	  2 Γ5+(2) ⊕ 2 Γ5-(2)  	  Γ1+(1) ⊕ Γ2+(1) ⊕ Γ3+(1) ⊕ Γ4+(1) ⊕ 2 Γ5+(2)  	  Γ1-(1) ⊕ Γ2-(1) ⊕ Γ3-(1) ⊕ Γ4-(1) ⊕ 2 Γ5-(2)  	  Γ6(2) ⊕ Γ7(2) ⊕ Γ8(2) ⊕ Γ9(2)  	  2 Γ7(2) ⊕ 2 Γ8(2)  	  2 Γ6(2) ⊕ 2 Γ9(2)  	  2 Γ7(2) ⊕ 2 Γ9(2)  	  2 Γ6(2) ⊕ 2 Γ8(2)  	  4 Γ6(2) ⊕ 4 Γ7(2)  	  4 Γ8(2) ⊕ 4 Γ9(2)  
+M:(1/2,1/2,0)	  2 M2(2)  	  2 M1(2)  	  M3(2) ⊕ M4(2)  	  M3(2) ⊕ M4(2)  	  M1(2) ⊕ M2(2)  	  M1(2) ⊕ M2(2)  	  M3(2) ⊕ M4(2)  	  M3(2) ⊕ M4(2)  	  2 M1(2) ⊕ 2 M2(2)  	  M1(2) ⊕ M2(2) ⊕ M3(2) ⊕ M4(2)  	  M1(2) ⊕ M2(2) ⊕ M3(2) ⊕ M4(2)  	  2 M5(4)  	  2 M5(4)  	  2 M5(4)  	  2 M5(4)  	  2 M5(4)  	  4 M5(4)  	  4 M5(4)  
+Z:(0,0,1/2)	  Z1(2) ⊕ Z2(2)  	  Z1(2) ⊕ Z2(2)  	  Z3Z4(4)  	  Z3Z4(4)  	  Z1(2) ⊕ Z2(2)  	  Z1(2) ⊕ Z2(2)  	  2 Z2(2)  	  2 Z1(2)  	  2 Z3Z4(4)  	  Z1(2) ⊕ Z2(2) ⊕ Z3Z4(4)  	  Z1(2) ⊕ Z2(2) ⊕ Z3Z4(4)  	  Z5Z7(4) ⊕ Z6Z8(4)  	  Z5Z7(4) ⊕ Z6Z8(4)  	  Z5Z7(4) ⊕ Z6Z8(4)  	  2 Z6Z8(4)  	  2 Z5Z7(4)  	  2 Z5Z7(4) ⊕ 2 Z6Z8(4)  	  2 Z5Z7(4) ⊕ 2 Z6Z8(4)  
+R:(0,1/2,1/2)	  R1R2(4)  	  R1R2(4)  	  R1R2(4)  	  R1R2(4)  	  R1R2(4)  	  R1R2(4)  	  R1R2(4)  	  R1R2(4)  	  2 R1R2(4)  	  2 R1R2(4)  	  2 R1R2(4)  	  R3R3(4) ⊕ R4R4(4)  	  R3R3(4) ⊕ R4R4(4)  	  R3R3(4) ⊕ R4R4(4)  	  R3R3(4) ⊕ R4R4(4)  	  R3R3(4) ⊕ R4R4(4)  	  2 R3R3(4) ⊕ 2 R4R4(4)  	  2 R3R3(4) ⊕ 2 R4R4(4)  
+X:(0,1/2,0)	  X1(2) ⊕ X2(2)  	  X1(2) ⊕ X2(2)  	  X1(2) ⊕ X2(2)  	  X1(2) ⊕ X2(2)  	  X1(2) ⊕ X2(2)  	  X1(2) ⊕ X2(2)  	  X1(2) ⊕ X2(2)  	  X1(2) ⊕ X2(2)  	  2 X1(2) ⊕ 2 X2(2)  	  2 X1(2) ⊕ 2 X2(2)  	  2 X1(2) ⊕ 2 X2(2)  	  2 X3X4(4)  	  2 X3X4(4)  	  2 X3X4(4)  	  2 X3X4(4)  	  2 X3X4(4)  	  4 X3X4(4)  	  4 X3X4(4)  
