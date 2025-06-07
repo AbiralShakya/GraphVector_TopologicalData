@@ -49,7 +49,7 @@ class ImprovedBCS_Scraper:
         options.add_argument('--disable-extensions')
         options.add_argument('--disable-plugins')
         options.add_argument('--disable-images')
-        options.add_argument('--disable-javascript')  # Try without JS first
+        #options.add_argument('--disable-javascript')  
         options.add_argument('--window-size=1920,1080')
         options.add_argument('--disable-blink-features=AutomationControlled')
         options.add_argument('--disable-web-security')
@@ -144,6 +144,68 @@ class ImprovedBCS_Scraper:
         except Exception as e:
             print(f"  -> ❌ Requests fallback failed: {e}")
             return None
+        
+    # Add this new method to your ImprovedBCS_Scraper class
+
+    def scrape_decomposition_page(self, cell_element):
+        """
+        Handles clicking a 'Decomposable' button, scraping the new tab,
+        and returning the structured decomposition data.
+        """
+        print("  -> Found 'Decomposable' button. Scraping decomposition page...")
+        original_window = self.driver.current_window_handle
+        
+        try:
+            # Find and click the button within the cell
+            button = cell_element.find_element(By.TAG_NAME, "input")
+            button.click()
+
+            # Wait for the new tab to open and switch to it
+            WebDriverWait(self.driver, 10).until(EC.number_of_windows_to_be(2))
+            for window_handle in self.driver.window_handles:
+                if window_handle != original_window:
+                    self.driver.switch_to.window(window_handle)
+                    break
+            
+            # Now we are on the new page, parse it
+            page_soup = BeautifulSoup(self.driver.page_source, 'html.parser')
+            
+            # Find the specific table with the branches
+            decomposition_table = page_soup.find('table', string=lambda text: text and 'branch' in text.lower())
+            
+            if not decomposition_table:
+                print("  -> ❌ Could not find decomposition table on new page.")
+                self.driver.close()
+                self.driver.switch_to.window(original_window)
+                return {'type': 'decomposable', 'data': 'Error: Table not found'}
+
+            rows = decomposition_table.find_all('tr')
+            branches_data = []
+            
+            # The first row is headers (e.g., branch 1, branch 2)
+            # The subsequent rows are the data
+            for row in rows[1:]: # Skip header
+                cells = row.find_all('td')
+                if len(cells) > 1: # Ensure it's a data row
+                    # The first cell is the index, the rest are the branch data
+                    branch_irreps = [cell.get_text(strip=True) for cell in cells[1:]]
+                    branches_data.append(branch_irreps)
+            
+            print(f"  -> ✅ Scraped {len(branches_data)} decomposition(s) with {len(branches_data[0])} branch(es).")
+            
+            # Close the new tab and switch back
+            self.driver.close()
+            self.driver.switch_to.window(original_window)
+            
+            return {'type': 'decomposable', 'data': branches_data}
+
+        except Exception as e:
+            print(f"  -> ❌ Error during decomposition scraping: {e}")
+            # Ensure we switch back to the main window in case of an error
+            if len(self.driver.window_handles) > 1:
+                self.driver.close()
+            self.driver.switch_to.window(original_window)
+            return {'type': 'decomposable', 'data': f'Error: {e}'}
 
     def extract_table_data_with_fallbacks(self, sg_number, max_retries=3):
         """Extract table data with multiple fallback strategies."""
@@ -202,6 +264,106 @@ class ImprovedBCS_Scraper:
         
         print(f"  -> ❌ All strategies failed for SG {sg_number}")
         return None
+    
+    # Add or replace this function in your ImprovedBCS_Scraper class.
+# This function will now be the main entry point for processing and saving a space group.
+
+    def process_and_ingest_space_group(self, sg_number):
+        """
+        Orchestrates the entire process:
+        1. Scrapes the data from the website, including decomposable branches.
+        2. Ingests the main EBR data into the database.
+        3. Ingests the decomposition branch data, linking it to the main EBR entries.
+        """
+        print(f"--- Starting full processing and ingestion for SG {sg_number} ---")
+
+        # STEP 1: Scrape the data from the website using the previously defined logic
+        # This returns the structured dictionary, including the special dict for decomposable data.
+        table_data = self.extract_table_data_with_fallbacks(sg_number) # Assumes this is your main scraping method
+        
+        if not table_data or not table_data.get('wyckoff_positions'):
+            print(f"❌ Scraping failed or returned no data for SG {sg_number}. Aborting ingestion.")
+            return False
+
+        # STEP 2: Prepare and insert the MAIN EBR data to get the ebr_ids
+        try:
+            wyckoff_entries = table_data['wyckoff_positions']
+            orbital_entries = table_data['band_representations']
+            
+            # Create a simple list of notes for the main insertion.
+            # If the entry is a complex dict, we just mark it as 'decomposable'.
+            notes_for_main_insertion = []
+            for item in table_data.get('decomposability', []):
+                if isinstance(item, dict) and item.get('type') == 'decomposable':
+                    notes_for_main_insertion.append('decomposable')
+                else:
+                    notes_for_main_insertion.append(str(item).lower())
+
+            # Prepare k-point data in the format expected by _insert_data
+            kpoint_data_list = []
+            for kpoint_label, irrep_cells in table_data['kpoints'].items():
+                kpoint_data_list.append((kpoint_label.split(':')[0], irrep_cells))
+            
+            print(f"  -> Ingesting main EBR data for {len(wyckoff_entries)} columns...")
+            
+            # Use the powerful _insert_data method from your DB manager
+            # This returns a list of dicts with the crucial 'ebr_id' for each column
+            inserted_ebrs_info = self.db._insert_data(
+                sg_number,
+                wyckoff_entries,
+                orbital_entries,
+                notes_for_main_insertion,
+                kpoint_data_list
+            )
+            print(f"  -> ✅ Main data ingestion complete. {len(inserted_ebrs_info)} EBRs created.")
+
+        except Exception as e:
+            print(f"❌ An error occurred during the main data ingestion for SG {sg_number}: {e}")
+            import traceback
+            traceback.print_exc()
+            return False
+
+        # STEP 3: Loop through the results and insert the DECOMPOSITION BRANCH data
+        decomposable_ebrs_found = 0
+        for col_index, ebr_info in enumerate(inserted_ebrs_info):
+            # Check if this column was marked as decomposable
+            if ebr_info['note'].lower() == 'decomposable':
+                decomposable_ebrs_found += 1
+                ebr_id = ebr_info['ebr_id']
+                
+                # Get the corresponding structured data from our original scrape
+                decomposition_info = table_data['decomposability'][col_index]
+                
+                if isinstance(decomposition_info, dict) and 'data' in decomposition_info:
+                    branch_data_rows = decomposition_info['data']
+                    print(f"  -> Found {len(branch_data_rows)} decomposition branches for EBR ID {ebr_id}. Ingesting...")
+                    
+                    for decomposition_index, branch_row in enumerate(branch_data_rows, 1):
+                        # The branch_row is a list like ['branch1_str', 'branch2_str']
+                        if len(branch_row) == 2:
+                            branch1_str, branch2_str = branch_row
+                            try:
+                                # Use the DB manager's dedicated function to add the branch
+                                self.db.add_ebr_decomposition_branch(
+                                    ebr_id,
+                                    decomposition_index,
+                                    branch1_str,
+                                    branch2_str
+                                )
+                                print(f"    -> ✅ Added branch index {decomposition_index} for EBR ID {ebr_id}.")
+                            except ValueError as ve:
+                                print(f"    -> ❌ Validation Error adding branch for EBR ID {ebr_id}: {ve}")
+                            except Exception as e:
+                                print(f"    -> ❌ Error adding branch for EBR ID {ebr_id}: {e}")
+                        else:
+                            print(f"    -> ❌ Malformed branch data for EBR ID {ebr_id}: expected 2 branches, found {len(branch_row)}")
+
+        if decomposable_ebrs_found > 0:
+            print(f"  -> ✅ Decomposition branch ingestion complete.")
+        else:
+            print("  -> No decomposable EBRs found in this scrape.")
+
+        return True
 
     def selenium_extraction(self, sg_number):
         """Standard Selenium extraction method."""
@@ -246,7 +408,7 @@ class ImprovedBCS_Scraper:
                 time.sleep(10)  # Give it more time
             
             # Parse the results
-            print("  -> Parsing page content...")
+            print("  ->  content...")
             soup = BeautifulSoup(self.driver.page_source, 'html.parser')
             
             # Find the main data table
@@ -314,61 +476,135 @@ class ImprovedBCS_Scraper:
         
         return None
 
+    # This is the MODIFIED version of your parse_table_to_dict method
+# It includes the fix for the NoSuchElementException
+
+    # This is the corrected version of your parse_table_to_dict function.
+# It fixes the StaleElementReferenceException.
+
     def parse_table_to_dict(self, table_soup, sg_number):
-        """Parse the HTML table into a structured dictionary."""
+        """
+        Parse the HTML table into a structured dictionary. Fixes StaleElementReferenceException
+        by re-finding the table element after potential page changes.
+        """
         try:
             rows = table_soup.find_all('tr')
-            if len(rows) < 4:
-                print(f"  -> Warning: Table has only {len(rows)} rows")
-                return None
-            
             table_dict = {
                 'space_group': sg_number,
-                'wyckoff_positions': [],
-                'band_representations': [],
-                'decomposability': [],
-                'kpoints': {}
+                'wyckoff_positions': [], 'band_representations': [],
+                'decomposability': [], 'kpoints': {}
             }
-            
-            # Parse each row
-            for row in rows:
+
+            # We will re-find the main_table_element inside the loop when necessary
+            # to ensure it's not stale.
+
+            for row_index, row in enumerate(rows):
                 cells = row.find_all(['td', 'th'])
-                if not cells:
-                    continue
-                
+                if not cells: continue
+
                 first_cell_text = cells[0].get_text(strip=True).lower()
-                row_data = []
                 
-                # Extract cell data, handling special formatting
-                for cell in cells[1:]:
-                    text = cell.get_text(strip=True)
-                    # Handle overlined text if present
-                    if cell.find('font', {'style': lambda x: x and 'overline' in x}):
-                        text = self.handle_overlined_text(cell)
-                    row_data.append(text)
-                
-                # Categorize the row based on first cell content
-                if 'wyckoff' in first_cell_text:
-                    table_dict['wyckoff_positions'] = row_data
-                elif 'band-rep' in first_cell_text or 'band rep' in first_cell_text:
-                    table_dict['band_representations'] = row_data
-                elif 'decomposable' in first_cell_text or 'indecomposable' in first_cell_text:
-                    table_dict['decomposability'] = row_data
-                elif ':' in cells[0].get_text(strip=True):
-                    # K-point row
-                    kpoint_label = cells[0].get_text(strip=True)
-                    table_dict['kpoints'][kpoint_label] = row_data
-            
+                if 'decomposable' not in first_cell_text:
+                    # Handle simple text rows with BeautifulSoup as before
+                    row_data = [cell.get_text(strip=True).replace('\n', ' ') for cell in cells[1:]]
+                    if 'wyckoff' in first_cell_text:
+                        table_dict['wyckoff_positions'] = row_data
+                    elif 'band-rep' in first_cell_text:
+                        table_dict['band_representations'] = row_data
+                    elif ':' in cells[0].get_text(strip=True):
+                        kpoint_label = cells[0].get_text(strip=True)
+                        table_dict['kpoints'][kpoint_label] = row_data
+                else:
+                    # --- Handle the Decomposable/Indecomposable row with Selenium ---
+                    decomposability_data = []
+                    
+                    # --- START: THE FIX ---
+                    # We re-find the table here because a previous iteration might have made the
+                    # original reference stale by switching tabs.
+                    try:
+                        wait = WebDriverWait(self.driver, 10)
+                        xpath_selector = "//td[contains(text(), 'Wyckoff pos')]/ancestor::table"
+                        main_table_element = wait.until(EC.presence_of_element_located((By.XPATH, xpath_selector)))
+                    except TimeoutException:
+                        print("❌ Could not re-find the main data table. Aborting parse.")
+                        return None
+                    # --- END: THE FIX ---
+
+                    selenium_cells = main_table_element.find_elements(By.XPATH, f".//tr[{row_index + 1}]/td")[1:]
+
+                    for cell_element in selenium_cells:
+                        cell_html = cell_element.get_attribute('innerHTML')
+                        if 'bandrepdesc.pl' in cell_html and 'Decomposable' in cell_html:
+                            decomposition = self.scrape_decomposition_page(cell_element)
+                            decomposability_data.append(decomposition)
+                        else:
+                            decomposability_data.append("Indecomposable")
+                    
+                    table_dict['decomposability'] = decomposability_data
+
             return table_dict
-            
+
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             print(f"  -> Error parsing table: {e}")
             return None
+        
+    def parse_cell_content(self, cell):
+        """Parse cell content, handling overlined text and multiple irreps properly."""
+        try:
+            # Get the raw text first
+            text = cell.get_text(strip=True)
+            decomposable = cell.find('form', action=lambda x: x and 'bandrepdesc.pl' in x)
+            if decomposable:
+                return "DECOMPOSABLE_BUTTON"
 
-    def handle_overlined_text(self, cell):
-        """Handle overlined text in table cells."""
-        text = cell.get_text(strip=True)
-        return text
+            
+            # Check if this cell contains overlined text
+            overlined_fonts = cell.find_all('font', {'style': lambda x: x and 'overline' in x})
+            
+            if overlined_fonts:
+                # This is a complex cell with overlined text
+                # Need to parse it more carefully
+                cell_parts = []
+                
+                # Get all text nodes and font elements
+                for element in cell.children:
+                    if element.name == 'font':
+                        # Check if it's overlined
+                        if element.get('style') and 'overline' in element.get('style'):
+                            # This is overlined text - add a bar marker
+                            overlined_text = element.get_text(strip=True)
+                            cell_parts.append(f"¯{overlined_text}")
+                        else:
+                            cell_parts.append(element.get_text(strip=True))
+                    elif hasattr(element, 'strip'):
+                        # Text node
+                        text_content = element.strip()
+                        if text_content:
+                            cell_parts.append(text_content)
+                
+                # Join the parts
+                processed_text = ''.join(cell_parts)
+                
+                # Handle cases like "R2R2(2)" which should be treated as one irrep
+                # Look for pattern: letters followed by numbers, then same letters+numbers, then (dimension)
+                import re
+                pattern = r'([A-Z])(\d+)\1\2\((\d+)\)'
+                match = re.search(pattern, processed_text)
+                
+                if match:
+                    # This is a doubled irrep like R2R2(2)
+                    return processed_text
+                else:
+                    return processed_text
+            else:
+                # Simple text cell
+                return text
+                
+        except Exception as e:
+            print(f"  -> Error parsing cell content: {e}")
+            return cell.get_text(strip=True)
 
     def validate_table_data(self, table_dict):
         """Validate that the extracted table data makes sense."""
@@ -426,84 +662,60 @@ class ImprovedBCS_Scraper:
         if table_dict['decomposability']:
             text_lines.append("Decomposable " + " ".join(table_dict['decomposability']))
         
-        # Add k-point data
+        # Add k-point data - fix the formatting issue
         for kpoint, irreps in table_dict['kpoints'].items():
+            # Clean up the k-point label (remove the coordinate part for the line format)
+            kpoint_clean = kpoint.split(':')[0] if ':' in kpoint else kpoint
             irreps_text = " ".join(irreps)
-            text_lines.append(f"{kpoint}: {irreps_text}")
+            text_lines.append(f"{kpoint_clean}: {irreps_text}")
         
         return "\n".join(text_lines)
-    
-    def _parse_and_insert_from_text(self, sg_number, raw_text_data):
-        """Takes the structured text block and performs parsing and database insertion."""
-        lines = [line.strip() for line in raw_text_data.strip().split('\n') if line.strip()]
+
+    def convert_to_database_format(self, table_dict):
+        """Convert table data to the exact format expected by the database."""
+        if not table_dict:
+            return ""
         
-        sections = {}
-        current_header = None
-        header_pattern = re.compile(r'^(Wyckoff pos\.|Band-Rep\.|Decomposable)')
+        text_lines = []
         
-        # This logic correctly groups lines under their respective headers
-        for line in lines:
-            match = header_pattern.match(line)
-            if match:
-                current_header = match.group(1)
-                sections[current_header] = [line[len(current_header):].strip()]
-            elif re.match(r'^[A-ZΓ]+:', line):
-                current_header = "kpoints"
-                if current_header not in sections: sections[current_header] = []
-                sections[current_header].append(line)
-            elif current_header and current_header != "kpoints":
-                sections[current_header].append(line)
-
-        wyckoff_entries = " ".join(sections.get('Wyckoff pos.', [])).split()
-        orbital_entries = " ".join(sections.get('Band-Rep.', [])).split()
-        notes_entries = " ".join(sections.get('Decomposable', [])).split()
-        kpoint_lines = sections.get('kpoints', [])
-
-        if not wyckoff_entries or not orbital_entries:
-            raise ValueError("Failed to parse Wyckoff or Band-Rep lines from scraped text.")
-
-        num_cols = len(wyckoff_entries)
-
-        kpoint_data_final = []
-        for kp_line_str in kpoint_lines:
-            parts = kp_line_str.split(':', 1)
-            kp_label = parts[0].strip()
-            irreps_text = parts[1].strip() if len(parts) > 1 else ""
-            cells = parse_kpoint_cells(irreps_text)
-            if len(cells) != num_cols:
-                raise ValueError(f"Mismatch at k-point {kp_label}. Expected {num_cols} irrep columns, found {len(cells)} in '{irreps_text}'.")
-            kpoint_data_final.append((kp_label, cells))
-
-        cursor = self.conn.cursor()
-        cursor.execute("SELECT id FROM space_groups WHERE number = ?", (sg_number,))
-        sg_row = cursor.fetchone()
-        sg_id = sg_row[0] if sg_row else cursor.execute("INSERT INTO space_groups(number) VALUES (?)", (sg_number,)).lastrowid
+        # Header rows
+        if table_dict['wyckoff_positions']:
+            text_lines.append("Wyckoff pos. " + " ".join(table_dict['wyckoff_positions']))
         
-        cursor.execute("DELETE FROM ebrs WHERE space_group_id = ?", (sg_id,))
+        if table_dict['band_representations']:
+            text_lines.append("Band-Rep. " + " ".join(table_dict['band_representations']))
         
-        for j in range(num_cols):
-            wyck_letter, site_sym = self.parse_wyckoff(wyckoff_entries[j])
-            orb_label, orb_mult = self.parse_orbital(orbital_entries[j])
-            note = notes_entries[j] if j < len(notes_entries) else "indecomposable"
-
-            cursor.execute("""
-                INSERT INTO ebrs (space_group_id, wyckoff_letter, site_symmetry, orbital_label, orbital_multiplicity, notes, time_reversal)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            """, (sg_id, wyck_letter, site_sym, orb_label, orb_mult, note, 1))
-            ebr_id = cursor.lastrowid
+        if table_dict['decomposability']:
+            text_lines.append("Decomposable " + " ".join(table_dict['decomposability']))
+        
+        # K-point data - ensure proper formatting for database
+        num_ebrs = len(table_dict['wyckoff_positions']) if table_dict['wyckoff_positions'] else 0
+        
+        for kpoint_full, irreps in table_dict['kpoints'].items():
+            # Extract just the k-point label (e.g., "R" from "R:(1/2,1/2,1/2)")
+            kpoint_label = kpoint_full.split(':')[0] if ':' in kpoint_full else kpoint_full
             
-            for (kp_label, cells) in kpoint_data_final:
-                full_irrep_str = cells[j]
-                mult = self.parse_multiplicity(full_irrep_str)
-                label_no_mult = self.parse_irrep_label(full_irrep_str)
-                cursor.execute("""
-                    INSERT INTO irreps (ebr_id, k_point, irrep_label, multiplicity)
-                    VALUES (?, ?, ?, ?)
-                """, (ebr_id, kp_label, label_no_mult, mult))
+            # Process the irreps to match database expectations
+            processed_irreps = []
+            
+            for irrep in irreps:
+                # Handle cases like "R2R2(2)" - this should be treated as one irrep entry
+                if irrep.strip():
+                    processed_irreps.append(irrep.strip())
+            
+            # Ensure we have the right number of irrep columns
+            while len(processed_irreps) < num_ebrs:
+                processed_irreps.append("")
+            
+            # Truncate if we have too many (shouldn't happen but safety check)
+            processed_irreps = processed_irreps[:num_ebrs]
+            
+            irreps_text = " ".join(processed_irreps)
+            text_lines.append(f"{kpoint_label}: {irreps_text}")
         
-        self.conn.commit()
-        print(f"✅ Successfully ingested {num_cols} EBRs for SG {sg_number} into the database.")
-        return True
+        result = "\n".join(text_lines)
+        print(f"  -> Database format preview:\n{result}")
+        return result
 
     def process_space_group(self, sg_number):
         """Main method to process a single space group."""
@@ -512,14 +724,12 @@ class ImprovedBCS_Scraper:
         if not table_data:
             return False
         
-        # Convert to text format for database insertion
-        formatted_text = self.convert_to_text_format(table_data)
+        # Convert to database format 
+        formatted_text = self.convert_to_database_format(table_data)
         
         if not formatted_text:
             print(f"  -> ❌ Failed to format data for SG {sg_number}")
             return False
-        
-        print(f"  -> Data preview:\n{formatted_text[:200]}...")
         
         # Insert into database
         try:
@@ -527,6 +737,7 @@ class ImprovedBCS_Scraper:
             return True
         except Exception as e:
             print(f"  -> ❌ Database insertion failed for SG {sg_number}: {e}")
+            print(f"  -> Problematic data:\n{formatted_text}")
             return False
 
     def run_scraper_for_range(self, start_sg, end_sg):
@@ -538,6 +749,18 @@ class ImprovedBCS_Scraper:
         failed_sgs = []
         
         for sg in range(start_sg, end_sg + 1):
+            print(f"\n{'='*60}")
+            print(f"PROCESSING SPACE GROUP {sg}")
+            print(f"{'='*60}")
+            
+            # Call the new, all-in-one function
+            if self.process_and_ingest_space_group(sg):
+                successful += 1
+                print(f"✅ Successfully processed and ingested SG {sg}")
+            else:
+                failed += 1
+                failed_sgs.append(sg)
+                print(f"❌ Failed to process SG {sg}")
             print(f"\n{'='*60}")
             print(f"PROCESSING SPACE GROUP {sg}")
             print(f"{'='*60}")
@@ -585,7 +808,6 @@ class ImprovedBCS_Scraper:
             except:
                 pass
 
-# Usage example with retry logic for failures
 if __name__ == "__main__":
     from PEBR_TR_nonmagnetic_query import EBRDatabaseManager
     
@@ -594,7 +816,7 @@ if __name__ == "__main__":
     
     try:
         # Initial run
-        failed_sgs = scraper.run_scraper_for_range(1, 10)
+        failed_sgs = scraper.run_scraper_for_range(12, 13)
         
         # Retry failed space groups
         if failed_sgs:
