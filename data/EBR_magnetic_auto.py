@@ -58,157 +58,285 @@ class MagneticBCSRequestsScraper:
         })
 
     def fetch_main(self, bns_number: str) -> str:
-        """Fetches the main page for a given Magnetic (BNS) space group."""
+        """
+        Fetches the main page for a given Magnetic (BNS) space group using the
+        correct, minimal payload.
+        """
         url = urljoin(BASE_URL, "mbandrep.pl")
         try:
+            # A GET request first is still good practice to establish a session
             self.session.get(url, timeout=30)
         
+            # This is the correct, minimal payload for the magnetic program.
             payload = {
                 "super": bns_number,
-                "elementary": "Elementary", 
+                "elementary": "Elementary",
             }
+
             r_post = self.session.post(url, data=payload, timeout=60)
             r_post.raise_for_status()
             return r_post.text
         except requests.exceptions.RequestException as e:
             raise RuntimeError(f"Failed to fetch main page for BNS {bns_number}: {e}") from e
 
-    def parse_main(self, html: str, bns_number: str) -> dict:
-        """Parse the main EBR table."""
-        soup = BeautifulSoup(html, PARSER)
+    # In your MagneticBCSRequestsScraper class, replace parse_main with this:
+
+    # In your MagneticBCSRequestsScraper class
+
+    def parse_main(self, html: str, bns_number: str) -> list[dict]:
+        """
+        [FINAL CORRECTED VERSION] Parses the main EBR table using a robust
+        column counting method to ensure all data is captured.
+        """
+        soup = BeautifulSoup(html, "html.parser")
         main_table = None
         for table in soup.find_all("table"):
-            if table.find("td", string=lambda s: s and "Wyckoff pos" in s):
+            if table.find(string=lambda s: s and "Wyckoff pos" in s):
                 main_table = table
                 break
 
         if not main_table:
-            raise RuntimeError(f"No main table found for SG {bns_number}")
+            debug_filename = f"debug_bns_{bns_number}.html"
+            with open(debug_filename, "w", encoding="utf-8") as f:
+                f.write(html)
+            raise RuntimeError(
+                f"No main table found for BNS {bns_number}. "
+                f"HTML response saved to '{debug_filename}' for inspection."
+            )
 
-        data = {
-            "wyckoff": [], "bandrep": [], "kpoints": {}, "decomp_forms": []
-        }
+        all_rows = main_table.find_all("tr")
+        if not all_rows: return []
 
-        for tr in main_table.find_all("tr"):
+        header_rows = {}
+        k_vector_rows_start_index = -1
+
+        for i, tr in enumerate(all_rows):
             cells = tr.find_all(['td', 'th'])
             if not cells: continue
+            
+            text = cells[0].get_text(strip=True).lower()
+            if "wyckoff pos" in text:
+                header_rows["wyckoff"] = cells
+            elif "band-rep" in text:
+                header_rows["bandrep"] = cells
+            elif "decomposable" in text:
+                header_rows["decomposability"] = cells
+            elif ":" in cells[0].get_text(strip=True):
+                k_vector_rows_start_index = i
+                break
+                
+        if not all(k in header_rows for k in ["wyckoff", "bandrep"]):
+            raise ValueError(f"Could not find all header rows for BNS {bns_number}")
 
-            first_cell_text = cells[0].get_text(strip=True)
+        # FIXED: Calculate the number of EBR columns by finding the maximum number of 
+        # actual data columns (excluding the first column which contains labels)
+        # Also check k-point rows to ensure we don't miss any columns
+        max_cols_from_headers = max(
+            len(header_rows.get("wyckoff", [])),
+            len(header_rows.get("bandrep", [])),
+            len(header_rows.get("decomposability", []))
+        )
+        
+        # Check k-point rows to get the actual number of columns
+        max_cols_from_kpoints = 0
+        if k_vector_rows_start_index != -1:
+            for i in range(k_vector_rows_start_index, len(all_rows)):
+                k_vector_row_cells = all_rows[i].find_all(['td', 'th'])
+                if k_vector_row_cells:
+                    max_cols_from_kpoints = max(max_cols_from_kpoints, len(k_vector_row_cells))
+        
+        # Take the maximum from both header and k-point rows, then subtract 1 for the label column
+        num_ebr_columns = max(max_cols_from_headers, max_cols_from_kpoints) - 1
+        
+        print(f"Debug: Found {num_ebr_columns} EBR columns for BNS {bns_number}")
+        print(f"Debug: Header cols = {max_cols_from_headers}, K-point cols = {max_cols_from_kpoints}")
 
-            if first_cell_text.lower().startswith("wyckoff"):
-                data["wyckoff"] = [td.get_text(strip=True) for td in cells[1:]]
-            elif first_cell_text.lower().startswith("band-rep"):
-                data["bandrep"] = [td.get_text(strip=True) for td in cells[1:]]
-            elif ":" in first_cell_text:
-                label = first_cell_text.split(":")[0]
-                data["kpoints"][label] = [td.get_text(strip=True) for td in cells[1:]]
-            elif "Decomposable" in first_cell_text or "Indecomposable" in first_cell_text:
-                for td in cells[1:]:
-                    form = td.find("form", action=lambda a: a and "bandrepdesc.pl" in a)
-                    if form:
-                        # Extract the hidden input values needed for the POST request
-                        form_payload = {
-                            inp.get("name"): inp.get("value")
-                            for inp in form.find_all("input")
-                            if inp.get("name")
-                        }
-                        data["decomp_forms"].append(form_payload)
-                    else:
-                        data["decomp_forms"].append(None)
-        return data
+        if num_ebr_columns <= 0:
+            return []
+            
+        ebr_data_list = []
 
-    def fetch_decomposition(self, form_payload: dict) -> list[list[str]] | None:
-        """Fetch a bandrepdesc.pl page using its form data and parse its branches."""
-        url = urljoin(BASE_URL, "bandrepdesc.pl")
+        # Pass 1: Initialize EBR objects from the header rows
+        for i in range(1, num_ebr_columns + 1): # i is 1-based column index
+            ebr_obj = {"kpoints": {}}
+            
+            if i < len(header_rows["wyckoff"]):
+                ebr_obj["wyckoff"] = header_rows["wyckoff"][i].get_text(strip=True)
+            else:
+                ebr_obj["wyckoff"] = ""  # Handle missing data gracefully
+                
+            if i < len(header_rows["bandrep"]):
+                ebr_obj["bandrep"] = header_rows["bandrep"][i].get_text(strip=True)
+            else:
+                ebr_obj["bandrep"] = ""  # Handle missing data gracefully
+            
+            decomposability_cells = header_rows.get("decomposability", [])
+            if i < len(decomposability_cells):
+                form = decomposability_cells[i].find("form")
+                if form:
+                    ebr_obj["decomposability"] = {
+                        "type": "decomposable",
+                        "payload": {inp.get("name"): inp.get("value") for inp in form.find_all("input") if inp.get("name")}
+                    }
+                else:
+                    ebr_obj["decomposability"] = {"type": "indecomposable"}
+            else:
+                ebr_obj["decomposability"] = {"type": "indecomposable"}
+
+            ebr_data_list.append(ebr_obj)
+
+        # Pass 2: Populate k-point data for each EBR object
+        if k_vector_rows_start_index != -1:
+            for i in range(k_vector_rows_start_index, len(all_rows)):
+                k_vector_row_cells = all_rows[i].find_all(['td', 'th'])
+                if not k_vector_row_cells: continue
+                
+                k_point_label_full = k_vector_row_cells[0].get_text(strip=True)
+                if ":" not in k_point_label_full: continue
+                
+                k_point_label = k_point_label_full.split(":")[0]
+
+                # FIXED: Make sure we process ALL available columns
+                for j in range(min(num_ebr_columns, len(k_vector_row_cells) - 1)): # j is 0-based list index
+                    column_index_in_html = j + 1
+                    if column_index_in_html < len(k_vector_row_cells):
+                        irrep_str = k_vector_row_cells[column_index_in_html].get_text(strip=True)
+                        if j < len(ebr_data_list):  # Safety check
+                            ebr_data_list[j]["kpoints"][k_point_label] = irrep_str
+
+        # Debug output to verify we're capturing all EBRs
+        print(f"Debug: Parsed {len(ebr_data_list)} EBRs for BNS {bns_number}")
+        for idx, ebr in enumerate(ebr_data_list):
+            print(f"  EBR {idx+1}: Wyckoff='{ebr.get('wyckoff', '')}', Band-rep='{ebr.get('bandrep', '')}', K-points={len(ebr.get('kpoints', {}))}")
+
+        return ebr_data_list
+
+    def fetch_decomposition(self, form_payload: dict) -> dict | None:
+        """
+        [UPDATED] Fetches a decomposition page and intelligently determines if it's a
+        branch table or an EBR list.
+        """
+        url = urljoin(BASE_URL, "bandrepdesc.pl") # This might need to be mbandrepdesc.pl
         r = self.session.post(url, data=form_payload, timeout=30)
         r.raise_for_status()
         soup = BeautifulSoup(r.text, PARSER)
 
-        # Robustly find the decomposition table.
+        # First, look for a branch table (our original logic)
         branch_table = None
         for table in soup.find_all("table"):
-            # Check for header cells containing "branch"
             if table.find(['td', 'th'], string=lambda s: s and "branch" in s.lower()):
                 branch_table = table
                 break
+        
+        if branch_table:
+            branches = []
+            for row in branch_table.find_all("tr")[1:]:
+                cells = [td.get_text(strip=True) for td in row.find_all("td")[1:]]
+                if cells: branches.append(cells)
+            return {"type": "branches", "data": branches}
 
-        if not branch_table:
-            return None
+        # If no branch table, look for an EBR list.
+        # Based on your image, these are just listed. We find them by looking for the ↑G symbol.
+        ebr_list = [tag.get_text(strip=True) for tag in soup.find_all(string=lambda s: s and "↑G" in s)]
+        if ebr_list:
+            return {"type": "ebr_list", "data": ebr_list}
 
-        branches = []
-        # Start from the second row to skip the header
-        for row in branch_table.find_all("tr")[1:]:
-            cells = [td.get_text(strip=True) for td in row.find_all("td")[1:]]
-            if cells: # Only add if there are actual branch cells
-                branches.append(cells)
-        return branches
+        return None # Failed to parse either type
 
-    def process_space_group(self, bns_number: int) -> bool:
-        """Scrape SG, ingest main EBRs, then any decompositions."""
+    def process_space_group(self, bns_number: str) -> bool:
+        """
+        [REWRITTEN] Processes a single space group using the new column-aware architecture.
+        """
         print(f"\n--- Processing Magnetic SG (BNS) {bns_number} ---")
-
         try:
             html = self.fetch_main(bns_number)
-            data = self.parse_main(html, bns_number)
+            # `ebr_data_list` is a list of objects, one for each column.
+            ebr_data_list = self.parse_main(html, bns_number)
         except Exception as e:
-            print(f"❌ SG {bns_number}: fetch/parse failed: {e}")
+            print(f"❌ BNS {bns_number}: fetch/parse failed: {e}")
             return False
 
-        # Fetch decompositions for columns that had a form
-        decomps = []
-        for form_payload in data["decomp_forms"]:
-            if form_payload:
-                try:
-                    # Pass the payload instead of just a URL
-                    decomps.append(self.fetch_decomposition(form_payload))
-                except Exception as e:
-                    print(f"   ↳ branch fetch failed for SG {bns_number}: {e}")
-                    decomps.append(None)
-            else:
-                decomps.append(None)
-        data["decompositions"] = decomps
+        if not ebr_data_list:
+            print(f"ℹ️ No EBR data found for BNS {bns_number}.")
+            return True
 
-        # Ingest main EBR data
-        notes = ["decomposable" if form else "indecomposable" for form in data["decomp_forms"]]
-        kpoint_list = list(data["kpoints"].items())
-        try:
-            inserted, sg_id = self.db._insert_data(
-                bns_number, data["wyckoff"], data["bandrep"], notes, kpoint_list
-            )
-            print(f"✅ BNS {bns_number}: inserted {len(inserted)} EBRs")
-        except Exception as e:
-            print(f"❌ BNS {bns_number}: DB insertion failed: {e}")
-            import traceback
-            traceback.print_exc()
-            return False
+        # Now, iterate through each EBR we found and process it
+        for ebr_data in ebr_data_list:
+            try:
+                # Step 1: Insert the main EBR data and get its new ID
+                ebr_id = self.db.insert_single_ebr(bns_number, ebr_data)
+                print(f"✅ Inserted EBR '{ebr_data['bandrep']}' with ID {ebr_id} for BNS {bns_number}.")
 
-        # Ingest the decomposition branches
-        for idx, info in enumerate(inserted):
-            if info.get("note") == "decomposable":
-                # 'branches' is a list of lists, e.g., [[b1, b2], [b1, b2, b3]]
-                decompositions = data["decompositions"][idx]
-                if not decompositions:
-                    continue
-                
-                print(f"   ↳ Ingesting {len(decompositions)} decomposition set(s) for EBR {info['ebr_id']}...")
+                # Step 2: Handle decompositions if they exist
+                if ebr_data.get("decomposability", {}).get("type") == "decomposable":
+                    payload = ebr_data["decomposability"]["payload"]
+                    print(f"   ↳ Fetching decomposition for EBR {ebr_id}...")
+                    decomp_result = self.fetch_decomposition(payload)
 
-                # 'decomposition_index' corresponds to the row number on the decomposition page (1, 2, ...)
-                for decomp_idx, branch_list in enumerate(decompositions, 1):
+                    if not decomp_result:
+                        print(f"   ↳❌ WARNING: Failed to parse decomposition page for EBR {ebr_id}.")
+                        continue
                     
-                    # 'branch_list' is the list of actual branch strings for this one decomposition
-                    # e.g., ['M5M6...', 'M5M6...'] or ['branch1', 'branch2', 'branch3']
-                    print(f"     ↳ Set {decomp_idx} has {len(branch_list)} branches.")
+                    # Check which type of decomposition we got and call the right DB function
+                    if decomp_result["type"] == "branches":
+                        print(f"   ↳ Ingesting {len(decomp_result['data'])} branch set(s)...")
+                        for decomp_idx, branch_list in enumerate(decomp_result["data"], 1):
+                            for branch_idx, irrep_string in enumerate(branch_list, 1):
+                                self.db.add_decomposition_item(bns_number, ebr_id, decomp_idx, branch_idx, irrep_string)
 
-                    # 'branch_index' corresponds to the column number (branch 1, branch 2, ...)
-                    for branch_idx, irrep_string in enumerate(branch_list, 1):
-                        try:
-                            # Call the new, flexible insertion function for each branch
-                            self.db.add_decomposition_item(
-                                sg_id, info["ebr_id"], decomp_idx, branch_idx, irrep_string
-                            )
-                        except Exception as e:
-                            print(f"   ↳❌ failed to add item for decomp {decomp_idx}, branch {branch_idx}: {e}")
+                    elif decomp_result["type"] == "ebr_list":
+                        print(f"   ↳ Ingesting {len(decomp_result['data'])} EBR list decomposition...")
+                        self.db.add_ebr_list_decomposition(bns_number, ebr_id, decomp_result["data"])
+
+            except Exception as e:
+                print(f"❌ An error occurred processing an EBR for BNS {bns_number}: {e}")
+                import traceback
+                traceback.print_exc()
+
         return True
+    
+    def insert_single_ebr(self, bns_number, ebr_data):
+        """Inserts one EBR and its associated k-point irreps, returning the new ebr_id."""
+        from PEBR_TR_nonmagnetic_query import EBRDatabaseManager
+        parser_helpers = EBRDatabaseManager()
+
+        # Ensure the space group exists
+        cursor = self.conn.cursor()
+        cursor.execute("INSERT OR IGNORE INTO magnetic_space_groups(bns_number) VALUES (?)", (bns_number,))
+
+        # Insert the main EBR record
+        wyck_letter, site_sym = parser_helpers.parse_wyckoff(ebr_data["wyckoff"])
+        orb_label, orb_mult = parser_helpers.parse_orbital(ebr_data["bandrep"])
+        note = ebr_data.get("decomposability", {}).get("type", "indecomposable")
+
+        cursor.execute("""
+            INSERT INTO magnetic_ebrs (bns_number, wyckoff_letter, site_symmetry, orbital_label, orbital_multiplicity, notes)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (bns_number, wyck_letter, site_sym, orb_label, orb_mult, note))
+        ebr_id = cursor.lastrowid
+
+        # Insert all the k-point irreps for this EBR
+        for k_point, irrep_str in ebr_data["kpoints"].items():
+            mult = parser_helpers.parse_multiplicity(irrep_str)
+            label_no_mult = parser_helpers.parse_irrep_label(irrep_str)
+            cursor.execute("""
+                INSERT INTO magnetic_irreps (bns_number, ebr_id, k_point, irrep_label, multiplicity)
+                VALUES (?, ?, ?, ?, ?)
+            """, (bns_number, ebr_id, k_point, label_no_mult, mult))
+        
+        self.conn.commit()
+        parser_helpers.close()
+        return ebr_id
+
+    def add_ebr_list_decomposition(self, bns_number, parent_ebr_id, ebr_list):
+        """Adds rows for an EBR that decomposes into other EBRs."""
+        cursor = self.conn.cursor()
+        for ebr_string in ebr_list:
+            cursor.execute("""
+                INSERT INTO magnetic_ebr_decomposition_ebrs (bns_number, parent_ebr_id, decomposes_into)
+                VALUES (?, ?, ?)
+            """, (bns_number, parent_ebr_id, ebr_string))
+        self.conn.commit()
 
     def run(self, bns_provider: BNSNumberProvider):
         failed_bns = []
@@ -224,7 +352,6 @@ class MagneticBCSRequestsScraper:
             time.sleep(random.uniform(1.0, 2.0))
 
         print(f"\nDone. Failed BNS Numbers: {failed_bns}")
-
 
 
 if __name__ == "__main__":

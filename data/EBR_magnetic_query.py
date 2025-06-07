@@ -70,22 +70,24 @@ class MagneticEBRDatabaseManager:
     def create_tables(self):
         cursor = self.conn.cursor()
         
+        # --- FIX 1: Use bns_number as the PRIMARY KEY ---
+        # The integer `id` column is no longer necessary for this table.
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS magnetic_space_groups (
-        id          INTEGER PRIMARY KEY AUTOINCREMENT,
-        bns_number  TEXT UNIQUE NOT NULL,
+        bns_number  TEXT PRIMARY KEY NOT NULL,
         created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         """)
         
+        # --- FIX 2: Replace space_group_id with bns_number (TEXT) ---
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS magnetic_ebrs (
         id             INTEGER PRIMARY KEY AUTOINCREMENT,
-        space_group_id INTEGER NOT NULL REFERENCES magnetic_space_groups(id) ON DELETE CASCADE,
-        wyckoff_letter TEXT    NOT NULL,
-        site_symmetry  TEXT    NOT NULL,
-        orbital_label  TEXT    NOT NULL,
+        bns_number     TEXT NOT NULL REFERENCES magnetic_space_groups(bns_number) ON DELETE CASCADE,
+        wyckoff_letter TEXT NOT NULL,
+        site_symmetry  TEXT NOT NULL,
+        orbital_label  TEXT NOT NULL,
         orbital_multiplicity INTEGER NOT NULL,
         notes          TEXT,
         created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -93,11 +95,12 @@ class MagneticEBRDatabaseManager:
         );
         """)
         
-        cursor.execute("DROP TABLE IF EXISTS magnetic_ebr_decomposition_branches;") # Keep this for clean slate
+        cursor.execute("DROP TABLE IF EXISTS magnetic_ebr_decomposition_items;")
+        # --- FIX 3: Replace space_group_id with bns_number (TEXT) ---
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS magnetic_ebr_decomposition_items (
         id                  INTEGER PRIMARY KEY AUTOINCREMENT,
-        space_group_id      INTEGER NOT NULL REFERENCES magnetic_space_groups(id) ON DELETE CASCADE,
+        bns_number          TEXT NOT NULL REFERENCES magnetic_space_groups(bns_number) ON DELETE CASCADE,
         ebr_id              INTEGER NOT NULL REFERENCES magnetic_ebrs(id) ON DELETE CASCADE,
         decomposition_index INTEGER NOT NULL,
         branch_index        INTEGER NOT NULL,
@@ -105,10 +108,11 @@ class MagneticEBRDatabaseManager:
         );
         """)
 
+        # --- FIX 4: Replace space_group_id with bns_number (TEXT) ---
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS magnetic_irreps (
         id             INTEGER PRIMARY KEY AUTOINCREMENT,
-        space_group_id INTEGER NOT NULL REFERENCES magnetic_space_groups(id) ON DELETE CASCADE,
+        bns_number     TEXT NOT NULL REFERENCES magnetic_space_groups(bns_number) ON DELETE CASCADE,
         ebr_id         INTEGER NOT NULL REFERENCES magnetic_ebrs(id) ON DELETE CASCADE,
         k_point        TEXT    NOT NULL,
         irrep_label    TEXT    NOT NULL,
@@ -117,16 +121,25 @@ class MagneticEBRDatabaseManager:
         """)
         self.conn.commit()
         
-        # --- FIX 2: Point triggers to the correct MAGNETIC table names ---
+        # --- FIX 5: Update triggers to use the new primary key ---
         cursor.execute("""
         CREATE TRIGGER IF NOT EXISTS update_magnetic_space_groups_updated_at
         AFTER UPDATE ON magnetic_space_groups FOR EACH ROW
-        BEGIN UPDATE magnetic_space_groups SET updated_at = CURRENT_TIMESTAMP WHERE id = OLD.id; END;
+        BEGIN UPDATE magnetic_space_groups SET updated_at = CURRENT_TIMESTAMP WHERE bns_number = OLD.bns_number; END;
         """)
         cursor.execute("""
         CREATE TRIGGER IF NOT EXISTS update_magnetic_ebrs_updated_at
         AFTER UPDATE ON magnetic_ebrs FOR EACH ROW
         BEGIN UPDATE magnetic_ebrs SET updated_at = CURRENT_TIMESTAMP WHERE id = OLD.id; END;
+        """)
+
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS magnetic_ebr_decomposition_ebrs (
+            id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+            bns_number          TEXT NOT NULL REFERENCES magnetic_space_groups(bns_number) ON DELETE CASCADE,
+            parent_ebr_id       INTEGER NOT NULL REFERENCES magnetic_ebrs(id) ON DELETE CASCADE,
+            decomposes_into     TEXT NOT NULL  -- The string name of the resulting EBR
+        );
         """)
         self.conn.commit()
     
@@ -357,15 +370,7 @@ class MagneticEBRDatabaseManager:
             
         return total_dimension
 
-    def add_decomposition_item(self, sg_id, ebr_id, decomp_idx, branch_idx, irrep_string):
-        cursor = self.conn.cursor()
-        cursor.execute("""
-            INSERT INTO magnetic_ebr_decomposition_items
-            (space_group_id, ebr_id, decomposition_index, branch_index, irreps_string)
-            VALUES (?, ?, ?, ?, ?)
-        """, (sg_id, ebr_id, decomp_idx, branch_idx, irrep_string))
-        self.conn.commit()
-
+ 
 
     def get_ebr_decomposition_branches(self, ebr_id):
         cursor = self.conn.cursor()
@@ -389,17 +394,22 @@ class MagneticEBRDatabaseManager:
         return rc > 0
 
     def _insert_data(self, bns_number, wyckoff_entries, orbital_entries, notes_entries, kpoint_data_list):
-        from PEBR_TR_nonmagnetic_query import EBRDatabaseManager # To access parsing helpers
-        parser_helpers = EBRDatabaseManager() # A bit of a hack to reuse parsing functions
+        # This helper class can be defined elsewhere or imported
+        from PEBR_TR_nonmagnetic_query import EBRDatabaseManager 
+        parser_helpers = EBRDatabaseManager()
         
         cursor = self.conn.cursor()
-        cursor.execute("SELECT id FROM magnetic_space_groups WHERE bns_number = ?", (bns_number,))
-        sg_row = cursor.fetchone()
-        sg_id = sg_row[0] if sg_row else cursor.execute(
-            "INSERT INTO magnetic_space_groups(bns_number) VALUES (?)", (bns_number,)
-        ).lastrowid
-
-        cursor.execute("DELETE FROM magnetic_ebrs WHERE space_group_id = ?", (sg_id,))
+        
+        # --- FIX 6: Insert the BNS number directly. ---
+        # INSERT OR IGNORE does nothing if the bns_number already exists.
+        cursor.execute("INSERT OR IGNORE INTO magnetic_space_groups(bns_number) VALUES (?)", (bns_number,))
+        
+        # We still need to delete old EBRs to prevent duplicates on re-runs
+        # We can get the id for this bns_number to do this.
+        cursor.execute("SELECT id FROM magnetic_ebrs WHERE bns_number = ?", (bns_number,))
+        old_ebr_ids = [row[0] for row in cursor.fetchall()]
+        if old_ebr_ids:
+            cursor.execute("DELETE FROM magnetic_ebrs WHERE id IN ({})".format(','.join('?' for _ in old_ebr_ids)), old_ebr_ids)
         self.conn.commit()
 
         inserted_ebrs = []
@@ -408,10 +418,11 @@ class MagneticEBRDatabaseManager:
             orb_label, orb_mult = parser_helpers.parse_orbital(orbital_entries[j])
             note = notes_entries[j] if j < len(notes_entries) else "indecomposable"
 
+            # --- FIX 7: Insert bns_number string instead of integer id ---
             cursor.execute("""
-                INSERT INTO magnetic_ebrs (space_group_id, wyckoff_letter, site_symmetry, orbital_label, orbital_multiplicity, notes)
+                INSERT INTO magnetic_ebrs (bns_number, wyckoff_letter, site_symmetry, orbital_label, orbital_multiplicity, notes)
                 VALUES (?, ?, ?, ?, ?, ?)
-            """, (sg_id, wyck_letter, site_sym, orb_label, orb_mult, note))
+            """, (bns_number, wyck_letter, site_sym, orb_label, orb_mult, note))
             ebr_id = cursor.lastrowid
             inserted_ebrs.append({'ebr_id': ebr_id, 'note': note})
 
@@ -420,13 +431,15 @@ class MagneticEBRDatabaseManager:
                 mult = parser_helpers.parse_multiplicity(full_irrep_str)
                 label_no_mult = parser_helpers.parse_irrep_label(full_irrep_str)
                 cursor.execute("""
-                    INSERT INTO magnetic_irreps (space_group_id, ebr_id, k_point, irrep_label, multiplicity)
+                    INSERT INTO magnetic_irreps (bns_number, ebr_id, k_point, irrep_label, multiplicity)
                     VALUES (?, ?, ?, ?, ?)
-                """, (sg_id, ebr_id, kp_label, label_no_mult, mult))
+                """, (bns_number, ebr_id, kp_label, label_no_mult, mult))
         
         self.conn.commit()
         parser_helpers.close()
-        return inserted_ebrs, sg_id
+        
+        # --- FIX 8: No longer need to return sg_id ---
+        return inserted_ebrs
     
     def validate_input_file(self, filepath):
         """Validate that input file exists and has expected format."""
@@ -583,7 +596,7 @@ class MagneticEBRDatabaseManager:
                         print("❌ Branch strings cannot be empty.")
                         continue
                     
-                    if self.add_ebr_decomposition_branch(ebr_id, dec_idx, b1_str, b2_str):
+                    if self.add_ebr_list_decomposition(ebr_id, dec_idx, b1_str, b2_str):
                         print(f"✅ Branch index {dec_idx} added/updated for EBR ID {ebr_id}.")
                     # add_ebr_decomposition_branch prints its own error on failure
                 except ValueError: 
@@ -631,7 +644,7 @@ class MagneticEBRDatabaseManager:
                             # Check if this index already exists for 'update' count
                             is_update = any(br[0] == dec_idx for br in existing_branches)
 
-                            if self.add_ebr_decomposition_branch(ebr_id, dec_idx, b1, b2):
+                            if self.add_ebr_list_decomposition(ebr_id, dec_idx, b1, b2):
                                 if is_update and clear_existing_choice != 'y': # only count as update if not cleared
                                     updated_count += 1
                                 else:
@@ -683,8 +696,71 @@ class MagneticEBRDatabaseManager:
             else: 
                 print("❌ Invalid branch action. Please choose A, B, D, C, or R.")
     
-    
-    # ... (get_next_space_group, get_database_status, query_space_group as in previous full code) ...
+    def insert_single_ebr(self, bns_number, ebr_data):
+        """
+        Inserts all data for a single EBR (one column) and its associated 
+        k-point irreps, returning the new ebr_id.
+        """
+        # This is a clever way to reuse your existing parsing helper functions
+        from PEBR_TR_nonmagnetic_query import EBRDatabaseManager 
+        parser_helpers = EBRDatabaseManager()
+
+        cursor = self.conn.cursor()
+        
+        # Step 1: Ensure the magnetic space group exists in its table
+        cursor.execute("INSERT OR IGNORE INTO magnetic_space_groups(bns_number) VALUES (?)", (bns_number,))
+
+        # Step 2: Get the details from the ebr_data object
+        wyck_letter, site_sym = parser_helpers.parse_wyckoff(ebr_data["wyckoff"])
+        orb_label, orb_mult = parser_helpers.parse_orbital(ebr_data["bandrep"])
+        note = ebr_data.get("decomposability", {}).get("type", "indecomposable")
+
+        # Step 3: Insert the main record into the magnetic_ebrs table
+        cursor.execute("""
+            INSERT INTO magnetic_ebrs (bns_number, wyckoff_letter, site_symmetry, orbital_label, orbital_multiplicity, notes)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (bns_number, wyck_letter, site_sym, orb_label, orb_mult, note))
+        ebr_id = cursor.lastrowid
+
+        # Step 4: Loop through the k-points and insert all associated irreps
+        for k_point, irrep_str in ebr_data["kpoints"].items():
+            mult = parser_helpers.parse_multiplicity(irrep_str)
+            label_no_mult = parser_helpers.parse_irrep_label(irrep_str)
+            cursor.execute("""
+                INSERT INTO magnetic_irreps (bns_number, ebr_id, k_point, irrep_label, multiplicity)
+                VALUES (?, ?, ?, ?, ?)
+            """, (bns_number, ebr_id, k_point, label_no_mult, mult))
+        
+        self.conn.commit()
+        parser_helpers.close()
+        
+        # Step 5: Return the ID of the newly created EBR for linking decompositions
+        return ebr_id
+
+    def add_ebr_list_decomposition(self, bns_number, parent_ebr_id, ebr_list):
+        """
+        Adds rows for an EBR that decomposes into a list of other EBRs.
+        """
+        cursor = self.conn.cursor()
+        for ebr_string in ebr_list:
+            cursor.execute("""
+                INSERT INTO magnetic_ebr_decomposition_ebrs (bns_number, parent_ebr_id, decomposes_into)
+                VALUES (?, ?, ?)
+            """, (bns_number, parent_ebr_id, ebr_string))
+        self.conn.commit()
+
+    def add_decomposition_item(self, bns_number, ebr_id, decomp_idx, branch_idx, irrep_string):
+        """
+        Adds a single decomposition branch item to the flexible items table.
+        """
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            INSERT INTO magnetic_ebr_decomposition_items
+            (bns_number, ebr_id, decomposition_index, branch_index, irreps_string)
+            VALUES (?, ?, ?, ?, ?)
+        """, (bns_number, ebr_id, decomp_idx, branch_idx, irrep_string))
+        self.conn.commit()
+
     def get_next_space_group(self):
         cursor = self.conn.cursor()
         cursor.execute("SELECT MAX(number) FROM space_groups WHERE number <= 230")
