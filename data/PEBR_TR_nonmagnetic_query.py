@@ -56,7 +56,7 @@ def parse_kpoint_cells(irreps_txt):
     return cells
 
 class EBRDatabaseManager:
-    def __init__(self, db_path="pebr_tr_nonmagnetic_rev3.db"):
+    def __init__(self, db_path="pebr_tr_nonmagnetic_rev4.db"):
         self.db_path = db_path
         self.conn = None
         self.connect()
@@ -103,6 +103,7 @@ class EBRDatabaseManager:
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS ebr_decomposition_branches (
           id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+          space_group_id INTEGER NOT NULL REFERENCES space_groups(id),
           ebr_id              INTEGER NOT NULL REFERENCES ebrs(id) ON DELETE CASCADE,
           decomposition_index INTEGER NOT NULL,
           branch1_irreps      TEXT NOT NULL,
@@ -115,6 +116,7 @@ class EBRDatabaseManager:
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS irreps (
           id           INTEGER PRIMARY KEY AUTOINCREMENT,
+          space_group_id INTEGER NOT NULL REFERENCES space_groups(id),
           ebr_id       INTEGER NOT NULL REFERENCES ebrs(id) ON DELETE CASCADE,
           k_point      TEXT    NOT NULL,
           irrep_label  TEXT    NOT NULL,
@@ -128,6 +130,9 @@ class EBRDatabaseManager:
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_irrep_ebr ON irreps(ebr_id);")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_irrep_kpoint ON irreps(k_point);")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_ebr_decomp_ebr_id ON ebr_decomposition_branches(ebr_id);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_ebr_decomp_sg_id ON ebr_decomposition_branches(space_group_id);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_irrep_sg_id ON irreps(space_group_id);")
+    
 
         cursor.execute("""
         CREATE TRIGGER IF NOT EXISTS update_space_groups_updated_at
@@ -363,7 +368,7 @@ class EBRDatabaseManager:
             
         return total_dimension
 
-    def add_ebr_decomposition_branch(self, ebr_id, decomposition_index, branch1_str, branch2_str): 
+    def add_ebr_decomposition_branch(self, sg_id, ebr_id, decomposition_index, branch1_str, branch2_str): 
         """
         Adds or replaces a decomposition branch after validating dimensions.
         Raises ValueError if dimensions are inconsistent.
@@ -397,9 +402,9 @@ class EBRDatabaseManager:
         try:
             cursor.execute("""
                 INSERT OR REPLACE INTO ebr_decomposition_branches 
-                (ebr_id, decomposition_index, branch1_irreps, branch2_irreps) 
-                VALUES (?, ?, ?, ?)
-            """, (ebr_id, decomposition_index, branch1_str, branch2_str))
+                (space_group_id, ebr_id, decomposition_index, branch1_irreps, branch2_irreps) 
+                VALUES (?, ?, ?, ?, ?)
+            """, (sg_id, ebr_id, decomposition_index, branch1_str, branch2_str))
             self.conn.commit()
             return True
         except sqlite3.Error as e:
@@ -439,12 +444,11 @@ class EBRDatabaseManager:
         sg_row = cursor.fetchone()
         if sg_row:
             sg_id = sg_row[0]
-            # Update its timestamp if we are about to add/replace EBRs
             cursor.execute("UPDATE space_groups SET updated_at = CURRENT_TIMESTAMP WHERE id = ?", (sg_id,))
         else:
             # Insert new space group, symbol can be updated later if parsed
             cursor.execute("INSERT INTO space_groups(number, symbol) VALUES (?, ?)", (sg_number, None))
-            sg_id = cursor.lastrowid # Get ID of newly inserted space group
+            sg_id = cursor.lastrowid
         
         # Delete old EBRs for this space group. ON DELETE CASCADE handles irreps and branches.
         cursor.execute("DELETE FROM ebrs WHERE space_group_id = ?", (sg_id,))
@@ -497,9 +501,9 @@ class EBRDatabaseManager:
                     mult = self.parse_multiplicity(full_irrep_str)
                     label_no_mult = self.parse_irrep_label(full_irrep_str)
                     cursor.execute("""
-                        INSERT INTO irreps (ebr_id, k_point, irrep_label, multiplicity) 
-                        VALUES (?, ?, ?, ?)
-                    """, (ebr_id, kp_label, label_no_mult, mult))
+                        INSERT INTO irreps (space_group_id, ebr_id, k_point, irrep_label, multiplicity) 
+                        VALUES (?, ?, ?, ?, ?)
+                    """, (sg_id, ebr_id, kp_label, label_no_mult, mult))
                 else: 
                     raise ValueError(
                         f"Mismatch in irrep data for k-point {kp_label}. "
@@ -507,7 +511,7 @@ class EBRDatabaseManager:
                         f"Cells: {cells_for_kpoint}"
                     )
         self.conn.commit()
-        return inserted_ebr_info_list
+        return inserted_ebr_info_list, sg_id
     
     def validate_input_file(self, filepath):
         """Validate that input file exists and has expected format."""

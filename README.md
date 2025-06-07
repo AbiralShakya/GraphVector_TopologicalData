@@ -38,17 +38,20 @@ https://static-content.springer.com/esm/art%3A10.1038%2Fnature23268/MediaObjects
 
 
 TODO: 
-    by 06.05.2025 EOD
-        ~ finish all DB creation   
-            - BANDREP and magnetic BANDREP
-            - topological indices for single and double irrep 
-            - create .db files for the 4 combos
-            - relate to local files
-            - pull from JARVIS
-            - create graph structure of data
-            - create full DB
-        
-        ~ look at prev multi task code and start building mag + topo multi task (worked on before) 
-            - read physics + ml papers on 2d materials classification, classification of electronic properties, magnetic properties when applied currents to 2d or 3d lattice
-        
-        - important: understand an SOTA ml classifier regarding TI, look at runtime, compare to DFT methods, idea for creating my own algo to do such classification and how to compare training workload
+    {  ~ finish all DB creation   
+        - BANDREP and magnetic BANDREP
+        - topological indices for single and double irrep 
+        - create .db files for the 4 combos
+        - relate to local files
+        - pull from JARVIS
+        - create graph structure of data
+        - create full DB
+    
+    ~ look at prev multi task code and start building mag + topo multi task (worked on before) 
+        - read physics + ml papers on 2d materials classification, classification of electronic properties, magnetic properties when applied currents to 2d or 3d lattice
+    
+    - important: understand an SOTA ml classifier regarding TI, look at runtime, compare to DFT methods, idea for creating my own algo to do such classification and how to compare training workload
+}
+
+
+thanks to BYU ISOTROPY software suite for ISO-MAG tgable of magnetic spaces !
