@@ -79,137 +79,93 @@ class MagneticBCSRequestsScraper:
         except requests.exceptions.RequestException as e:
             raise RuntimeError(f"Failed to fetch main page for BNS {bns_number}: {e}") from e
 
-    # In your MagneticBCSRequestsScraper class, replace parse_main with this:
-
-    # In your MagneticBCSRequestsScraper class
-
-    def parse_main(self, html: str, bns_number: str) -> list[dict]:
+    def parse_main(self, html: str, sg_number: int) -> list[dict]:
         """
-        [FINAL CORRECTED VERSION] Parses the main EBR table using a robust
-        column counting method to ensure all data is captured.
+        Parses the main EBR table using robust column counting and ensures
+        all data objects have a consistent structure.
         """
-        soup = BeautifulSoup(html, "html.parser")
-        main_table = None
-        for table in soup.find_all("table"):
-            if table.find(string=lambda s: s and "Wyckoff pos" in s):
-                main_table = table
-                break
+        soup = BeautifulSoup(html, PARSER)
+        # Using frame="box" is a more direct way to find the main table
+        main_table = soup.find("table", frame="box")
 
-        if not main_table:
-            debug_filename = f"debug_bns_{bns_number}.html"
+        if not main_table or not main_table.find(string=lambda s: s and "Wyckoff pos" in s):
+            debug_filename = f"debug_sg_{sg_number}.html"
             with open(debug_filename, "w", encoding="utf-8") as f:
                 f.write(html)
             raise RuntimeError(
-                f"No main table found for BNS {bns_number}. "
+                f"No main table found for SG {sg_number}. "
                 f"HTML response saved to '{debug_filename}' for inspection."
             )
 
         all_rows = main_table.find_all("tr")
-        if not all_rows: return []
+        header_data = {}
+        k_vector_data = []
 
-        header_rows = {}
-        k_vector_rows_start_index = -1
-
-        for i, tr in enumerate(all_rows):
-            cells = tr.find_all(['td', 'th'])
+        # Separate header rows from k-vector rows
+        for row in all_rows:
+            cells = row.find_all(['td', 'th'])
             if not cells: continue
-            
-            text = cells[0].get_text(strip=True).lower()
-            if "wyckoff pos" in text:
-                header_rows["wyckoff"] = cells
-            elif "band-rep" in text:
-                header_rows["bandrep"] = cells
-            elif "decomposable" in text:
-                header_rows["decomposability"] = cells
-            elif ":" in cells[0].get_text(strip=True):
-                k_vector_rows_start_index = i
-                break
-                
-        if not all(k in header_rows for k in ["wyckoff", "bandrep"]):
-            raise ValueError(f"Could not find all header rows for BNS {bns_number}")
+            first_cell_text = cells[0].get_text(strip=True)
+            if ":" in first_cell_text:
+                k_vector_data.append(cells)
+            else:
+                # Clean up the key for easier access
+                header_key = first_cell_text.lower().replace('.', '').replace('/', '')
+                if header_key: header_data[header_key] = cells
 
-        # FIXED: Calculate the number of EBR columns by finding the maximum number of 
-        # actual data columns (excluding the first column which contains labels)
-        # Also check k-point rows to ensure we don't miss any columns
-        max_cols_from_headers = max(
-            len(header_rows.get("wyckoff", [])),
-            len(header_rows.get("bandrep", [])),
-            len(header_rows.get("decomposability", []))
-        )
+        # Use your robust method to count the total number of columns
+        max_cols = 0
+        for key in header_data:
+            max_cols = max(max_cols, len(header_data[key]))
+        for row in k_vector_data:
+            max_cols = max(max_cols, len(row))
         
-        # Check k-point rows to get the actual number of columns
-        max_cols_from_kpoints = 0
-        if k_vector_rows_start_index != -1:
-            for i in range(k_vector_rows_start_index, len(all_rows)):
-                k_vector_row_cells = all_rows[i].find_all(['td', 'th'])
-                if k_vector_row_cells:
-                    max_cols_from_kpoints = max(max_cols_from_kpoints, len(k_vector_row_cells))
-        
-        # Take the maximum from both header and k-point rows, then subtract 1 for the label column
-        num_ebr_columns = max(max_cols_from_headers, max_cols_from_kpoints) - 1
-        
-        print(f"Debug: Found {num_ebr_columns} EBR columns for BNS {bns_number}")
-        print(f"Debug: Header cols = {max_cols_from_headers}, K-point cols = {max_cols_from_kpoints}")
-
+        num_ebr_columns = max_cols - 1
         if num_ebr_columns <= 0:
             return []
             
         ebr_data_list = []
-
+        
         # Pass 1: Initialize EBR objects from the header rows
-        for i in range(1, num_ebr_columns + 1): # i is 1-based column index
+        for i in range(1, num_ebr_columns + 1):  # i is the 1-based column index
             ebr_obj = {"kpoints": {}}
             
-            if i < len(header_rows["wyckoff"]):
-                ebr_obj["wyckoff"] = header_rows["wyckoff"][i].get_text(strip=True)
+            wyckoff_cells = header_data.get("wyckoff pos", [])
+            bandrep_cells = header_data.get("band-rep", [])
+            decomp_cells = header_data.get("decomposableindecomposable", [])
+
+            # --- START: THE FIX ---
+            # Ensure 'wyckoff' and 'bandrep' keys are always created,
+            # even if their value is an empty string.
+            if i < len(wyckoff_cells):
+                ebr_obj["wyckoff"] = wyckoff_cells[i].get_text(strip=True)
             else:
-                ebr_obj["wyckoff"] = ""  # Handle missing data gracefully
-                
-            if i < len(header_rows["bandrep"]):
-                ebr_obj["bandrep"] = header_rows["bandrep"][i].get_text(strip=True)
+                ebr_obj["wyckoff"] = ""  # Add key with empty string
+
+            if i < len(bandrep_cells):
+                ebr_obj["bandrep"] = bandrep_cells[i].get_text(strip=True)
             else:
-                ebr_obj["bandrep"] = ""  # Handle missing data gracefully
-            
-            decomposability_cells = header_rows.get("decomposability", [])
-            if i < len(decomposability_cells):
-                form = decomposability_cells[i].find("form")
-                if form:
-                    ebr_obj["decomposability"] = {
-                        "type": "decomposable",
-                        "payload": {inp.get("name"): inp.get("value") for inp in form.find_all("input") if inp.get("name")}
-                    }
-                else:
-                    ebr_obj["decomposability"] = {"type": "indecomposable"}
+                ebr_obj["bandrep"] = ""  # Add key with empty string
+            # --- END: THE FIX ---
+
+            if i < len(decomp_cells):
+                form = decomp_cells[i].find("form")
+                ebr_obj["decomposability"] = {"type": "decomposable", "payload": {inp.get("name"): inp.get("value") for inp in form.find_all("input") if inp.get("name")}} if form else {"type": "indecomposable"}
             else:
                 ebr_obj["decomposability"] = {"type": "indecomposable"}
-
+                
             ebr_data_list.append(ebr_obj)
 
-        # Pass 2: Populate k-point data for each EBR object
-        if k_vector_rows_start_index != -1:
-            for i in range(k_vector_rows_start_index, len(all_rows)):
-                k_vector_row_cells = all_rows[i].find_all(['td', 'th'])
-                if not k_vector_row_cells: continue
-                
-                k_point_label_full = k_vector_row_cells[0].get_text(strip=True)
-                if ":" not in k_point_label_full: continue
-                
-                k_point_label = k_point_label_full.split(":")[0]
-
-                # FIXED: Make sure we process ALL available columns
-                for j in range(min(num_ebr_columns, len(k_vector_row_cells) - 1)): # j is 0-based list index
-                    column_index_in_html = j + 1
-                    if column_index_in_html < len(k_vector_row_cells):
-                        irrep_str = k_vector_row_cells[column_index_in_html].get_text(strip=True)
-                        if j < len(ebr_data_list):  # Safety check
-                            ebr_data_list[j]["kpoints"][k_point_label] = irrep_str
-
-        # Debug output to verify we're capturing all EBRs
-        print(f"Debug: Parsed {len(ebr_data_list)} EBRs for BNS {bns_number}")
-        for idx, ebr in enumerate(ebr_data_list):
-            print(f"  EBR {idx+1}: Wyckoff='{ebr.get('wyckoff', '')}', Band-rep='{ebr.get('bandrep', '')}', K-points={len(ebr.get('kpoints', {}))}")
+        # Pass 2: Populate k-point data
+        for k_row_cells in k_vector_data:
+            k_label = k_row_cells[0].get_text(strip=True).split(":")[0]
+            for i in range(1, len(k_row_cells)):
+                ebr_index = i - 1
+                if ebr_index < len(ebr_data_list):
+                    ebr_data_list[ebr_index]["kpoints"][k_label] = k_row_cells[i].get_text(strip=True)
 
         return ebr_data_list
+
 
     def fetch_decomposition(self, form_payload: dict) -> dict | None:
         """
