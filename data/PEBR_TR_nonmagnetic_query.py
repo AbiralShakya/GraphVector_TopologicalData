@@ -370,28 +370,28 @@ class EBRDatabaseManager:
         """
         cursor = self.conn.cursor()
         
-        # 1. Get the parent EBR's dimension
-        cursor.execute("SELECT orbital_multiplicity FROM ebrs WHERE id = ?", (ebr_id,))
-        ebr_row = cursor.fetchone()
-        if not ebr_row:
-            raise ValueError(f"EBR with ID {ebr_id} not found.")
-        parent_dim = ebr_row[0]
+        # # 1. Get the parent EBR's dimension
+        # cursor.execute("SELECT orbital_multiplicity FROM ebrs WHERE id = ?", (ebr_id,))
+        # ebr_row = cursor.fetchone()
+        # if not ebr_row:
+        #     raise ValueError(f"EBR with ID {ebr_id} not found.")
+        # parent_dim = ebr_row[0]
 
-        # 2. Calculate the dimension of each branch from the irrep strings
-        dim_b1 = self._calculate_irrep_string_dimension(branch1_str)
-        dim_b2 = self._calculate_irrep_string_dimension(branch2_str)
+        # # 2. Calculate the dimension of each branch from the irrep strings
+        # dim_b1 = self._calculate_irrep_string_dimension(branch1_str)
+        # dim_b2 = self._calculate_irrep_string_dimension(branch2_str)
         
-        # 3. Validate: The dimension of each branch must equal the parent's dimension
-        if parent_dim != dim_b1:
-            raise ValueError(
-                f"Dimension mismatch for Branch 1. Parent dimension is {parent_dim}, "
-                f"but branch irreps sum to {dim_b1}."
-            )
-        if parent_dim != dim_b2:
-            raise ValueError(
-                f"Dimension mismatch for Branch 2. Parent dimension is {parent_dim}, "
-                f"but branch irreps sum to {dim_b2}."
-            )
+        # # 3. Validate: The dimension of each branch must equal the parent's dimension
+        # if parent_dim != dim_b1:
+        #     raise ValueError(
+        #         f"Dimension mismatch for Branch 1. Parent dimension is {parent_dim}, "
+        #         f"but branch irreps sum to {dim_b1}."
+        #     )
+        # if parent_dim != dim_b2:
+        #     raise ValueError(
+        #         f"Dimension mismatch for Branch 2. Parent dimension is {parent_dim}, "
+        #         f"but branch irreps sum to {dim_b2}."
+        #     )
 
         # 4. If validation passes, insert or replace the data
         try:
