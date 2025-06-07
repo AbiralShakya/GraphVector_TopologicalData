@@ -73,7 +73,7 @@ class MagneticBCSRequestsScraper:
         except requests.exceptions.RequestException as e:
             raise RuntimeError(f"Failed to fetch main page for BNS {bns_number}: {e}") from e
 
-    def parse_main(self, html: str, sg: int) -> dict:
+    def parse_main(self, html: str, bns_number: str) -> dict:
         """Parse the main EBR table."""
         soup = BeautifulSoup(html, PARSER)
         main_table = None
@@ -83,7 +83,7 @@ class MagneticBCSRequestsScraper:
                 break
 
         if not main_table:
-            raise RuntimeError(f"No main table found for SG {sg}")
+            raise RuntimeError(f"No main table found for SG {bns_number}")
 
         data = {
             "wyckoff": [], "bandrep": [], "kpoints": {}, "decomp_forms": []
@@ -151,7 +151,7 @@ class MagneticBCSRequestsScraper:
             html = self.fetch_main(bns_number)
             data = self.parse_main(html, bns_number)
         except Exception as e:
-            print(f"❌ SG {sg}: fetch/parse failed: {e}")
+            print(f"❌ SG {bns_number}: fetch/parse failed: {e}")
             return False
 
         # Fetch decompositions for columns that had a form
@@ -175,11 +175,11 @@ class MagneticBCSRequestsScraper:
             inserted, sg_id = self.db._insert_data(
                 bns_number, data["wyckoff"], data["bandrep"], notes, kpoint_list
             )
-            print(f"✅ SG {bns_number}: inserted {len(inserted)} EBRs")
+            print(f"✅ BNS {bns_number}: inserted {len(inserted)} EBRs")
         except Exception as e:
-            print(f"❌ SG {bns_number}: DB insertion failed: {e}")
+            print(f"❌ BNS {bns_number}: DB insertion failed: {e}")
             import traceback
-            traceback.print_exc() # Print full traceback for DB errors
+            traceback.print_exc()
             return False
 
         # Ingest the decomposition branches
@@ -210,15 +210,6 @@ class MagneticBCSRequestsScraper:
                             print(f"   ↳❌ failed to add item for decomp {decomp_idx}, branch {branch_idx}: {e}")
         return True
 
-    def run(self, start: int, end: int):
-        failed = []
-        for sg in range(start, end + 1):
-            print(f"\n--- Processing SG {sg} ---")
-            if not self.process_space_group(sg):
-                failed.append(sg)
-            time.sleep(random.uniform(1.0, 2.5))
-        print(f"\nDone. Failed SGs: {failed}")
-
     def run(self, bns_provider: BNSNumberProvider):
         failed_bns = []
         while True:
@@ -230,7 +221,7 @@ class MagneticBCSRequestsScraper:
             if not self.process_space_group(next_bns):
                 failed_bns.append(next_bns)
 
-            time.sleep(random.uniform(1.0, 2.5))
+            time.sleep(random.uniform(1.0, 2.0))
 
         print(f"\nDone. Failed BNS Numbers: {failed_bns}")
 
@@ -241,8 +232,8 @@ if __name__ == "__main__":
     p.add_argument("--magnetic", action="store_true", help="Scrape magnetic band co-reps.")
     args = p.parse_args()
     print("--- Starting MAGNETIC Band Co-Representation Scraper ---")
-    db = MagneticEBRDatabaseManager('/Users/abiralshakya/Documents/Research/GraphVectorTopological/magnetic_table_bns.txt')
-    provider = BNSNumberProvider("magnetic_table_bns.txt")
+    db = MagneticEBRDatabaseManager('ebr_magnetic.db')
+    provider = BNSNumberProvider('/Users/abiralshakya/Documents/Research/GraphVectorTopological/magnetic_table_bns.txt')
     scraper = MagneticBCSRequestsScraper(db)
     scraper.run(provider)
     db.close()
