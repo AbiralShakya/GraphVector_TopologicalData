@@ -7,7 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 
 PARSER = "html.parser"
-from PEBR_TR_nonmagnetic_query import EBRDatabaseManager
+from EBR_magnetic_query import MagneticEBRDatabaseManager
 
 BASE_URL = "https://www.cryst.ehu.es/cgi-bin/cryst/programs/"
 
@@ -45,8 +45,8 @@ class BNSNumberProvider:
                 return bns_num
         return None # All space groups have been scraped
 
-class BCSRequestsScraper:
-    def __init__(self, db: EBRDatabaseManager):
+class MagneticBCSRequestsScraper:
+    def __init__(self, db: MagneticEBRDatabaseManager):
         self.db = db
         self.session = requests.Session()
         self.session.headers.update({
@@ -148,8 +148,8 @@ class BCSRequestsScraper:
         print(f"\n--- Processing Magnetic SG (BNS) {bns_number} ---")
 
         try:
-            html = self.fetch_main(sg)
-            data = self.parse_main(html, sg)
+            html = self.fetch_main(bns_number)
+            data = self.parse_main(html, bns_number)
         except Exception as e:
             print(f"❌ SG {sg}: fetch/parse failed: {e}")
             return False
@@ -185,19 +185,29 @@ class BCSRequestsScraper:
         # Ingest the decomposition branches
         for idx, info in enumerate(inserted):
             if info.get("note") == "decomposable":
-                branches = data["decompositions"][idx]
-                if not branches:
-                    print(f"   ↳ WARNING: EBR {info['ebr_id']} marked decomposable but no branches found/scraped.")
+                # 'branches' is a list of lists, e.g., [[b1, b2], [b1, b2, b3]]
+                decompositions = data["decompositions"][idx]
+                if not decompositions:
                     continue
-                print(f"   ↳ Ingesting {len(branches)} branches for EBR {info['ebr_id']}...")
-                for bi, branch_row in enumerate(branches, 1):
-                    try:
-                        # Assuming all decompositions have exactly two branches
-                        self.db.add_ebr_decomposition_branch(
-                            sg_id, info["ebr_id"], bi, branch_row[0], branch_row[1]
-                        )
-                    except Exception as e:
-                        print(f"   ↳❌ failed to add branch {bi} for EBR {info['ebr_id']}: {e}")
+                
+                print(f"   ↳ Ingesting {len(decompositions)} decomposition set(s) for EBR {info['ebr_id']}...")
+
+                # 'decomposition_index' corresponds to the row number on the decomposition page (1, 2, ...)
+                for decomp_idx, branch_list in enumerate(decompositions, 1):
+                    
+                    # 'branch_list' is the list of actual branch strings for this one decomposition
+                    # e.g., ['M5M6...', 'M5M6...'] or ['branch1', 'branch2', 'branch3']
+                    print(f"     ↳ Set {decomp_idx} has {len(branch_list)} branches.")
+
+                    # 'branch_index' corresponds to the column number (branch 1, branch 2, ...)
+                    for branch_idx, irrep_string in enumerate(branch_list, 1):
+                        try:
+                            # Call the new, flexible insertion function for each branch
+                            self.db.add_decomposition_item(
+                                sg_id, info["ebr_id"], decomp_idx, branch_idx, irrep_string
+                            )
+                        except Exception as e:
+                            print(f"   ↳❌ failed to add item for decomp {decomp_idx}, branch {branch_idx}: {e}")
         return True
 
     def run(self, start: int, end: int):
@@ -227,14 +237,12 @@ class BCSRequestsScraper:
 
 
 if __name__ == "__main__":
-    p = argparse.ArgumentParser(
-        description="Fast BandRep scraper using Requests and BeautifulSoup"
-    )
-    p.add_argument("--start", type=int, required=True, help="first SG to scrape")
-    p.add_argument("--end",   type=int, required=True, help="last SG to scrape")
+    p = argparse.ArgumentParser(description="Bilbao Crystallographic Server Scraper")
+    p.add_argument("--magnetic", action="store_true", help="Scrape magnetic band co-reps.")
     args = p.parse_args()
-
-    db = EBRDatabaseManager()
-    scraper = BCSRequestsScraper(db)
-    scraper.run(args.start, args.end)
+    print("--- Starting MAGNETIC Band Co-Representation Scraper ---")
+    db = MagneticEBRDatabaseManager('/Users/abiralshakya/Documents/Research/GraphVectorTopological/magnetic_table_bns.txt')
+    provider = BNSNumberProvider("magnetic_table_bns.txt")
+    scraper = MagneticBCSRequestsScraper(db)
+    scraper.run(provider)
     db.close()
