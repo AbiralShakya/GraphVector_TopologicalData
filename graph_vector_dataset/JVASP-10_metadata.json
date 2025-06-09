@@ -1,0 +1,13 @@
+{
+  "jid": "JVASP-10",
+  "formula": "VSe2",
+  "normalized_formula": "Se2V",
+  "target_label": 1.0,
+  "num_atoms": 3,
+  "num_edges": 12,
+  "jarvis_props": {
+    "formation_energy": null,
+    "band_gap": 0.0,
+    "space_group": "P-3m1"
+  }
+}
