@@ -72,42 +72,6 @@ class TopologicalMaterialAnalyzer:
                 normalized += element + str(count)
         
         return normalized
-    
-    def download_with_requests(self, url: str, filepath: str, max_retries: int = 3) -> Optional[str]:
-        """Alternative download using requests with retry logic."""
-        session = requests.Session()
-        
-        # Disable SSL warnings
-        import urllib3
-        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-        
-        # Setup retry strategy
-        retry_strategy = Retry(
-            total=max_retries,
-            backoff_factor=1,
-            status_forcelist=[429, 500, 502, 503, 504],
-        )
-        
-        adapter = HTTPAdapter(max_retries=retry_strategy)
-        session.mount("http://", adapter)
-        session.mount("https://", adapter)
-        
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        }
-        
-        try:
-            response = session.get(url, headers=headers, verify=False, timeout=30)
-            response.raise_for_status()
-            
-            with open(filepath, 'w', encoding='utf-8') as f:
-                f.write(response.text)
-            
-            return filepath
-            
-        except Exception as e:
-            print(f"Requests download failed: {e}")
-            return None
 
     def load_local_database(self):
         """Load and process the local materials database CSV."""
@@ -167,72 +131,32 @@ class TopologicalMaterialAnalyzer:
     
     def download_poscar(self, poscar_url: str, material_formula: str, icsd_id: str) -> Optional[str]:
         """
-        Download POSCAR file from the given URL using httpx for faster performance.
-        
-        Args:
-            poscar_url: URL to download POSCAR from
-            material_formula: Formula of the material for filename
-            icsd_id: ICSD ID for unique identification
-            
-        Returns:
-            Path to downloaded file or None if failed
+        Download POSCAR file using plain requests and save it under self.poscar_storage_dir.
         """
+        # sanitize filename
+        safe_formula = "".join(c if c.isalnum() else "_" for c in material_formula)
+        filename = f"{safe_formula}_ICSD_{icsd_id}_POSCAR"
+        filepath = os.path.join(self.poscar_storage_dir, filename)
+
+        # avoid re-downloading
+        if os.path.exists(filepath):
+            print(f"↑ already exists: {filename}")
+            return filepath
+
         try:
-            # Create safe filename
-            safe_formula = "".join(c if c.isalnum() else "_" for c in material_formula)
-            filename = f"{safe_formula}_ICSD_{icsd_id}_POSCAR"
-            filepath = os.path.join(self.poscar_storage_dir, filename)
+            # your one-liner fetch
+            resp = requests.get(poscar_url, verify=False, timeout=30)
+            resp.raise_for_status()
             
-            # Check if file already exists
-            if os.path.exists(filepath):
-                print(f"POSCAR already exists: {filename}")
-                return filepath
-            
-            import certifi
-            with httpx.Client(timeout=30.0, follow_redirects=True, verify=certifi.where()) as client:
-                response = client.get(poscar_url)
-                response.raise_for_status()
-                
-                # Check if response contains HTML (might be an error page)
-                content_type = response.headers.get('content-type', '').lower()
-                if 'text/html' in content_type:
-                    # Parse HTML to extract POSCAR content or handle error
-                    soup = BeautifulSoup(response.content, 'html.parser')
-                    
-                    # Look for POSCAR content in <pre> tags (common for raw text display)
-                    pre_tag = soup.find('pre')
-                    if pre_tag:
-                        poscar_content = pre_tag.get_text()
-                    else:
-                        # Look for code blocks or other text containers
-                        code_tag = soup.find('code')
-                        if code_tag:
-                            poscar_content = code_tag.get_text()
-                        else:
-                            # If no structured content found, try to extract from body
-                            body = soup.find('body')
-                            if body:
-                                poscar_content = body.get_text().strip()
-                            else:
-                                poscar_content = response.text
-                    
-                    # Basic validation - POSCAR should have multiple lines
-                    if len(poscar_content.split('\n')) < 5:
-                        raise ValueError("Downloaded content doesn't look like a valid POSCAR file")
-                        
-                else:
-                    # Direct text content (ideal case)
-                    poscar_content = response.text
-                
-                # Save the file
-                with open(filepath, 'w') as f:
-                    f.write(poscar_content)
-                
-                print(f"Downloaded POSCAR: {filename}")
-                return filepath
-                
+            # write it out
+            with open(filepath, "w", encoding="utf-8") as f:
+                f.write(resp.text)
+
+            print(f"✅ downloaded POSCAR: {filename}")
+            return filepath
+
         except Exception as e:
-            print(f"Error downloading POSCAR from {poscar_url}: {e}")
+            print(f"❌ failed to download {poscar_url}: {e}")
             return None
     
     async def download_poscar_async(self, poscar_url: str, material_formula: str, icsd_id: str) -> Optional[str]:
@@ -337,17 +261,16 @@ class TopologicalMaterialAnalyzer:
             # Download POSCAR file
             poscar_url = material_info['poscar_link']
             if poscar_url and pd.notna(poscar_url):
-                poscar_path = self.download_poscar(
-                    poscar_url, 
-                    formula, 
+                results['poscar_path'] = self.download_poscar(
+                    poscar_url,
+                    formula,
                     str(material_info['icsd_id'])
                 )
-                results['poscar_path'] = poscar_path
-            
+                        
             # Perform magnetic symmetry analysis
             magnetic_info = self.get_magnetic_symmetry_info(entry)
             results['magnetic_info'] = magnetic_info
-            
+
             # Print summary
             print(f"Space Group: {entry.get('spg_symbol')} ({entry.get('spg_number')})")
             if magnetic_info.get('bns_number'):
@@ -528,8 +451,8 @@ def main():
     # Analyze single material
     jvasp_input = "JVASP-14202"
     result = analyzer.analyze_material(jvasp_input)
-    result2 = analyzer.download_with_requests(jvasp_input)
-    print(result2)
+    # result2 = analyzer.download_with_requests(jvasp_input)
+    # print(result2)
     
     # Analyze multiple materials (example)
     # jvasp_ids = ["JVASP-125448", "JVASP-12345", "JVASP-67890"]
