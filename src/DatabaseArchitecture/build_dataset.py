@@ -147,6 +147,182 @@ class TopologicalMaterialAnalyzer:
             traceback.print_exc()
             self.formula_lookup = {}
 
+    def generate_data_block_with_sg_check(self, jid: str) -> Optional[Dict]:
+        self.processed_count += 1
+        print(f"Processing JID: {jid}")
+
+        jid_data = get_jid_data(jid=jid, dataset="dft_3d")
+        if not jid_data:
+            print(f"  NO data found for JID: {jid}")
+            return None
+        
+        formula = jid_data.get('formula', '')
+        print(f"  Formula: {formula}")
+
+        if not formula:
+            print(f"  No formula found for JID: {jid}")
+            return None
+        
+        norm_formula = self.normalize_formula(formula)
+        print(f"  Normalized formula: {norm_formula}")
+
+        # Process only if material in local dataset 
+        if norm_formula not in self.formula_lookup:
+            print(f"  Formula {norm_formula} not found in local database")
+            return None
+        
+        # Get the local data entry first
+        local_data_entry = self.formula_lookup[norm_formula]
+        
+        # Debug: Check what keys are available in jid_data
+        print(f"  Available keys in jid_data: {list(jid_data.keys())}")
+        
+        # Create structure - try different possible keys
+        structure = None
+        structure_keys_to_try = ['atoms', 'structure', 'final_str', 'initial_structure']
+        
+        for key in structure_keys_to_try:
+            if key in jid_data:
+                try:
+                    print(f"  Trying to create structure from key: {key}")
+                    if isinstance(jid_data[key], dict):
+                        print(f"    Structure data keys: {list(jid_data[key].keys())}")
+                        structure = Structure.from_dict(jid_data[key])
+                        print(f"  ✓ Structure created from '{key}': {len(structure)} atoms")
+                        break
+                    elif isinstance(jid_data[key], str):
+                        from pymatgen.io.vasp.inputs import Poscar
+                        poscar = Poscar.from_string(jid_data[key])
+                        structure = poscar.structure
+                        print(f"  ✓ Structure created from POSCAR string in '{key}': {len(structure)} atoms")
+                        break
+                except Exception as e:
+                    print(f"    Failed to create structure from '{key}': {e}")
+                    continue
+        
+        if structure is None:
+            try:
+                print("  Attempting to build structure manually from JARVIS format...")    
+                if 'atoms' in jid_data:
+                    atoms_data = jid_data['atoms']
+                    if 'lattice_mat' in atoms_data and 'coords' in atoms_data and 'elements' in atoms_data:
+                        from pymatgen.core import Lattice
+                        
+                        lattice = Lattice(atoms_data['lattice_mat'])
+                        coords = atoms_data['coords']
+                        elements = atoms_data['elements']
+                        
+                        coords_are_cartesian = atoms_data.get('cartesian', False)
+                        
+                        structure = Structure(lattice, elements, coords, coords_are_cartesian=coords_are_cartesian)
+                        print(f"  ✓ Structure built from JARVIS format: {len(structure)} atoms")
+                        print(f"    Lattice: {lattice.abc}")
+                        print(f"    Elements: {elements}")
+                        print(f"    Coordinates type: {'cartesian' if coords_are_cartesian else 'fractional'}")
+                
+                elif 'lattice_mat' in jid_data and 'coords' in jid_data and 'elements' in jid_data:
+                    from pymatgen.core import Lattice
+                    lattice = Lattice(jid_data['lattice_mat'])
+                    coords = jid_data['coords']
+                    elements = jid_data['elements']
+                    structure = Structure(lattice, elements, coords)
+                    print(f"  ✓ Structure built from top-level JARVIS data: {len(structure)} atoms")
+                    
+            except Exception as e:
+                print(f"    Manual structure building failed: {e}")
+                print(f"    Error details: {type(e).__name__}: {str(e)}")
+                
+                if 'atoms' in jid_data:
+                    atoms_data = jid_data['atoms']
+                    print(f"    Debug - lattice_mat shape: {np.array(atoms_data.get('lattice_mat', [])).shape if 'lattice_mat' in atoms_data else 'missing'}")
+                    print(f"    Debug - coords shape: {np.array(atoms_data.get('coords', [])).shape if 'coords' in atoms_data else 'missing'}")
+                    print(f"    Debug - elements length: {len(atoms_data.get('elements', [])) if 'elements' in atoms_data else 'missing'}")
+                    print(f"    Debug - cartesian flag: {atoms_data.get('cartesian', 'missing')}")
+        
+        if structure is None:
+            print(f"  ERROR: Could not create structure for {jid}")
+            return None
+
+        # Check space group match
+        try:
+            analyzer = SpacegroupAnalyzer(structure, symprec=0.1)
+            sg_number_from_jarvis = analyzer.get_space_group_number()
+            
+            # Check if space groups match (assuming your CSV has 'Spacegroup_Number' column)
+            local_sg = local_data_entry.get('Spacegroup_Number')
+            if local_sg and local_sg != sg_number_from_jarvis:
+                print(f"  Skipping {jid} ({norm_formula}, SG {sg_number_from_jarvis}): Space group mismatch with local DB (local: {local_sg})")
+                return None
+                
+        except Exception as e:
+            print(f"  Error in space group analysis: {e}")
+            return None
+
+        self.matched_count += 1
+        print(f"  ✓ Match found! ({self.matched_count}/{self.processed_count})")
+        
+        # Extract Asymmetric Unit & Symmetry
+        try:
+            space_group = analyzer.get_space_group_symbol()
+            print(f"  Space group: {space_group}")
+            
+            # Get primitive structure for graph generation
+            primitive_structure = analyzer.get_primitive_standard_structure()
+            symm_ops = analyzer.get_symmetry_operations(cartesian=True)
+            print(f"  Symmetry operations: {len(symm_ops)}")
+            
+        except Exception as e:
+            print(f"  Error in symmetry analysis: {e}")
+            primitive_structure = structure
+            symm_ops = []
+
+        # Generate Graphs and Features
+        print("  Generating features...")
+        
+        # Crystal graph
+        crystal_graph = self._create_crystal_graph(primitive_structure)
+        print(f"  Crystal graph: {crystal_graph.x.shape[0]} nodes, {crystal_graph.edge_index.shape[1]} edges")
+        
+        # ASPH features
+        asph_vector = self._compute_asph_features(structure)
+        print(f"  ASPH features: {asph_vector.shape}")
+        
+        # Band representation features
+        band_rep_vector, target_y = self._featurize_bilbao_data(local_data_entry)
+        print(f"  Band rep features: {band_rep_vector.shape}, Target: {target_y.item()}")
+        
+        # K-space graph
+        kspace_graph = self._create_kspace_graph(band_rep_vector)
+        print(f"  K-space graph: {kspace_graph.x.shape[0]} nodes")
+        
+        # Set the target 'y' on the primary graph object
+        crystal_graph.y = target_y
+
+        # Assemble the final data block
+        data_block = {
+            'jid': jid,
+            'formula': formula,
+            'normalized_formula': norm_formula,
+            'crystal_graph': crystal_graph,
+            'kspace_graph': kspace_graph,
+            'asph_features': asph_vector,
+            'band_rep_features': band_rep_vector,
+            'target_label': target_y,
+            'symmetry_ops': {
+                'rotations': torch.stack([torch.tensor(op.rotation_matrix, dtype=torch.float) for op in symm_ops]) if symm_ops else torch.empty(0, 3, 3),
+                'translations': torch.stack([torch.tensor(op.translation_vector, dtype=torch.float) for op in symm_ops]) if symm_ops else torch.empty(0, 3)
+            },
+            'jarvis_props': {
+                'formation_energy': jid_data.get('form_energy_per_atom'),
+                'band_gap': jid_data.get('optb88vdw_bandgap'),
+                'space_group': space_group if 'space_group' in locals() else None
+            },
+            'local_topo_data': local_data_entry
+        }
+        
+        print(f"  ✓ Data block generated successfully")
+        return data_block
+
     def _get_elemental_features(self, atomic_number: int) -> torch.Tensor:
         """Creates a feature vector for a given element using basic atomic properties."""
         # Basic atomic properties - you can expand this with more sophisticated features
@@ -349,126 +525,6 @@ class TopologicalMaterialAnalyzer:
             global_features=band_rep_vector.unsqueeze(0)  # Store full band rep as global feature
         )
     
-    def generate_data_block_with_sg_check(self, jid: str) -> Optional[Dict]:
-        self.processed_count += 1
-        print(f"Processing JID: {jid}")
-
-        jid_data = get_jid_data(jid = jid, dataset = "dft_3d")
-        if not jid_data:
-            print(f"  NO data found for JID: {jid}")
-            return None
-        
-        formula = jid_data.get('formula', '')
-        print(f"  Formula: {formula}")
-
-        if not formula:
-            print(f"  No formula found for JID: {jid}")
-            return None
-        
-        norm_formula = self.normalize_formula(formula)
-        print(f"  Normalized formula: {norm_formula}")
-
-        # Process only if material in local dataset 
-        if norm_formula not in self.formula_lookup:
-                print(f"  Formula {norm_formula} not found in local database")
-                return None
-            
-        self.matched_count += 1
-        print(f"  ✓ Match found! ({self.matched_count}/{self.processed_count})")
-        
-        local_data_entry = self.formula_lookup[norm_formula]
-
-        structure = Structure.from_dict(jid_data["atoms"])
-        analyzer = SpacegroupAnalyzer(structure, symprec=0.1)
-        sg_number_from_jarvis = analyzer.get_space_group_number()
-
-        norm_formula = self.normalize_formula(jid_data['formula'])
-    
-        # This assumes your CSV has a 'Spacegroup_Number' column
-        local_entry = self.formula_lookup.get(norm_formula)
-        
-        if not local_entry or local_entry.get('Spacegroup_Number') != sg_number_from_jarvis:
-            # No match, OR the formula matches but the space group does NOT.
-            # This is the more robust check.
-            print(f"  Skipping {jid} ({norm_formula}, SG {sg_number_from_jarvis}): No matching entry in local DB with this space group.")
-            return None
-    
-        self.matched_count += 1
-
-        print(f"  ✓ Match found! ({self.matched_count}/{self.processed_count})")
-            
-        local_data_entry = self.formula_lookup[norm_formula]
-        
-        # 3. Create Structure object
-        try:
-            structure = Structure.from_dict(jid_data["atoms"])
-            print(f"  Structure created: {len(structure)} atoms")
-        except Exception as e:
-            print(f"  Error creating structure: {e}")
-            return None
-
-        # 4. Extract Asymmetric Unit & Symmetry
-        try:
-            analyzer = SpacegroupAnalyzer(structure, symprec=0.1)
-            space_group = analyzer.get_space_group_symbol()
-            print(f"  Space group: {space_group}")
-            
-            # Get primitive structure for graph generation
-            primitive_structure = analyzer.get_primitive_standard_structure()
-            symm_ops = analyzer.get_symmetry_operations(cartesian=True)
-            print(f"  Symmetry operations: {len(symm_ops)}")
-            
-        except Exception as e:
-            print(f"  Error in symmetry analysis: {e}")
-            primitive_structure = structure
-            symm_ops = []
-
-        # 5. Generate Graphs and Features
-        print("  Generating features...")
-        
-        # Crystal graph
-        crystal_graph = self._create_crystal_graph(primitive_structure)
-        print(f"  Crystal graph: {crystal_graph.x.shape[0]} nodes, {crystal_graph.edge_index.shape[1]} edges")
-        
-        # ASPH features
-        asph_vector = self._compute_asph_features(structure)
-        print(f"  ASPH features: {asph_vector.shape}")
-        
-        # Band representation features
-        band_rep_vector, target_y = self._featurize_bilbao_data(local_data_entry)
-        print(f"  Band rep features: {band_rep_vector.shape}, Target: {target_y.item()}")
-        
-        # K-space graph
-        kspace_graph = self._create_kspace_graph(band_rep_vector)
-        print(f"  K-space graph: {kspace_graph.x.shape[0]} nodes")
-        
-        # Set the target 'y' on the primary graph object
-        crystal_graph.y = target_y
-
-        # 6. Assemble the final data block
-        data_block = {
-            'jid': jid,
-            'formula': formula,
-            'normalized_formula': norm_formula,
-            'crystal_graph': crystal_graph,
-            'kspace_graph': kspace_graph,
-            'asph_features': asph_vector,
-            'band_rep_features': band_rep_vector,
-            'target_label': target_y,
-            'symmetry_ops': {
-                'rotations': torch.stack([torch.tensor(op.rotation_matrix, dtype=torch.float) for op in symm_ops]) if symm_ops else torch.empty(0, 3, 3),
-                'translations': torch.stack([torch.tensor(op.translation_vector, dtype=torch.float) for op in symm_ops]) if symm_ops else torch.empty(0, 3)
-            },
-            'jarvis_props': {
-                'formation_energy': jid_data.get('form_energy_per_atom'),
-                'band_gap': jid_data.get('optb88vdw_bandgap'),
-                'space_group': space_group if 'space_group' in locals() else None
-            },
-            'local_topo_data': local_data_entry
-        }
-        
-        print(f"  ✓ Data block generated successfully")
-        return data_block
 
 def get_jarvis_jids(max_jids: int = 1000) -> List[str]:
     """Get a list of JIDs from JARVIS database."""
@@ -519,7 +575,7 @@ def main():
             continue
         
         # Process the material
-        material_block = analyzer.generate_data_block(jid)
+        material_block = analyzer.generate_data_block_with_sg_check(jid)
         
         if material_block:
             # Save the data block
