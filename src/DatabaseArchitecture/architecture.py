@@ -1,3 +1,7 @@
+# todo implement point cloud 
+# read poscar data from local file
+# figure out 
+
 import torch
 import pandas as pd
 import h5py
@@ -103,7 +107,7 @@ class MultiModalMaterialDatabase:
         """Hybrid format: HDF5 for arrays, JSON for metadata, separate graph files"""
         
         # 1. Structure data in HDF5 (efficient for arrays)
-        structure_path = self.base_path / 'structures' / f"{record.jid}.h5"
+        structure_path = self.base_path / 'structures' / f"{record.jid}.h5" 
         with h5py.File(structure_path, 'w') as f:
             f.create_dataset('lattice_matrix', data=record.lattice_matrix)
             f.create_dataset('atomic_positions', data=record.atomic_positions)
@@ -278,66 +282,146 @@ class EnhancedTopologicalMaterialAnalyzer(TopologicalMaterialAnalyzer):
         self.database = MultiModalMaterialDatabase(database_path)
     
     def generate_and_save_material_record(self, jid: str, 
-                                        format_type: str = 'hybrid') -> Optional[MaterialRecord]:
+                                    format_type: str = 'hybrid') -> Optional[MaterialRecord]:
         """Generate complete material record and save to database"""
-        
-        # Use your existing processing logic
+    
         data_block = self.generate_data_block_with_sg_check(jid)
         if not data_block:
             return None
         
-        # Convert to structured record
-        record = MaterialRecord(
-            jid=data_block['jid'],
-            formula=data_block['formula'],
-            normalized_formula=data_block['normalized_formula'],
-            space_group=data_block['jarvis_props']['space_group'],
-            space_group_number=data_block.get('space_group_number', 0),
+        try:
+            # Extract crystal graph data safely
+            crystal_graph = data_block['crystal_graph']
             
-            # Structure data
-            lattice_matrix=data_block['crystal_graph'].pos.numpy() if hasattr(data_block['crystal_graph'], 'pos') else np.zeros((3,3)),
-            atomic_positions=data_block['crystal_graph'].pos.numpy(),
-            atomic_numbers=[int(z) for z in data_block['crystal_graph'].x[:, 0] * 100],  # Denormalize
-            elements=data_block.get('elements', []),
+            # Get atomic positions from crystal graph
+            if hasattr(crystal_graph, 'pos') and crystal_graph.pos is not None:
+                atomic_positions = crystal_graph.pos.numpy()
+            else:
+                print(f"Warning: No atomic positions found for {jid}")
+                return None
             
-            # Graph data
-            crystal_graph=data_block['crystal_graph'],
-            kspace_graph=data_block['kspace_graph'],
+            # Get atomic numbers from crystal graph features
+            if hasattr(crystal_graph, 'x') and crystal_graph.x is not None:
+                # Assuming first column contains normalized atomic numbers
+                atomic_numbers = [int(z * 100) for z in crystal_graph.x[:, 0].numpy()]
+            else:
+                print(f"Warning: No atomic features found for {jid}")
+                return None
             
-            # Point cloud
-            asph_features=data_block['asph_features'].numpy(),
+            # Get lattice matrix from JARVIS properties
+            jarvis_props = data_block.get('jarvis_props', {})
             
-            # Labels
-            topological_class=data_block.get('topological_class', 'Unknown'),
-            topological_binary=float(data_block['target_label'].item()),
-            band_gap=data_block['jarvis_props']['band_gap'],
-            formation_energy=data_block['jarvis_props']['formation_energy'],
+            # Try to get lattice from JARVIS data
+            if 'lattice_abc' in jarvis_props and 'lattice_angles' in jarvis_props:
+                # Convert from abc + angles to matrix (you'll need to implement this)
+                lattice_matrix = self._abc_angles_to_matrix(
+                    jarvis_props['lattice_abc'], 
+                    jarvis_props['lattice_angles']
+                )
+            else:
+                # Fallback: create identity matrix scaled by average position
+                lattice_matrix = np.eye(3) * 10.0  # Default 10 Angstrom cell
             
-            # Metadata
-            symmetry_operations=data_block['symmetry_ops'],
-            local_database_props=data_block['local_topo_data'],
-            processing_timestamp=pd.Timestamp.now().isoformat()
-        )
-        
-        # Save to database
-        self.database.save_material_record(record, format_type)
-        return record
-    
+            # Get elements list
+            elements = data_block.get('elements', [])
+            if not elements and 'formula' in data_block:
+                # Try to extract elements from formula
+                elements = self._extract_elements_from_formula(data_block['formula'])
+            
+            # Create the record
+            record = MaterialRecord(
+                jid=data_block['jid'],
+                formula=data_block.get('formula', 'Unknown'),
+                normalized_formula=data_block.get('normalized_formula', 'Unknown'),
+                space_group=jarvis_props.get('space_group', 'Unknown'),
+                space_group_number=jarvis_props.get('space_group_number', 0),
+                
+                # Structure data
+                lattice_matrix=lattice_matrix,
+                atomic_positions=atomic_positions,
+                atomic_numbers=atomic_numbers,
+                elements=elements,
+                
+                # Graph data
+                crystal_graph=data_block['crystal_graph'],
+                kspace_graph=data_block['kspace_graph'],
+                
+                # Point cloud
+                asph_features=data_block['asph_features'].numpy(),
+                
+                # Labels
+                topological_class=data_block.get('topological_class', 'Unknown'),
+                topological_binary=float(data_block['target_label'].item()),
+                band_gap=jarvis_props.get('band_gap'),
+                formation_energy=jarvis_props.get('formation_energy'),
+                
+                # Metadata
+                symmetry_operations=data_block.get('symmetry_ops', {}),
+                local_database_props=data_block.get('local_topo_data', {}),
+                processing_timestamp=pd.Timestamp.now().isoformat()
+            )
+            
+            # Save to database
+            self.database.save_material_record(record, format_type)
+            return record
+            
+        except Exception as e:
+            print(f"Error creating material record for {jid}: {str(e)}")
+            return None
 
+    def _abc_angles_to_matrix(self, abc: List[float], angles: List[float]) -> np.ndarray:
+        """Convert lattice parameters (a,b,c,alpha,beta,gamma) to matrix"""
+        a, b, c = abc
+        alpha, beta, gamma = np.radians(angles)  # Convert to radians
+        
+        # Standard conversion from lattice parameters to matrix
+        cos_alpha = np.cos(alpha)
+        cos_beta = np.cos(beta)
+        cos_gamma = np.cos(gamma)
+        sin_gamma = np.sin(gamma)
+        
+        # Calculate lattice vectors
+        ax = a
+        ay = 0
+        az = 0
+        
+        bx = b * cos_gamma
+        by = b * sin_gamma
+        bz = 0
+        
+        cx = c * cos_beta
+        cy = c * (cos_alpha - cos_beta * cos_gamma) / sin_gamma
+        cz = c * np.sqrt(1 - cos_beta**2 - ((cos_alpha - cos_beta * cos_gamma) / sin_gamma)**2)
+        
+        return np.array([
+            [ax, ay, az],
+            [bx, by, bz],
+            [cx, cy, cz]
+        ])
+
+    def _extract_elements_from_formula(self, formula: str) -> List[str]:
+        """Extract element symbols from chemical formula"""
+        import re
+        
+        # Find all element symbols (capital letter followed by optional lowercase)
+        elements = re.findall(r'[A-Z][a-z]?', formula)
+        return elements
+    
 def main():
-    """Main execution function."""
+    """Main execution function with proper database integration."""
     # --- Configuration ---
     csv_path = "/Users/abiralshakya/Documents/Research/GraphVectorTopological/materials_database.csv"
-    output_dir = "./graph_vector_dataset"
+    output_dir = "./graph_vector_dataset"  # Keep this for backward compatibility
     db_path = "/Users/abiralshakya/Documents/Research/GraphVectorTopological/src/db_all"
+    
     os.makedirs(output_dir, exist_ok=True)
     
     # Configuration
     max_materials = 10  # Start with a smaller number for testing
     
-    # --- Initialize Analyzer ---
-    print("Initializing Topological Material Analyzer...")
-    analyzer = EnhancedTopologicalMaterialAnalyzer(csv_path=csv_path, database_path = db_path)
+    # --- Initialize Enhanced Analyzer ---
+    print("Initializing Enhanced Topological Material Analyzer...")
+    analyzer = EnhancedTopologicalMaterialAnalyzer(csv_path=csv_path, database_path=db_path)
     
     if not analyzer.formula_lookup:
         print("ERROR: No materials loaded from local database. Please check the CSV file.")
@@ -349,45 +433,86 @@ def main():
     # --- Main Processing Loop ---
     print(f"\nStarting data generation for up to {len(jids_to_process)} materials...")
     print(f"Looking for matches in local database with {len(analyzer.formula_lookup)} materials...")
+    print(f"Database will be saved to: {db_path}")
     
     successful_generations = 0
+    successful_db_saves = 0
     
     for i, jid in enumerate(tqdm.tqdm(jids_to_process, desc="Processing JIDs")):
-        output_path = os.path.join(output_dir, f"{jid}.pt")
-        
-        # Skip if already processed
-        if os.path.exists(output_path):
+        # Check if already processed in database
+        metadata_path = Path(db_path) / 'metadata' / f"{jid}.json"
+        if metadata_path.exists():
+            print(f"Skipping {jid} - already exists in database")
             successful_generations += 1
+            successful_db_saves += 1
             continue
         
-        # Process the material
-        material_block = analyzer.generate_data_block_with_sg_check(jid)
-        
-        if material_block:
-            # Save the data block
-            torch.save(material_block, output_path)
-            successful_generations += 1
+        # Generate and save material record using the enhanced analyzer
+        try:
+            record = analyzer.generate_and_save_material_record(jid, format_type='hybrid')
             
-            # Save metadata as JSON for easy inspection
-            metadata_path = os.path.join(output_dir, f"{jid}_metadata.json")
-            metadata = {
-                'jid': material_block['jid'],
-                'formula': material_block['formula'],
-                'normalized_formula': material_block['normalized_formula'],
-                'target_label': material_block['target_label'].item(),
-                'num_atoms': material_block['crystal_graph'].x.shape[0],
-                'num_edges': material_block['crystal_graph'].edge_index.shape[1],
-                'jarvis_props': material_block['jarvis_props']
-            }
-            with open(metadata_path, 'w') as f:
-                json.dump(metadata, f, indent=2)
+            if record:
+                successful_generations += 1
+                successful_db_saves += 1
+                
+                # Also save old format for backward compatibility (optional)
+                old_output_path = os.path.join(output_dir, f"{jid}.pt")
+                if not os.path.exists(old_output_path):
+                    # Generate the old data block format
+                    material_block = analyzer.generate_data_block_with_sg_check(jid)
+                    if material_block:
+                        torch.save(material_block, old_output_path)
+                        
+                        # Save metadata as JSON for easy inspection
+                        metadata_path = os.path.join(output_dir, f"{jid}_metadata.json")
+                        metadata = {
+                            'jid': material_block['jid'],
+                            'formula': material_block['formula'],
+                            'normalized_formula': material_block['normalized_formula'],
+                            'target_label': material_block['target_label'].item(),
+                            'num_atoms': material_block['crystal_graph'].x.shape[0],
+                            'num_edges': material_block['crystal_graph'].edge_index.shape[1],
+                            'jarvis_props': material_block['jarvis_props']
+                        }
+                        with open(metadata_path, 'w') as f:
+                            json.dump(metadata, f, indent=2)
+                
+                print(f"✓ Successfully processed and saved {jid} to database")
+            else:
+                print(f"✗ Failed to process {jid}")
+                
+        except Exception as e:
+            print(f"✗ Error processing {jid}: {str(e)}")
+            continue
         
-        # Print progress every 10 materials
-        if (i + 1) % 10 == 0:
-            print(f"\nProgress: {i+1}/{len(jids_to_process)} processed, {successful_generations} successful, {analyzer.matched_count} matches found")
+        # Print progress every 5 materials
+        if (i + 1) % 5 == 0:
+            print(f"\nProgress: {i+1}/{len(jids_to_process)} processed")
+            print(f"  Database saves: {successful_db_saves}")
+            print(f"  Matches found: {analyzer.matched_count}")
         
         # Small delay to be respectful to the API
         time.sleep(0.1)
+    
+    # --- Create Master Index and ML Datasets ---
+    if successful_db_saves > 0:
+        print("\n" + "="*60)
+        print("CREATING MASTER INDEX AND ML DATASETS...")
+        print("="*60)
+        
+        try:
+            # Create master index
+            master_df = analyzer.database.create_master_index()
+            print(f"✓ Master index created with {len(master_df)} materials")
+            
+            # Create ML datasets
+            split_paths = analyzer.database.create_ml_datasets()
+            print("✓ ML dataset splits created:")
+            for split_name, path in split_paths.items():
+                print(f"  {split_name}: {path}")
+                
+        except Exception as e:
+            print(f"✗ Error creating master index/datasets: {str(e)}")
     
     # --- Final Report ---
     print(f"\n" + "="*60)
@@ -396,9 +521,71 @@ def main():
     print(f"Total JIDs processed: {analyzer.processed_count}")
     print(f"Matches found in local DB: {analyzer.matched_count}")
     print(f"Successful data blocks: {successful_generations}")
-    print(f"Success rate: {successful_generations/analyzer.processed_count*100:.1f}%")
-    print(f"Dataset location: {output_dir}")
+    print(f"Successful database saves: {successful_db_saves}")
+    print(f"Success rate: {successful_generations/analyzer.processed_count*100:.1f}% (processing)")
+    print(f"Database save rate: {successful_db_saves/analyzer.processed_count*100:.1f}% (database)")
+    print(f"Database location: {db_path}")
+    print(f"Legacy dataset location: {output_dir}")
     print(f"="*60)
+    
+    # Print directory structure
+    db_path_obj = Path(db_path)
+    if db_path_obj.exists():
+        print(f"\nDatabase structure:")
+        for item in sorted(db_path_obj.rglob("*")):
+            if item.is_file():
+                rel_path = item.relative_to(db_path_obj)
+                print(f"  {rel_path}")
+
+
+def inspect_database(db_path: str):
+    """Helper function to inspect what's in the database"""
+    db_path_obj = Path(db_path)
+    
+    print(f"Database inspection: {db_path}")
+    print("="*50)
+    
+    if not db_path_obj.exists():
+        print("Database directory does not exist!")
+        return
+    
+    # Check each subdirectory
+    subdirs = ['structures', 'graphs', 'metadata', 'datasets']
+    for subdir in subdirs:
+        subdir_path = db_path_obj / subdir
+        if subdir_path.exists():
+            files = list(subdir_path.rglob("*"))
+            files = [f for f in files if f.is_file()]
+            print(f"{subdir}: {len(files)} files")
+            for f in files[:3]:  # Show first 3 files
+                print(f"  - {f.name}")
+            if len(files) > 3:
+                print(f"  ... and {len(files) - 3} more")
+        else:
+            print(f"{subdir}: directory not found")
+    
+    # Check master index
+    master_csv = db_path_obj / 'master_index.csv'
+    master_parquet = db_path_obj / 'master_index.parquet'
+    
+    if master_csv.exists():
+        df = pd.read_csv(master_csv)
+        print(f"Master index: {len(df)} materials")
+        if len(df) > 0:
+            print(f"  Columns: {list(df.columns)}")
+            print(f"  Topological materials: {(df['topological_binary'] == 1).sum()}")
+    else:
+        print("Master index: not found")
+
+
+# Add this at the end of main() if you want to inspect right after
+def main_with_inspection():
+    """Main function with database inspection"""
+    main()
+    
+    # Inspect the database after processing
+    db_path = "/Users/abiralshakya/Documents/Research/GraphVectorTopological/src/db_all"
+    inspect_database(db_path)
 
 if __name__ == "__main__":
     main()
