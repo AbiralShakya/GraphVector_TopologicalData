@@ -1,6 +1,9 @@
-# todo implement point cloud 
-# read poscar data from local file
-# figure out 
+# all of this is for non magnetic
+# rather than saving k space graph for all, just link it to given space group's k space graph
+# homology point cloud for atom build, vectorize it
+# atom graph from poscar build
+# use materials project instead of jarvis since we can query 2d materials in mat project and mat project has all the relevant materials
+
 
 import torch
 import pandas as pd
@@ -12,28 +15,25 @@ from typing import Dict, Optional, List, Tuple, Union
 import numpy as np
 from dataclasses import dataclass, asdict
 import pickle
-from build_dataset_test import TopologicalMaterialAnalyzer
+from dataset_builder_backend import TopologicalMaterialAnalyzer 
 import time
 import tqdm
-from jarvis.db.figshare import data as jdata
+from dataset_builder_backend import KSpaceGraphBuilder
 
-def get_jarvis_jids(max_jids: int = 1000) -> List[str]:
-    """Get a list of JIDs from JARVIS database."""
-    print(f"Fetching JID list from JARVIS (max: {max_jids})...")
-    
-    # You can get JIDs in several ways:
-    # 1. From a specific range
-    jid_list = []
-    for i in range(1, max_jids + 1):
-        jid_list.append(f"JVASP-{i}")
-    
-    print(f"Generated {len(jid_list)} JIDs")
-    return jid_list
+from pymatgen.ext.matproj import MPRester
+from pymatgen.core import Structure
+from pymatgen.analysis.structure_matcher import StructureMatcher
 
+# Assuming TopologicalMaterialAnalyzer and its dependencies are available
+# (e.g., from build_dataset_test.py or defined within this file)
+# If TopologicalMaterialAnalyzer uses JARVIS data, you'll need to adapt it
+# to accept Structure objects from pymatgen, or to fetch data itself.
 
+# --- Keep your existing classes and methods (MaterialRecord, MultiModalMaterialDatabase, POSCARReader) ---
+# (I'll omit them here for brevity, assuming they are in your full script)
 @dataclass
 class MaterialRecord:
-    """Structured material record with all 4 data modalities"""
+    """Enhanced material record with vectorized features and expanded MP data"""
     jid: str
     formula: str
     normalized_formula: str
@@ -46,140 +46,290 @@ class MaterialRecord:
     elements: List[str]
     
     crystal_graph: Dict  # Real-space graph
-    kspace_graph: Dict   # K-space graph
+    kspace_graph_reference: str  # Reference to shared space group k-space graph
     
-    asph_features: np.ndarray
+    asph_features: np.ndarray  
+    vectorized_features: Dict 
     
-    topological_class: str  # 'TI', 'SM', 'NI', etc.
+    topological_class: str  # 'TI', 'SM', 'NI'
     topological_binary: float  # 0 or 1
+    
     band_gap: Optional[float]
     formation_energy: Optional[float]
+    energy_above_hull: Optional[float]
+    density: Optional[float]
+    volume: Optional[float]
+    nsites: Optional[int]
+    total_magnetization: Optional[float]
+    magnetic_type: Optional[str]
+    theoretical: Optional[bool]
+    stability: Optional[Dict]
+    electronic_structure: Optional[Dict]
+    mechanical_properties: Optional[Dict]
     
     symmetry_operations: Dict
     local_database_props: Dict
     processing_timestamp: str
 
+
+class PointCloudVectorizer:
+    """Task 1: Vectorize point cloud features for compatibility with non-GNN models"""
+    
+    @staticmethod
+    def vectorize_point_cloud(point_cloud: np.ndarray, methods: List[str] = None) -> Dict[str, np.ndarray]:
+        """
+        Convert point cloud to multiple vectorized representations
+        
+        Args:
+            point_cloud: Original point cloud features (N x D)
+            methods: List of vectorization methods to apply
+        
+        Returns:
+            Dictionary of vectorized features
+        """
+        if methods is None:
+            methods = ['statistical', 'histogram', 'moments', 'pca', 'aggregated']
+        
+        vectorized = {}
+        
+        if 'statistical' in methods:
+            vectorized['statistical'] = PointCloudVectorizer._statistical_features(point_cloud)
+        
+        if 'histogram' in methods:
+            vectorized['histogram'] = PointCloudVectorizer._histogram_features(point_cloud)
+        
+        if 'moments' in methods:
+            vectorized['moments'] = PointCloudVectorizer._moment_features(point_cloud)
+        
+        if 'pca' in methods:
+            vectorized['pca'] = PointCloudVectorizer._pca_features(point_cloud)
+        
+        if 'aggregated' in methods:
+            vectorized['aggregated'] = PointCloudVectorizer._aggregated_features(point_cloud)
+        
+        if 'bag_of_words' in methods:
+            vectorized['bag_of_words'] = PointCloudVectorizer._bag_of_words_features(point_cloud)
+        
+        return vectorized
+    
+
+    @staticmethod
+    def _statistical_features(point_cloud: np.ndarray) -> np.ndarray:
+        """Extract statistical features: mean, std, min, max, median, skew, kurtosis"""
+        from scipy import stats
+        
+        features = []
+        # Per-dimension statistics
+        features.extend(np.mean(point_cloud, axis=0))  # Mean per dimension
+        features.extend(np.std(point_cloud, axis=0))   # Std per dimension
+        features.extend(np.min(point_cloud, axis=0))   # Min per dimension
+        features.extend(np.max(point_cloud, axis=0))   # Max per dimension
+        features.extend(np.median(point_cloud, axis=0)) # Median per dimension
+        
+        # Global statistics
+        features.append(np.mean(point_cloud))  # Overall mean
+        features.append(np.std(point_cloud))   # Overall std
+        features.append(np.min(point_cloud))   # Overall min
+        features.append(np.max(point_cloud))   # Overall max
+        
+        # Higher-order moments per dimension
+        for dim in range(point_cloud.shape[1]):
+            features.append(stats.skew(point_cloud[:, dim]))     # Skewness
+            features.append(stats.kurtosis(point_cloud[:, dim])) # Kurtosis
+        
+        return np.array(features)
+
+
+    @staticmethod
+    def _histogram_features(point_cloud: np.ndarray, bins: int = 10) -> np.ndarray:
+        """Convert to histogram representation"""
+        features = []
+        
+        # Per-dimension histograms
+        for dim in range(point_cloud.shape[1]):
+            hist, _ = np.histogram(point_cloud[:, dim], bins=bins, density=True)
+            features.extend(hist)
+        
+        # Overall histogram (flattened point cloud)
+        hist, _ = np.histogram(point_cloud.flatten(), bins=bins, density=True)
+        features.extend(hist)
+        
+        return np.array(features)
+    
+    @staticmethod
+    def _moment_features(point_cloud: np.ndarray, max_moment: int = 4) -> np.ndarray:
+        """Extract statistical moments up to specified order"""
+        from scipy import stats
+        
+        features = []
+        
+        for moment in range(1, max_moment + 1):
+            # Per-dimension moments
+            for dim in range(point_cloud.shape[1]):
+                features.append(stats.moment(point_cloud[:, dim], moment=moment))
+        
+        return np.array(features)
+    
+    @staticmethod
+    def _pca_features(point_cloud: np.ndarray, n_components: int = 10) -> np.ndarray:
+        """Extract PCA-based features"""
+        from sklearn.decomposition import PCA
+        
+        # Ensure we don't request more components than available
+        n_components = min(n_components, min(point_cloud.shape) - 1)
+        
+        if n_components <= 0:
+            return np.array([])
+        
+        pca = PCA(n_components=n_components)
+        
+        try:
+            pca_transformed = pca.fit_transform(point_cloud)
+            
+            features = []
+            # Principal component statistics
+            features.extend(np.mean(pca_transformed, axis=0))
+            features.extend(np.std(pca_transformed, axis=0))
+            
+            # Explained variance ratios
+            features.extend(pca.explained_variance_ratio_)
+            
+            return np.array(features)
+        except:
+            # Return zeros if PCA fails
+            return np.zeros(n_components * 3)
+    
+    @staticmethod
+    def _aggregated_features(point_cloud: np.ndarray) -> np.ndarray:
+        """Aggregated features using different pooling operations"""
+        features = []
+        
+        # Different pooling operations
+        features.extend(np.mean(point_cloud, axis=0))    # Mean pooling
+        features.extend(np.max(point_cloud, axis=0))     # Max pooling
+        features.extend(np.min(point_cloud, axis=0))     # Min pooling
+        features.extend(np.median(point_cloud, axis=0))  # Median pooling
+        
+        # L2 norm per dimension
+        features.extend(np.linalg.norm(point_cloud, axis=0))
+        
+        # Range per dimension
+        features.extend(np.ptp(point_cloud, axis=0))
+        
+        return np.array(features)
+    
+    @staticmethod
+    def _bag_of_words_features(point_cloud: np.ndarray, n_clusters: int = 50) -> np.ndarray:
+        """Bag of words representation using k-means clustering"""
+        from sklearn.cluster import KMeans
+        
+        try:
+            # Fit k-means to create "visual words"
+            kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+            labels = kmeans.fit_predict(point_cloud)
+            
+            # Create histogram of cluster assignments
+            hist, _ = np.histogram(labels, bins=n_clusters, range=(0, n_clusters-1))
+            
+            # Normalize to get frequencies
+            hist = hist.astype(float) / len(labels)
+            
+            return hist
+        except:
+            # Return zeros if clustering fails
+            return np.zeros(n_clusters)
+
+class SpaceGroupManager:
+    """Task 3: Manage shared space group k-space graphs to reduce redundancy"""
+    
+    def __init__(self, base_path: str):
+        self.base_path = Path(base_path)
+        self.space_group_graphs_dir = self.base_path / 'space_group_graphs'
+        self.space_group_graphs_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Cache for loaded space group graphs
+        self._cached_graphs = {}
+    
+    def get_space_group_graph_path(self, space_group_number: int) -> Path:
+        """Get the file path for a space group k-space graph"""
+        return self.space_group_graphs_dir / f'sg_{space_group_number}_kspace.pt'
+    
+    def save_space_group_graph(self, space_group_number: int, kspace_graph: Dict) -> str:
+        """
+        Save k-space graph for a space group (only if it doesn't exist)
+        Returns reference string for the graph
+        """
+        graph_path = self.get_space_group_graph_path(space_group_number)
+        
+        if not graph_path.exists():
+            torch.save(kspace_graph, graph_path)
+            print(f"Saved k-space graph for space group {space_group_number}")
+        
+        # Return relative path as reference
+        return str(graph_path.relative_to(self.base_path))
+    
+    def load_space_group_graph(self, space_group_number: int) -> Optional[Dict]:
+        """Load k-space graph for a space group with caching"""
+        
+        # Check cache first
+        if space_group_number in self._cached_graphs:
+            return self._cached_graphs[space_group_number]
+        
+        graph_path = self.get_space_group_graph_path(space_group_number)
+        
+        if graph_path.exists():
+            try:
+                graph = torch.load(graph_path)
+                self._cached_graphs[space_group_number] = graph
+                return graph
+            except Exception as e:
+                print(f"Error loading space group graph {space_group_number}: {e}")
+                return None
+        else:
+            print(f"Space group graph {space_group_number} not found")
+            return None
+    
+    def get_graph_reference(self, space_group_number: int) -> str:
+        """Get reference string for space group graph"""
+        graph_path = self.get_space_group_graph_path(space_group_number)
+        return str(graph_path.relative_to(self.base_path))
+    
+    def create_space_group_index(self) -> pd.DataFrame:
+        """Create an index of all available space group graphs"""
+        space_group_files = list(self.space_group_graphs_dir.glob('sg_*_kspace.pt'))
+        
+        records = []
+        for file in space_group_files:
+            # Extract space group number from filename
+            sg_num = int(file.stem.split('_')[1])
+            
+            records.append({
+                'space_group_number': sg_num,
+                'file_path': str(file.relative_to(self.base_path)),
+                'file_size_mb': file.stat().st_size / (1024 * 1024),
+                'exists': True
+            })
+        
+        df = pd.DataFrame(records)
+        if not df.empty:
+            df = df.sort_values('space_group_number')
+        
+        # Save index
+        index_path = self.space_group_graphs_dir / 'space_group_index.csv'
+        df.to_csv(index_path, index=False)
+        
+        return df
+    
+
 class MultiModalMaterialDatabase:
-    """
-    Enhanced database structure for multi-modal materials data
-    Supports multiple storage formats and efficient querying
-    """
+    """Enhanced database with vectorized features and space group optimization"""
     
     def __init__(self, base_path: str):
         self.base_path = Path(base_path)
         self.setup_directory_structure()
-        
-    def setup_directory_structure(self):
-        """Create organized directory structure"""
-        directories = [
-            'raw_data',           # Original JARVIS + local data
-            'structures',         # POSCAR files and structure data
-            'graphs',            # Graph representations
-            'point_clouds',      # Topological/ASPH features
-            'metadata',          # JSON metadata and indices
-            'datasets',          # Processed datasets for ML
-            'analysis'           # Analysis results and visualizations
-        ]
-        
-        for dir_name in directories:
-            (self.base_path / dir_name).mkdir(parents=True, exist_ok=True)
-    
-    def save_material_record(self, record: MaterialRecord, 
-                           format_type: str = 'hybrid') -> None:
-        """
-        Save material record in specified format
-        
-        Formats:
-        - 'hybrid': Combination of HDF5 + JSON + individual files
-        - 'hdf5': Everything in HDF5 (efficient, but less human-readable)
-        - 'individual': Separate files for each component (most flexible)
-        """
-        
-        if format_type == 'hybrid':
-            self._save_hybrid_format(record)
-        elif format_type == 'hdf5':
-            self._save_hdf5_format(record)
-        elif format_type == 'individual':
-            self._save_individual_format(record)
-        else:
-            raise ValueError(f"Unknown format: {format_type}")
-    
-    def _save_hybrid_format(self, record: MaterialRecord):
-        """Hybrid format: HDF5 for arrays, JSON for metadata, separate graph files"""
-        
-        # 1. Structure data in HDF5 (efficient for arrays)
-        structure_path = self.base_path / 'structures' / f"{record.jid}.h5" 
-        with h5py.File(structure_path, 'w') as f:
-            f.create_dataset('lattice_matrix', data=record.lattice_matrix)
-            f.create_dataset('atomic_positions', data=record.atomic_positions)
-            f.create_dataset('atomic_numbers', data=record.atomic_numbers)
-            f.create_dataset('asph_features', data=record.asph_features)
-            
-            # Store strings as fixed-length or variable-length
-            f.create_dataset('elements', data=[s.encode('utf-8') for s in record.elements])
-        
-        # 2. Graph data as PyTorch files (preserves tensor structure)
-        graph_dir = self.base_path / 'graphs' / record.jid
-        graph_dir.mkdir(exist_ok=True)
-        
-        torch.save(record.crystal_graph, graph_dir / 'crystal_graph.pt')
-        torch.save(record.kspace_graph, graph_dir / 'kspace_graph.pt')
-        
-        # 3. Metadata as JSON (human-readable)
-        metadata = {
-            'jid': record.jid,
-            'formula': record.formula,
-            'normalized_formula': record.normalized_formula,
-            'space_group': record.space_group,
-            'space_group_number': record.space_group_number,
-            'topological_class': record.topological_class,
-            'topological_binary': record.topological_binary,
-            'band_gap': record.band_gap,
-            'formation_energy': record.formation_energy,
-            'processing_timestamp': record.processing_timestamp,
-            'local_database_props': record.local_database_props,
-            'file_locations': {
-                'structure': str(structure_path.relative_to(self.base_path)),
-                'crystal_graph': str((graph_dir / 'crystal_graph.pt').relative_to(self.base_path)),
-                'kspace_graph': str((graph_dir / 'kspace_graph.pt').relative_to(self.base_path))
-            }
-        }
-        
-        metadata_path = self.base_path / 'metadata' / f"{record.jid}.json"
-        with open(metadata_path, 'w') as f:
-            json.dump(metadata, f, indent=2)
-    
-    def _save_individual_format(self, record: MaterialRecord):
-        """Individual files for maximum flexibility and interoperability"""
-        
-        jid_dir = self.base_path / 'individual' / record.jid
-        jid_dir.mkdir(parents=True, exist_ok=True)
-        
-        # 1. POSCAR file (standard crystal structure format)
-        poscar_content = self._create_poscar_string(record)
-        with open(jid_dir / 'POSCAR', 'w') as f:
-            f.write(poscar_content)
-        
-        # 2. Crystal graph as GraphML (interoperable)
-        self._save_graph_as_graphml(record.crystal_graph, jid_dir / 'crystal_graph.graphml')
-        
-        # 3. K-space graph as GraphML
-        self._save_graph_as_graphml(record.kspace_graph, jid_dir / 'kspace_graph.graphml')
-        
-        # 4. Point cloud data as CSV
-        asph_df = pd.DataFrame(record.asph_features.reshape(1, -1))
-        asph_df.to_csv(jid_dir / 'asph_features.csv', index=False)
-        
-        # 5. Complete metadata as JSON
-        metadata = asdict(record)
-        # Convert numpy arrays to lists for JSON serialization
-        metadata['lattice_matrix'] = record.lattice_matrix.tolist()
-        metadata['atomic_positions'] = record.atomic_positions.tolist()
-        metadata['asph_features'] = record.asph_features.tolist()
-        
-        with open(jid_dir / 'metadata.json', 'w') as f:
-            json.dump(metadata, f, indent=2)
-    
+        self.vectorizer = PointCloudVectorizer()
+        self.space_group_manager = SpaceGroupManager(base_path)
+
     def create_master_index(self) -> pd.DataFrame:
         """Create a master index/catalog of all materials"""
         
@@ -191,6 +341,10 @@ class MultiModalMaterialDatabase:
                 metadata = json.load(f)
                 records.append(metadata)
         
+        if not records:
+            print("No metadata files found!")
+            return pd.DataFrame()
+        
         df = pd.DataFrame(records)
         
         # Save as both CSV (human-readable) and parquet (efficient)
@@ -198,45 +352,215 @@ class MultiModalMaterialDatabase:
         df.to_parquet(self.base_path / 'master_index.parquet', index=False)
         
         return df
+        
+    def setup_directory_structure(self):
+        """Create organized directory structure with new additions"""
+        directories = [
+            'raw_data',           # Original data
+            'structures',         # POSCAR files and structure data
+            'graphs',            # Material-specific crystal graphs
+            'space_group_graphs', # Shared k-space graphs by space group
+            'point_clouds',      # Original topological/ASPH features
+            'vectorized_features', # Vectorized representations
+            'metadata',          # JSON metadata and indices
+            'datasets',          # Processed datasets for ML
+            'analysis'           # Analysis results and visualizations
+        ]
+        
+        for dir_name in directories:
+            (self.base_path / dir_name).mkdir(parents=True, exist_ok=True)
     
-    def create_ml_datasets(self, train_split: float = 0.8, 
-                          val_split: float = 0.1) -> Dict[str, str]:
-        """Create train/val/test splits for ML"""
+    def save_material_record(self, record: MaterialRecord, 
+                           format_type: str = 'hybrid') -> None:
+        """Enhanced save with vectorized features and space group optimization"""
         
-        df = self.create_master_index()
+        if format_type == 'hybrid':
+            self._save_hybrid_format_enhanced(record)
+        elif format_type == 'hdf5':
+            self._save_hdf5_format(record)
+        elif format_type == 'individual':
+            self._save_individual_format_enhanced(record)
+        else:
+            raise ValueError(f"Unknown format: {format_type}")
+    
+    def _save_hybrid_format_enhanced(self, record: MaterialRecord):
+        """Enhanced hybrid format with vectorized features"""
         
-        # Stratified split by topological class
-        from sklearn.model_selection import train_test_split
-        
-        # First split: train vs (val + test)
-        train_df, temp_df = train_test_split(
-            df, train_size=train_split, 
-            stratify=df['topological_binary'],
-            random_state=42
-        )
-        
-        # Second split: val vs test
-        val_size = val_split / (1 - train_split)
-        val_df, test_df = train_test_split(
-            temp_df, train_size=val_size,
-            stratify=temp_df['topological_binary'],
-            random_state=42
-        )
-        
-        # Save splits
-        splits = {'train': train_df, 'val': val_df, 'test': test_df}
-        split_paths = {}
-        
-        for split_name, split_df in splits.items():
-            split_path = self.base_path / 'datasets' / f'{split_name}_split.csv'
-            split_df.to_csv(split_path, index=False)
-            split_paths[split_name] = str(split_path)
+        # 1. Structure data in HDF5
+        structure_path = self.base_path / 'structures' / f"{record.jid}.h5" 
+        with h5py.File(structure_path, 'w') as f:
+            f.create_dataset('lattice_matrix', data=record.lattice_matrix)
+            f.create_dataset('atomic_positions', data=record.atomic_positions)
+            f.create_dataset('atomic_numbers', data=record.atomic_numbers)
             
-            print(f"{split_name.capitalize()} set: {len(split_df)} materials")
-            print(f"  Topological: {(split_df['topological_binary'] == 1).sum()}")
-            print(f"  Non-topological: {(split_df['topological_binary'] == 0).sum()}")
+            dt = h5py.special_dtype(vlen=str)
+            f.create_dataset('elements', data=np.array(record.elements, dtype=object), dtype=dt)
         
-        return split_paths
+        # 2. Original point cloud data
+        point_cloud_path = self.base_path / 'point_clouds' / f"{record.jid}_asph.npy"
+        np.save(point_cloud_path, record.asph_features)
+
+        # Task 1: Save vectorized features
+        vectorized_dir = self.base_path / 'vectorized_features' / record.jid
+        vectorized_dir.mkdir(exist_ok=True)
+        
+        for method_name, features in record.vectorized_features.items():
+            feature_path = vectorized_dir / f"{method_name}.npy"
+            np.save(feature_path, features)
+
+        # 3. Crystal graph (material-specific)
+        graph_dir = self.base_path / 'graphs' / record.jid
+        graph_dir.mkdir(exist_ok=True)
+        torch.save(record.crystal_graph, graph_dir / 'crystal_graph.pt')
+        
+        # Task 3: K-space graph is now just a reference, not saved per material
+        # The actual k-space graph is managed by SpaceGroupManager
+
+        # 4. Create POSCAR file
+        poscar_path = self.base_path / 'structures' / f"{record.jid}_POSCAR"
+        poscar_content = self._create_poscar_string(record)
+        with open(poscar_path, 'w') as f:
+            f.write(poscar_content)
+        
+        # 5. Enhanced metadata with new MP properties
+        metadata = {
+            'jid': record.jid,
+            'formula': record.formula,
+            'normalized_formula': record.normalized_formula,
+            'space_group': record.space_group,
+            'space_group_number': record.space_group_number,
+            'topological_class': record.topological_class,
+            'topological_binary': record.topological_binary,
+            
+            # Task 2: Expanded MP properties
+            'band_gap': record.band_gap,
+            'formation_energy': record.formation_energy,
+            'energy_above_hull': record.energy_above_hull,
+            'density': record.density,
+            'volume': record.volume,
+            'nsites': record.nsites,
+            'total_magnetization': record.total_magnetization,
+            'magnetic_type': record.magnetic_type,
+            'theoretical': record.theoretical,
+            'stability': record.stability,
+            'electronic_structure': record.electronic_structure,
+            'mechanical_properties': record.mechanical_properties,
+            
+            'processing_timestamp': record.processing_timestamp,
+            'local_database_props': record.local_database_props,
+            'num_atoms': len(record.elements),
+            
+            # File locations
+            'file_locations': {
+                'structure_hdf5': str(structure_path.relative_to(self.base_path)),
+                'poscar': str(poscar_path.relative_to(self.base_path)),
+                'point_cloud': str(point_cloud_path.relative_to(self.base_path)),
+                'crystal_graph': str((graph_dir / 'crystal_graph.pt').relative_to(self.base_path)),
+                'kspace_graph_reference': record.kspace_graph_reference,
+                'vectorized_features_dir': str(vectorized_dir.relative_to(self.base_path))
+            },
+            
+            # Task 1: Vectorized feature info
+            'vectorized_methods': list(record.vectorized_features.keys()),
+            'vectorized_feature_sizes': {
+                method: features.shape[0] if hasattr(features, 'shape') else len(features)
+                for method, features in record.vectorized_features.items()
+            }
+        }
+        
+        metadata_path = self.base_path / 'metadata' / f"{record.jid}.json"
+        with open(metadata_path, 'w') as f:
+            json.dump(metadata, f, indent=2)
+    
+    def _save_individual_format_enhanced(self, record: MaterialRecord):
+        """Enhanced individual format with vectorized features"""
+        
+        jid_dir = self.base_path / 'individual' / record.jid
+        jid_dir.mkdir(parents=True, exist_ok=True)
+        
+        # 1. POSCAR file
+        poscar_content = self._create_poscar_string(record)
+        with open(jid_dir / 'POSCAR', 'w') as f:
+            f.write(poscar_content)
+        
+        # 2. Crystal graph as GraphML
+        self._save_graph_as_graphml(record.crystal_graph, jid_dir / 'crystal_graph.graphml')
+        
+        # Task 3: K-space graph reference instead of full graph
+        with open(jid_dir / 'kspace_graph_reference.txt', 'w') as f:
+            f.write(record.kspace_graph_reference)
+        
+        # 3. Original point cloud data as CSV
+        asph_df = pd.DataFrame(record.asph_features.reshape(1, -1))
+        asph_df.to_csv(jid_dir / 'asph_features.csv', index=False)
+        
+        # Task 1: Save vectorized features as separate CSVs
+        vectorized_dir = jid_dir / 'vectorized_features'
+        vectorized_dir.mkdir(exist_ok=True)
+        
+        for method_name, features in record.vectorized_features.items():
+            feature_df = pd.DataFrame(features.reshape(1, -1))
+            feature_df.to_csv(vectorized_dir / f'{method_name}.csv', index=False)
+        
+        # 4. Complete metadata as JSON
+        metadata = asdict(record)
+        # Convert numpy arrays to lists for JSON serialization
+        metadata['lattice_matrix'] = record.lattice_matrix.tolist()
+        metadata['atomic_positions'] = record.atomic_positions.tolist()
+        metadata['asph_features'] = record.asph_features.tolist()
+        metadata['vectorized_features'] = {
+            method: features.tolist() if hasattr(features, 'tolist') else features
+            for method, features in record.vectorized_features.items()
+        }
+        
+        with open(jid_dir / 'metadata.json', 'w') as f:
+            json.dump(metadata, f, indent=2)
+    
+    def create_vectorized_dataset(self, method: str = 'aggregated') -> pd.DataFrame:
+        """Task 1: Create dataset with vectorized features for non-GNN models"""
+        
+        records = []
+        metadata_dir = self.base_path / 'metadata'
+        
+        for json_file in metadata_dir.glob('*.json'):
+            with open(json_file, 'r') as f:
+                metadata = json.load(f)
+            
+            # Load the specific vectorized features
+            vectorized_dir = self.base_path / metadata['file_locations']['vectorized_features_dir']
+            feature_file = vectorized_dir / f"{method}.npy"
+            
+            if feature_file.exists():
+                features = np.load(feature_file)
+                
+                # Create record with features and metadata
+                record = {
+                    'jid': metadata['jid'],
+                    'formula': metadata['formula'],
+                    'space_group_number': metadata['space_group_number'],
+                    'topological_binary': metadata['topological_binary'],
+                    'band_gap': metadata['band_gap'],
+                    'formation_energy': metadata['formation_energy'],
+                    'density': metadata.get('density'),
+                    'volume': metadata.get('volume')
+                }
+                
+                # Add features as separate columns
+                for i, feature_val in enumerate(features):
+                    record[f'feature_{i}'] = feature_val
+                
+                records.append(record)
+        
+        df = pd.DataFrame(records)
+        
+        # Save vectorized dataset
+        output_path = self.base_path / 'datasets' / f'vectorized_{method}_dataset.csv'
+        df.to_csv(output_path, index=False)
+        
+        print(f"Created vectorized dataset with {len(df)} materials using {method} method")
+        print(f"Feature dimensions: {len([col for col in df.columns if col.startswith('feature_')])}")
+        
+        return df
     
     def _create_poscar_string(self, record: MaterialRecord) -> str:
         """Create POSCAR format string from material record"""
@@ -263,16 +587,19 @@ class MultiModalMaterialDatabase:
         lines.append("  ".join(map(str, element_counts)))
         lines.append("Direct")  # Fractional coordinates
         
+        # Convert cartesian to fractional coordinates
+        lattice_inv = np.linalg.inv(record.lattice_matrix)
+        fractional_positions = record.atomic_positions @ lattice_inv
+        
         # Atomic positions
-        for pos in record.atomic_positions:
+        for pos in fractional_positions:
             lines.append(f"  {pos[0]:12.6f}  {pos[1]:12.6f}  {pos[2]:12.6f}")
         
         return "\n".join(lines)
     
     def _save_graph_as_graphml(self, graph_data: Dict, filepath: Path):
         """Save graph in GraphML format for interoperability"""
-        # This is a simplified version - you'd need to implement
-        # conversion from your graph format to NetworkX/GraphML
+        # Placeholder - implement based on your graph structure
         pass
 
 class POSCARReader:
@@ -280,10 +607,7 @@ class POSCARReader:
     
     @staticmethod
     def read_poscar(poscar_path: str) -> Dict:
-        """
-        Read POSCAR file and extract structure information
-        Returns dict with lattice_matrix, atomic_positions, elements, etc.
-        """
+        """Read POSCAR file and extract structure information"""
         try:
             with open(poscar_path, 'r') as f:
                 lines = [line.strip() for line in f.readlines()]
@@ -313,7 +637,6 @@ class POSCARReader:
             atomic_numbers = []
             for elem, count in zip(elements, count_line):
                 full_elements.extend([elem] * count)
-                # Convert element symbol to atomic number
                 atomic_numbers.extend([POSCARReader.element_to_atomic_number(elem)] * count)
             
             # Coordinate mode (line 7)
@@ -324,14 +647,13 @@ class POSCARReader:
             total_atoms = sum(count_line)
             positions = []
             for i in range(8, 8 + total_atoms):
-                pos = [float(x) for x in lines[i].split()[:3]]  # Take only x,y,z
+                pos = [float(x) for x in lines[i].split()[:3]]
                 positions.append(pos)
             
             positions = np.array(positions)
             
             # Convert direct to cartesian if needed
             if direct_coords:
-                # Convert fractional coordinates to cartesian
                 positions = positions @ lattice_matrix
             
             return {
@@ -379,363 +701,345 @@ class POSCARReader:
                 formula_parts.append(f"{elem}{count}")
         return "".join(formula_parts)
 
-
-class MultiModalMaterialDatabase:
-    """Enhanced database structure for multi-modal materials data"""
-    
-    def __init__(self, base_path: str):
-        self.base_path = Path(base_path)
-        self.setup_directory_structure()
-        
-    def setup_directory_structure(self):
-        """Create organized directory structure"""
-        directories = [
-            'raw_data',           # Original JARVIS + local data
-            'structures',         # POSCAR files and structure data
-            'graphs',            # Graph representations
-            'point_clouds',      # Topological/ASPH features (separate files)
-            'metadata',          # JSON metadata and indices
-            'datasets',          # Processed datasets for ML
-            'analysis'           # Analysis results and visualizations
-        ]
-        
-        for dir_name in directories:
-            (self.base_path / dir_name).mkdir(parents=True, exist_ok=True)
-    
-    def save_material_record(self, record: 'MaterialRecord', 
-                           format_type: str = 'hybrid') -> None:
-        """Save material record in specified format"""
-        
-        if format_type == 'hybrid':
-            self._save_hybrid_format(record)
-        elif format_type == 'hdf5':
-            self._save_hdf5_format(record)
-        elif format_type == 'individual':
-            self._save_individual_format(record)
-        else:
-            raise ValueError(f"Unknown format: {format_type}")
-    
-    def _save_hybrid_format(self, record: 'MaterialRecord'):
-        """Hybrid format: HDF5 for arrays, JSON for metadata, separate files for graphs and point clouds"""
-        
-        # 1. Structure data in HDF5 (efficient for arrays)
-        structure_path = self.base_path / 'structures' / f"{record.jid}.h5"
-        with h5py.File(structure_path, 'w') as f:
-            f.create_dataset('lattice_matrix', data=record.lattice_matrix)
-            f.create_dataset('atomic_positions', data=record.atomic_positions)
-            f.create_dataset('atomic_numbers', data=record.atomic_numbers)
-            
-            # Store strings as variable-length strings
-            dt = h5py.special_dtype(vlen=str)
-            f.create_dataset('elements', data=record.elements, dtype=dt)
-        
-        # 2. Point cloud data as separate numpy file
-        point_cloud_path = self.base_path / 'point_clouds' / f"{record.jid}_asph.npy"
-        np.save(point_cloud_path, record.asph_features)
-        
-        # 3. Graph data as PyTorch files (preserves tensor structure)
-        graph_dir = self.base_path / 'graphs' / record.jid
-        graph_dir.mkdir(exist_ok=True)
-        
-        torch.save(record.crystal_graph, graph_dir / 'crystal_graph.pt')
-        torch.save(record.kspace_graph, graph_dir / 'kspace_graph.pt')
-        
-        # 4. Create POSCAR file
-        poscar_path = self.base_path / 'structures' / f"{record.jid}_POSCAR"
-        poscar_content = self._create_poscar_string(record)
-        with open(poscar_path, 'w') as f:
-            f.write(poscar_content)
-        
-        # 5. Metadata as JSON (human-readable)
-        metadata = {
-            'jid': record.jid,
-            'formula': record.formula,
-            'normalized_formula': record.normalized_formula,
-            'space_group': record.space_group,
-            'space_group_number': record.space_group_number,
-            'topological_class': record.topological_class,
-            'topological_binary': record.topological_binary,
-            'band_gap': record.band_gap,
-            'formation_energy': record.formation_energy,
-            'processing_timestamp': record.processing_timestamp,
-            'local_database_props': record.local_database_props,
-            'num_atoms': len(record.elements),
-            'file_locations': {
-                'structure_hdf5': str(structure_path.relative_to(self.base_path)),
-                'poscar': str(poscar_path.relative_to(self.base_path)),
-                'point_cloud': str(point_cloud_path.relative_to(self.base_path)),
-                'crystal_graph': str((graph_dir / 'crystal_graph.pt').relative_to(self.base_path)),
-                'kspace_graph': str((graph_dir / 'kspace_graph.pt').relative_to(self.base_path))
-            }
-        }
-        
-        metadata_path = self.base_path / 'metadata' / f"{record.jid}.json"
-        with open(metadata_path, 'w') as f:
-            json.dump(metadata, f, indent=2)
-    
-    def _create_poscar_string(self, record: 'MaterialRecord') -> str:
-        """Create POSCAR format string from material record"""
-        lines = []
-        lines.append(f"{record.formula} # {record.jid}")
-        lines.append("1.0")  # Scaling factor
-        
-        # Lattice vectors
-        for row in record.lattice_matrix:
-            lines.append(f"  {row[0]:12.6f}  {row[1]:12.6f}  {row[2]:12.6f}")
-        
-        # Element symbols and counts
-        unique_elements = []
-        element_counts = []
-        for element in record.elements:
-            if element not in unique_elements:
-                unique_elements.append(element)
-                element_counts.append(1)
-            else:
-                idx = unique_elements.index(element)
-                element_counts[idx] += 1
-        
-        lines.append("  ".join(unique_elements))
-        lines.append("  ".join(map(str, element_counts)))
-        lines.append("Direct")  # Fractional coordinates
-        
-        # Convert cartesian to fractional coordinates
-        lattice_inv = np.linalg.inv(record.lattice_matrix)
-        fractional_positions = record.atomic_positions @ lattice_inv
-        
-        # Atomic positions
-        for pos in fractional_positions:
-            lines.append(f"  {pos[0]:12.6f}  {pos[1]:12.6f}  {pos[2]:12.6f}")
-        
-        return "\n".join(lines)
-    
-    def create_master_index(self) -> pd.DataFrame:
-        """Create a master index/catalog of all materials"""
-        
-        records = []
-        metadata_dir = self.base_path / 'metadata'
-        
-        for json_file in metadata_dir.glob('*.json'):
-            with open(json_file, 'r') as f:
-                metadata = json.load(f)
-                records.append(metadata)
-        
-        if not records:
-            print("No metadata files found!")
-            return pd.DataFrame()
-        
-        df = pd.DataFrame(records)
-        
-        # Save as both CSV (human-readable) and parquet (efficient)
-        df.to_csv(self.base_path / 'master_index.csv', index=False)
-        df.to_parquet(self.base_path / 'master_index.parquet', index=False)
-        
-        return df
-
-
 class EnhancedTopologicalMaterialAnalyzer(TopologicalMaterialAnalyzer):
-    """Enhanced analyzer that uses the new database structure and reads POSCAR files"""
+    """
+    Enhanced analyzer that uses the new database structure and can integrate
+    with Materials Project data.
     
-    def __init__(self, csv_path: str, sqlite_db_path: str, output_database_path: str):
+    Note: The 'TopologicalMaterialAnalyzer' class needs to be adapted or
+    defined elsewhere to handle pymatgen Structure objects if it currently
+    relies heavily on JARVIS-specific data structures.
+    """
+    def __init__(self, csv_path: str, sqlite_db_path: str, output_database_path: str, mp_api_key: str):
         super().__init__(csv_path, sqlite_db_path)
         self.database = MultiModalMaterialDatabase(output_database_path)
-        
-    def find_poscar_file(self, jid: str, formula: str) -> Optional[str]:
-        """Find POSCAR file for given JID or formula"""
-        if not self.poscar_dir or not self.poscar_dir.exists():
-            return None
-        
-        # Search patterns for POSCAR files
-        search_patterns = [
-            f"{jid}*POSCAR*",
-            f"*{jid}*POSCAR*",
-            f"*{formula}*POSCAR*",
-            f"POSCAR*{jid}*",
-            f"POSCAR*{formula}*"
-        ]
-        
-        for pattern in search_patterns:
-            matches = list(self.poscar_dir.glob(pattern))
-            if matches:
-                return str(matches[0])
-        
-        # Also search in subdirectories
-        for pattern in search_patterns:
-            matches = list(self.poscar_dir.rglob(pattern))
-            if matches:
-                return str(matches[0])
-        
-        return None
-    
-    def generate_and_save_material_record(self, identifier: str, save_id: str, poscar_file_path : Optional[str] = None, 
-                                        format_type: str = 'hybrid') -> Optional['MaterialRecord']:
-        """Generate complete material record and save to database"""
-        
-        data_block = self.generate_data_block_with_sg_check(identifier)
-        if not data_block:
-            # The identifier might have been a JID, so let's use the save_id for the message
-            print(f"Could not generate data block for {save_id} using identifier '{identifier}'")
-            return None
-        
+        self.mp_rest = MPRester(mp_api_key)
+        self.structure_matcher = StructureMatcher(ltol=0.1, stol=0.1, angle_tol=5) 
+
+        self.kspace_graph_builder = KSpaceGraphBuilder()
+        self.topo_anlyzer = TopologicalMaterialAnalyzer()
+        all_kspace_data_dfs = []
+        for i in range(1, 230):
+            df = self.topo_anlyzer._get_kspace_data_from_db(i)
+            if df is not None:
+                all_kspace_data_dfs.append(df)
+        if all_kspace_data_dfs:
+            concatenated_kspace_data = pd.concat(all_kspace_data_dfs)
+            self.kspace_graph_builder = KSpaceGraphBuilder(initial_df_kspace_data= concatenated_kspace_data)
+
+    def get_mp_material_data(self, formula: str, space_group_number: int) -> Optional[Dict]:
+        """
+        Query Materials Project for material data matching formula and space group.
+        Returns the first matching entry or None.
+        """
+        print(f"Searching Materials Project for Formula: {formula}, Space Group: {space_group_number}")
         try:
-            poscar_data = None
-            if poscar_file_path and Path(poscar_file_path).exists():
-                poscar_data = POSCARReader.read_poscar(poscar_file_path)
-                print(f"✓ Using provided POSCAR file for {save_id}: {poscar_file_path}")
-            
-            # Extract structure data (prefer POSCAR if available)
-            if poscar_data:
-                lattice_matrix = poscar_data['lattice_matrix']
-                atomic_positions = poscar_data['atomic_positions']
-                atomic_numbers = poscar_data['atomic_numbers']
-                elements = poscar_data['elements']
-                formula = poscar_data['formula']
-            else:
-                # Fallback to crystal graph data
-                crystal_graph = data_block['crystal_graph']
-                
-                if hasattr(crystal_graph, 'pos') and crystal_graph.pos is not None:
-                    atomic_positions = crystal_graph.pos.numpy()
-                else:
-                    print(f"Warning: No atomic positions found for {save_id}")
-                    return None
-                
-                if hasattr(crystal_graph, 'x') and crystal_graph.x is not None:
-                    # Assuming first column contains normalized atomic numbers
-                    atomic_numbers = [int(z * 100) for z in crystal_graph.x[:, 0].numpy()]
-                else:
-                    print(f"Warning: No atomic features found for {save_id}")
-                    return None
-                
-                # Get lattice matrix from JARVIS properties or create default
-                jarvis_props = data_block.get('jarvis_props', {})
-                if 'lattice_abc' in jarvis_props and 'lattice_angles' in jarvis_props:
-                    lattice_matrix = self._abc_angles_to_matrix(
-                        jarvis_props['lattice_abc'], 
-                        jarvis_props['lattice_angles']
-                    )
-                else:
-                    lattice_matrix = np.eye(3) * 10.0  # Default 10 Angstrom cell
-                
-                elements = data_block.get('elements', [])
-                formula = data_block.get('formula', 'Unknown')
-            
-            # Get JARVIS properties
-            jarvis_props = data_block.get('jarvis_props', {})
-            
-            # Create the record
-            record = MaterialRecord(
-                jid= save_id,
+            # Query Materials Project by formula
+            # Note: Using 'fields' parameter instead of 'properties'
+            docs = self.mp_rest.summary.search(
                 formula=formula,
-                normalized_formula=data_block.get('normalized_formula', formula),
-                space_group=jarvis_props.get('space_group', 'Unknown'),
-                space_group_number=jarvis_props.get('space_group_number', 0),
+                fields=["material_id", "formula_pretty", "structure", "band_gap",
+                    "formation_energy_per_atom", "symmetry"]
+            )
+            
+            if not docs:
+                print(f"No entries found in MP for formula: {formula}")
+                return None
+            
+            # Filter by space group number
+            target_sg_num = space_group_number
+            for doc in docs:
+                # Debug: Print what we got
+                print(f"  Found entry: {doc.material_id} (Formula: {doc.formula_pretty})")
                 
-                # Structure data
+                # Try multiple ways to access space group info
+                sg_number = None
+                
+                # Method 1: Direct symmetry attribute
+                if hasattr(doc, 'symmetry') and doc.symmetry is not None:
+                    if hasattr(doc.symmetry, 'number'):
+                        sg_number = doc.symmetry.number
+                    elif hasattr(doc.symmetry, 'space_group_number'):
+                        sg_number = doc.symmetry.space_group_number
+                
+                # Method 2: Check if it's a dict-like object
+                if sg_number is None and hasattr(doc, 'symmetry') and doc.symmetry is not None:
+                    if isinstance(doc.symmetry, dict):
+                        sg_number = doc.symmetry.get('number') or doc.symmetry.get('space_group_number')
+                
+                # Method 3: Try accessing structure's space group directly
+                if sg_number is None and hasattr(doc, 'structure') and doc.structure is not None:
+                    try:
+                        from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
+                        sga = SpacegroupAnalyzer(doc.structure)
+                        sg_number = sga.get_space_group_number()
+                    except:
+                        pass
+                
+                print(f"    Space group found: {sg_number}")
+                
+                if sg_number == target_sg_num:
+                    print(f" ✓ Found MP entry: {doc.material_id} (Formula: {doc.formula_pretty}, SG: {sg_number})")
+                    # Convert doc to dictionary format for consistency
+                    return {
+                        'material_id': doc.material_id,
+                        'formula_pretty': doc.formula_pretty,
+                        'structure': doc.structure,
+                        'band_gap': getattr(doc, 'band_gap', None),
+                        'formation_energy_per_atom': getattr(doc, 'formation_energy_per_atom', None),
+                        'symmetry': {'number': sg_number} if sg_number else None
+                    }
+            
+            print(f"No exact match in MP for Formula: {formula} AND Space Group: {space_group_number}")
+            return None
+            
+        except Exception as e:
+            print(f"Error querying Materials Project for {formula} (SG: {space_group_number}): {e}")
+            return None
+
+    def generate_and_save_material_record(self, mp_material_data: Dict, save_id: str, 
+                                      poscar_file_path: Optional[str] = None, 
+                                      format_type: str = 'hybrid') -> Optional[MaterialRecord]:
+        """
+        Generate complete material record from Materials Project data and save to database.
+        
+        Args:
+            mp_material_data (Dict): The dictionary containing material data from MP.
+            save_id (str): A unique ID for saving (e.g., 'MP-mp-xxxxx').
+            poscar_file_path (Optional[str]): Path to a local POSCAR file if available.
+            format_type (str): Format to save the record ('hybrid', 'hdf5', 'individual').
+        """
+        
+        if not mp_material_data:
+            print(f"Cannot generate record for {save_id}: No MP data provided.")
+            return None
+
+        try:
+            # Extract basic info
+            material_id = mp_material_data.get('material_id', save_id)
+            formula = mp_material_data.get('formula_pretty', 'Unknown')
+            normalized_formula = mp_material_data.get('formula_reduced_abc', formula) # MP has reduced formula
+            
+            # Extract structure (pymatgen Structure object)
+            structure: Structure = mp_material_data.get('structure')
+            if not structure:
+                print(f"No structure found for MP material {material_id}. Skipping.")
+                return None
+            
+            # Get lattice and atomic info from pymatgen Structure
+            lattice_matrix = structure.lattice.matrix
+            atomic_positions = np.array(structure.cart_coords) # Cartesian coordinates
+            elements = [str(site.specie.symbol) for site in structure]
+            atomic_numbers = [site.specie.Z for site in structure]
+
+            # Get space group info from symmetry
+            symmetry_data = mp_material_data.get('symmetry', {})
+            space_group = symmetry_data.get('symbol', 'Unknown')
+            space_group_number = symmetry_data.get('number', 0)
+            
+            # Extract properties
+            band_gap = mp_material_data.get('band_gap')
+            formation_energy = mp_material_data.get('formation_energy_per_atom') # MP has per atom
+            
+            # Extract additional MP properties for the missing required fields
+            energy_above_hull = mp_material_data.get('energy_above_hull', 0.0)
+            density = mp_material_data.get('density', structure.density if structure else 0.0)
+            volume = mp_material_data.get('volume', structure.volume if structure else 0.0)
+            nsites = mp_material_data.get('nsites', len(structure) if structure else 0)
+            total_magnetization = mp_material_data.get('total_magnetization', 0.0)
+            magnetic_type = mp_material_data.get('ordering', 'Unknown')
+            theoretical = mp_material_data.get('theoretical', True)  # MP data is typically theoretical
+            
+            # Extract stability and electronic structure info
+            stability_data = {
+                'energy_above_hull': energy_above_hull,
+                'formation_energy_per_atom': formation_energy,
+                'is_stable': energy_above_hull <= 0.025  # Common stability threshold
+            }
+            
+            electronic_structure_data = {
+                'band_gap': band_gap,
+                'is_metal': band_gap == 0.0 if band_gap is not None else None,
+                'is_gap_direct': mp_material_data.get('is_gap_direct'),
+                'cbm': mp_material_data.get('cbm'),
+                'vbm': mp_material_data.get('vbm')
+            }
+            
+            # Extract mechanical properties if available
+            mechanical_properties_data = {
+                'bulk_modulus': mp_material_data.get('bulk_modulus'),
+                'shear_modulus': mp_material_data.get('shear_modulus'),
+                'elastic_tensor': mp_material_data.get('elastic_tensor')
+            }
+            
+            # Topological properties (these typically aren't directly in MP data)
+            # You'll need to compute or infer these. For now, using placeholders.
+            # The 'TopologicalMaterialAnalyzer' (if it has topological logic)
+            # needs to be adapted to process the Structure object.
+            
+            # Placeholder for topological data and graph data
+            # This is where your `TopologicalMaterialAnalyzer` would typically compute these.
+            # You need to integrate the logic from `build_dataset_test.py` here.
+            # For demonstration, I'll use dummy values.
+            
+            # HACK: Create a dummy data_block for now. This needs to be replaced
+            # by actual calculations from your TopologicalMaterialAnalyzer
+            # based on the pymatgen Structure object.
+            # The `generate_data_block_with_sg_check` method from your `TopologicalMaterialAnalyzer`
+            # needs to be refactored to accept a pymatgen Structure object.
+            dummy_crystal_graph = {'nodes': len(elements), 'edges': []}
+            dummy_kspace_graph = {'nodes': len(elements), 'edges': []}
+            dummy_asph_features = np.random.rand(128) # Placeholder point cloud features
+            dummy_topological_class = "Unknown"
+            dummy_topological_binary = 0.0 # Default to non-topological if not determined
+            dummy_symmetry_operations = symmetry_data # Using MP symmetry data
+            dummy_local_database_props = {}
+            
+            # Create vectorized features (combine various feature vectors)
+            vectorized_features = {
+            'asph_features': dummy_asph_features,
+            'basic_properties': np.array([band_gap or 0.0, formation_energy or 0.0, density, volume]),
+            'structural_properties': np.array([space_group_number, nsites, total_magnetization]),
+            'combined_features': np.concatenate([
+                dummy_asph_features,
+                np.array([band_gap or 0.0, formation_energy or 0.0, density, volume]),
+                np.array([space_group_number, nsites, total_magnetization])
+            ])
+        }
+            # Create kspace_graph_reference (placeholder - should be actual reference)
+            kspace_graph_reference = f"kspace_graph_{material_id}"
+            
+            # If your original TopologicalMaterialAnalyzer can work with a pymatgen Structure,
+            # you would do something like:
+            # material_block = self.generate_data_block_from_structure(structure)
+            # Then extract 'crystal_graph', 'kspace_graph', 'asph_features', 'target_label' etc.
+            # from material_block.
+            
+            # For the purpose of this replacement, we'll assume the original
+            # `generate_data_block_with_sg_check` can somehow be made to work
+            # with MP data, or you have a separate topological analysis module.
+            # The most direct path is to convert the MP structure into the format
+            # expected by your `TopologicalMaterialAnalyzer`.
+            
+            # Here's where you'd call your `TopologicalMaterialAnalyzer`
+            # This part needs to be adapted based on how your `TopologicalMaterialAnalyzer`
+            # processes structural data and generates features/graphs.
+            # For this example, I'll call a hypothetical method that takes a Pymatgen Structure.
+            
+            # Example of how you might integrate with your analyzer:
+            # Assuming analyzer has a method `process_structure_for_topological_data`
+            # which returns a dict similar to `data_block`
+            
+            # This part requires you to modify your `TopologicalMaterialAnalyzer`
+            # or `build_dataset_test.py` to handle `pymatgen.core.Structure` objects.
+            # For now, I'm using placeholder graphs and features.
+            
+            # To actually integrate:
+            # You would likely need to adapt `TopologicalMaterialAnalyzer` to accept
+            # a `pymatgen.core.Structure` object instead of a JID, and then
+            # extract lattice, positions, etc., and perform graph/feature generation.
+            
+            # For now, we use placeholders. YOU MUST REPLACE THESE WITH ACTUAL LOGIC.
+            crystal_graph_data = dummy_crystal_graph # Replace with actual graph generation
+            kspace_graph_data = dummy_kspace_graph # Replace with actual graph generation
+            asph_features_data = dummy_asph_features # Replace with actual point cloud generation
+            topological_class_data = dummy_topological_class
+            topological_binary_data = dummy_topological_binary
+
+            record = MaterialRecord(
+                jid=material_id, # Using MP material_id as JID
+                formula=formula,
+                normalized_formula=normalized_formula,
+                space_group=space_group,
+                space_group_number=space_group_number,
+                
                 lattice_matrix=lattice_matrix,
                 atomic_positions=atomic_positions,
                 atomic_numbers=atomic_numbers,
                 elements=elements,
                 
-                # Graph data
-                crystal_graph=data_block['crystal_graph'],
-                kspace_graph=data_block['kspace_graph'],
+                crystal_graph=crystal_graph_data,
+                kspace_graph_reference=kspace_graph_reference,  # NEW: Required field
                 
-                # Point cloud
-                asph_features=data_block['asph_features'].numpy(),
+                asph_features=asph_features_data,
+                vectorized_features=vectorized_features,  # NEW: Required field
                 
-                # Labels
-                topological_class=data_block.get('topological_class', 'Unknown'),
-                topological_binary=float(data_block['target_label'].item()),
-                band_gap=jarvis_props.get('band_gap'),
-                formation_energy=jarvis_props.get('formation_energy'),
+                topological_class=topological_class_data,
+                topological_binary=topological_binary_data,
+                band_gap=band_gap,
+                formation_energy=formation_energy,
                 
-                # Metadata
-                symmetry_operations=data_block.get('symmetry_ops', {}),
-                local_database_props=data_block.get('local_topo_data', {}),
+                # NEW: Additional required MP properties
+                energy_above_hull=energy_above_hull,
+                density=density,
+                volume=volume,
+                nsites=nsites,
+                total_magnetization=total_magnetization,
+                magnetic_type=magnetic_type,
+                theoretical=theoretical,
+                stability=stability_data,
+                electronic_structure=electronic_structure_data,
+                mechanical_properties=mechanical_properties_data,
+                
+                symmetry_operations=dummy_symmetry_operations,
+                local_database_props=dummy_local_database_props,
                 processing_timestamp=pd.Timestamp.now().isoformat()
             )
             
-            # Save to database
             self.database.save_material_record(record, format_type)
             return record
-            
+
         except Exception as e:
-            print(f"Error creating material record for {save_id}: {str(e)}")
+            print(f"Error creating material record for MP entry {save_id}: {str(e)}")
             import traceback
             traceback.print_exc()
             return None
-    
-    def _abc_angles_to_matrix(self, abc: List[float], angles: List[float]) -> np.ndarray:
-        """Convert lattice parameters (a,b,c,alpha,beta,gamma) to matrix"""
-        a, b, c = abc
-        alpha, beta, gamma = np.radians(angles)  # Convert to radians
-        
-        # Standard conversion from lattice parameters to matrix
-        cos_alpha = np.cos(alpha)
-        cos_beta = np.cos(beta)
-        cos_gamma = np.cos(gamma)
-        sin_gamma = np.sin(gamma)
-        
-        # Calculate lattice vectors
-        ax = a
-        ay = 0
-        az = 0
-        
-        bx = b * cos_gamma
-        by = b * sin_gamma
-        bz = 0
-        
-        cx = c * cos_beta
-        cy = c * (cos_alpha - cos_beta * cos_gamma) / sin_gamma
-        cz = c * np.sqrt(1 - cos_beta**2 - ((cos_alpha - cos_beta * cos_gamma) / sin_gamma)**2)
-        
-        return np.array([
-            [ax, ay, az],
-            [bx, by, bz],
-            [cx, cy, cz]
-        ])
-
 
 def main():
-    """Main execution function with proper database integration."""
+    """Main execution function with Materials Project API integration."""
     # --- Configuration ---
     csv_path = "/Users/abiralshakya/Documents/Research/GraphVectorTopological/materials_database.csv"
-    sqlite_db_path = "/Users/abiralshakya/Documents/Research/GraphVectorTopological/pebr_tr_nonmagnetic_rev4.db" # <--- SET THIS
-    output_database_dir = "./multimodal_materials_db"
+    sqlite_db_path = "/Users/abiralshakya/Documents/Research/GraphVectorTopological/pebr_tr_nonmagnetic_rev4.db"
+    output_database_dir = "./multimodal_materials_db_mp"
     
+    # You can set this as an environment variable or store it securely.
+    mp_api_key = "8O0LxKct7DKVrG2KqE9WhieXWpmsAZuu"
+    print (mp_api_key)
     os.makedirs(output_database_dir, exist_ok=True)
-    max_materials = 10
+    max_materials = 10 
 
     # --- Load Local CSV Data ---
     print(f"Reading data from local CSV: {csv_path}...")
     materials_df = pd.read_csv(csv_path)
 
-    # --- NEW: Load JARVIS Dataset Metadata ONCE ---
-    print("Loading JARVIS dft_3d dataset metadata (this may take a moment)...")
-    all_jarvis_data = jdata('dft_3d')
-    jarvis_df = pd.DataFrame(all_jarvis_data)
-    print(f"✓ Loaded metadata for {len(jarvis_df)} materials from JARVIS.")
-    # --- End of New Block ---
-
-    # --- Initialize Analyzer ---
-    print("Initializing Topological Material Analyzer...")
-    analyzer = TopologicalMaterialAnalyzer(
+    # --- Initialize Analyzer (now with MP API key) ---
+    print("Initializing Enhanced Topological Material Analyzer...")
+    analyzer = EnhancedTopologicalMaterialAnalyzer(
         csv_path=csv_path, 
-        db_path=sqlite_db_path
+        sqlite_db_path=sqlite_db_path, # This is still used by your original analyzer logic
+        output_database_path=output_database_dir,
+        mp_api_key=mp_api_key
     )
     
     # --- Main Processing Loop ---
-    print(f"\nStarting data generation for up to {max_materials} materials from your CSV...")
+    print(f"\nStarting data generation for up to {max_materials} materials from your CSV (using Materials Project)...")
     
-    successful_generations = 0 # Switched from successful_db_saves to this for clarity
-    SPACE_GROUP_COLUMN_NAME = 'Space Group'
+    successful_generations = 0 
+    SPACE_GROUP_COLUMN_NAME = 'Space Group' # Make sure this matches your CSV column name
+
+    # Use a set to keep track of processed ICSD IDs to avoid redundant processing
+    processed_icsd_ids = set()
 
     for index, row in tqdm.tqdm(materials_df.head(max_materials).iterrows(), total=max_materials, desc="Processing Materials"):
         formula = row['Formula']
         icsd_id = row['ICSD_ID']
         
+        # Skip if already processed (e.g., from a previous run or duplicate in CSV)
+        if icsd_id in processed_icsd_ids:
+            continue
+        
         if pd.isna(row[SPACE_GROUP_COLUMN_NAME]):
-            print(f"✗ Skipping formula '{formula}': Missing Space Group in CSV.")
+            print(f"✗ Skipping formula '{formula}' (ICSD: {icsd_id}): Missing Space Group in CSV.")
             continue
         
         try:
@@ -743,57 +1047,66 @@ def main():
             space_group_number_str = space_group_string.split(' ')[0]
             space_group_from_csv = int(space_group_number_str)
         except (ValueError, IndexError):
-            print(f"✗ Skipping formula '{formula}': Could not parse space group number from '{row[SPACE_GROUP_COLUMN_NAME]}'.")
+            print(f"✗ Skipping formula '{formula}' (ICSD: {icsd_id}): Could not parse space group number from '{row[SPACE_GROUP_COLUMN_NAME]}'.")
             continue
 
         unique_save_id = f"ICSD-{icsd_id}"
-        output_path = os.path.join(output_database_dir, f"{unique_save_id}.pt")
-
-        if os.path.exists(output_path):
+        # Check if the material has already been successfully processed and saved
+        # You'll need to adjust how you check for existence if you're saving in a new way
+        # For 'hybrid' format, check for the metadata JSON file.
+        existing_metadata_path = Path(output_database_dir) / 'metadata' / f"{unique_save_id}.json"
+        if existing_metadata_path.exists():
+            print(f"✓ Skipping {unique_save_id}: Already processed.")
+            successful_generations += 1 # Count already processed as successful
+            processed_icsd_ids.add(icsd_id)
             continue
-
-        try:
-            match = jarvis_df[
-                (jarvis_df['formula'] == formula) &
-                (jarvis_df['spg_number'] == space_group_from_csv)
-            ]
-
-            if match.empty:
-                print(f"✗ No JARVIS entry found for Formula: {formula} AND Space Group: {space_group_from_csv}. Skipping.")
-                continue
-
-            jid = match.iloc[0]['jid']
-            print(f"✓ Found exact match! JID: '{jid}' for {formula} (SG: {space_group_from_csv})")
-
-        except Exception as e:
-            print(f"✗ Error filtering JARVIS DataFrame for {formula}: {e}. Skipping.")
-            continue
-
-        material_block = analyzer.generate_data_block_with_sg_check(jid)
         
-        if material_block:
-            # Note: Using a simpler saving scheme from your original code
-            # If you want the more complex MultiModalDatabase saving, we can re-integrate that.
-            torch.save(material_block, output_path)
+        # --- NEW: Query Materials Project instead of JARVIS ---
+        mp_data = analyzer.get_mp_material_data(formula, space_group_from_csv)
+        
+        if not mp_data:
+            print(f"✗ No Materials Project entry found for Formula: {formula} AND Space Group: {space_group_from_csv}. Skipping.")
+            continue
+        
+        # Now, use the retrieved MP data to generate and save the material record
+        # Note: Your `generate_and_save_material_record` needs to be adapted to
+        # take the MP data directly, as it currently expects `data_block` which
+        # was JARVIS-specific. I've updated its signature above.
+        record = analyzer.generate_and_save_material_record(
+            mp_material_data=mp_data,
+            save_id=unique_save_id,
+            # poscar_file_path=analyzer.find_poscar_file(unique_save_id, formula) # Optional: if you still want to use local POSCARs
+        )
+        
+        if record:
             successful_generations += 1
-            print(f"✓ Successfully processed and saved {unique_save_id}")
-    
+            processed_icsd_ids.add(icsd_id)
+            print(f"✓ Successfully processed and saved {unique_save_id} (MP ID: {record.jid})")
+            
     # --- Final Report ---
     print(f"\n" + "="*60)
     print(f"DATASET GENERATION COMPLETE")
     print(f"="*60)
-    print(f"Total JIDs processed: {analyzer.processed_count}")
-    print(f"Matches found in local DB: {analyzer.matched_count}")
-    #print(f"Successful database saves: {successful_db_saves}")
-   # print(f"Database save rate: {successful_db_saves/analyzer.processed_count*100:.1f}% (database)")
+    print(f"Total materials in CSV: {len(materials_df)}")
+    print(f"Successfully processed and saved: {successful_generations}")
     print(f"Database location: {output_database_dir}")
     print(f"="*60)
-    print(f"Successful data blocks: {successful_generations}")
-
     
+    # Create master index and ML splits after processing
+    # Note: `create_master_index` and `create_ml_datasets` belong to MultiModalMaterialDatabase
+    # so we call them via `analyzer.database`.
+    if successful_generations > 0:
+        print("\nCreating master index and ML datasets...")
+        master_df = analyzer.database.create_master_index()
+        if not master_df.empty:
+            analyzer.database.create_ml_datasets()
+        else:
+            print("No materials were successfully processed to create a master index or ML datasets.")
+    else:
+        print("No materials were successfully processed. Skipping master index and ML dataset creation.")
+
     # Print directory structure
     inspect_database(output_database_dir)
-
 
 def inspect_database(db_path: str):
     """Helper function to inspect what's in the database"""
@@ -833,37 +1146,5 @@ def inspect_database(db_path: str):
     else:
         print("Master index: not found")
 
-
 if __name__ == "__main__":
     main()
-
-# Recommended database structure
-"""
-materials_database/
-├── raw_data/                    # Original data sources
-│   ├── jarvis_cache/
-│   └── local_database.csv
-├── structures/                  # Crystal structures
-│   ├── JVASP-1.h5              # Lattice, positions, elements
-│   └── JVASP-2.h5
-├── graphs/                      # Graph representations
-│   ├── JVASP-1/
-│   │   ├── crystal_graph.pt    # Real-space graph
-│   │   └── kspace_graph.pt     # K-space graph
-│   └── JVASP-2/
-├── point_clouds/               # Topological features
-│   ├── JVASP-1_asph.npy
-│   └── JVASP-2_asph.npy
-├── metadata/                   # Searchable metadata
-│   ├── JVASP-1.json
-│   └── JVASP-2.json
-├── datasets/                   # ML-ready datasets
-│   ├── train_split.csv
-│   ├── val_split.csv
-│   └── test_split.csv
-├── master_index.csv           # Complete catalog
-├── master_index.parquet       # Efficient version
-└── analysis/                  # Analysis results
-    ├── statistics.json
-    └── visualizations/
-"""

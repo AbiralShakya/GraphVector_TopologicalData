@@ -9,7 +9,7 @@ import os
 import re
 from tqdm import tqdm
 import numpy as np
-from typing import Dict, Optional, List, Tuple
+from typing import Dict, Optional, List, Tuple, Union
 import json
 import time
 
@@ -21,6 +21,7 @@ from gtda.homology import VietorisRipsPersistence
 from gtda.diagrams import BettiCurve, PersistenceEntropy
 from sklearn.preprocessing import StandardScaler
 import sqlite3
+import ast
 
 from jarvis.db.figshare import get_jid_data
 
@@ -113,28 +114,68 @@ class TopologicalMaterialAnalyzer:
         except Exception as e:
             print(f"✗ ERROR: Could not build vocabularies from SQLite DB. {e}")
 
+    # def _get_kspace_data_from_db(self, space_group_number: int) -> Optional[pd.DataFrame]:
+    #     """
+    #     Queries the SQLite DB to get all k-points and irrep labels
+    #     for a given space group number.
+    #     """
+    #     try:
+    #         query = """
+    #             SELECT
+    #               ir.k_point,
+    #               ir.irrep_label
+    #             FROM irreps AS ir
+    #             LEFT JOIN ebrs ON ir.ebr_id = ebrs.id
+    #             LEFT JOIN space_groups AS sg ON ebrs.space_group_id = sg.id
+    #             WHERE
+    #               sg.number = ?;
+    #         """
+    #         df = pd.read_sql_query(query, self.conn, params=(space_group_number,))
+    #         if not df.empty:
+    #             return df
+    #     except Exception as e:
+    #         print(f"  ✗ Warning: Could not query k-space data for SG {space_group_number}: {e}")
+    #     return None
+    def _connect(self):
+        """Establishes the database connection."""
+        if self.conn is None:
+            self.conn = sqlite3.connect(self.sqlite_db_path)
+
+    def _close(self):
+        """Closes the database connection."""
+        if self.conn:
+            self.conn.close()
+            self.conn = None
+
     def _get_kspace_data_from_db(self, space_group_number: int) -> Optional[pd.DataFrame]:
         """
-        Queries the SQLite DB to get all k-points and irrep labels
-        for a given space group number.
+        Queries the SQLite DB to get all k-points, irrep labels,
+        and associated decomposition branch information for a given space group number.
         """
+        self._connect() # Ensure connection is open
+
         try:
             query = """
                 SELECT
                   ir.k_point,
-                  ir.irrep_label
+                  ir.irrep_label,
+                  b.branch1_irreps,        -- NEW: Irreps for decomposition branch 1
+                  b.branch2_irreps,        -- NEW: Irreps for decomposition branch 2
+                  b.decomposition_index    -- NEW: Index of the specific EBR decomposition
                 FROM irreps AS ir
-                LEFT JOIN ebr ON ir.ebr_id = ebr.id
-                LEFT JOIN space_groups AS sg ON ebr.space_group_id = sg.id
+                LEFT JOIN ebrs ON ir.ebr_id = ebrs.id
+                LEFT JOIN space_groups AS sg ON ebrs.space_group_id = sg.id
+                LEFT JOIN ebr_decomposition_branches AS b ON ebrs.id = b.ebr_id -- NEW JOIN to get branch info
                 WHERE
                   sg.number = ?;
             """
-            # Use pandas to execute the query and return a DataFrame
             df = pd.read_sql_query(query, self.conn, params=(space_group_number,))
             if not df.empty:
                 return df
         except Exception as e:
             print(f"  ✗ Warning: Could not query k-space data for SG {space_group_number}: {e}")
+        finally:
+            self._close() 
         return None
     
     def generate_data_block_with_sg_check(self, jid: str) -> Optional[Dict]:
@@ -504,48 +545,77 @@ class TopologicalMaterialAnalyzer:
             )
 
     def _create_kspace_graph(self, band_rep_vector: torch.Tensor) -> Data:
-        """Generates the reciprocal-space k-point graph."""
-        # Create a simple graph where each k-point is a node
+        """
+        Generates a physics-informed reciprocal-space k-point graph.
+
+        Each node in the graph represents a k-point. Its features are its 3D
+        coordinates in reciprocal space. Edges are created between adjacent k-points
+        along the defined high-symmetry path, reflecting the typical flow of band
+        structure analysis. The comprehensive band representation vector is stored
+        as a global feature for the entire graph.
+
+        Args:
+            band_rep_vector (torch.Tensor): A tensor encoding the overall band
+                                            representation (e.g., from an irreducible
+                                            representation analysis). This tensor serves
+                                            as a global, graph-level feature.
+
+        Returns:
+            torch_geometric.data.Data: A PyTorch Geometric Data object representing
+                                    the k-space graph.
+                                    - x (torch.Tensor): Node features (N_k_points x 3),
+                                        where N_k_points is the number of k-points.
+                                    - edge_index (torch.Tensor): Graph connectivity (2 x E),
+                                        where E is the number of edges.
+                                    - u (torch.Tensor): Global graph features (1 x F),
+                                        where F is the dimensionality of band_rep_vector.
+        """
         n_k_points = len(self.master_k_points)
-        n_irreps = len(self.master_irreps)
+
+        # 1. Node Features (x): Use actual 3D k-point coordinates.
+        # This provides direct geometric information about the k-point's position
+        # in the Brillouin zone, which is physically crucial.
+        if isinstance(self.master_k_points, list):
+            node_features = torch.tensor(self.master_k_points, dtype=torch.float)
+        else: # Assume it's already a numpy array or torch tensor
+            node_features = torch.tensor(self.master_k_points, dtype=torch.float)
         
-        # Node features: k-point features + associated irrep information
-        node_features = []
-        for i in range(n_k_points):
-            # Basic k-point feature (one-hot encoding)
-            k_point_feature = torch.zeros(n_k_points)
-            k_point_feature[i] = 1.0
-            
-            # Associated irrep features for this k-point
-            irrep_features = band_rep_vector[n_k_points:]  # Irrep part of the vector
-            
-            # Combine features
-            combined_feature = torch.cat([k_point_feature, irrep_features])
-            node_features.append(combined_feature)
-        
-        if node_features:
-            node_features = torch.stack(node_features)
-        else:
-            node_features = torch.empty(0, n_k_points + n_irreps)
-        
-        # Create a simple connectivity (can be enhanced with actual k-space connectivity)
+        # Ensure node_features is 2D (num_nodes, num_node_features)
+        if node_features.dim() == 1:
+            # Handle case of a single k-point, reshape to (1, 3)
+            node_features = node_features.unsqueeze(0)
+        elif node_features.dim() == 0 or node_features.shape[0] == 0:
+            # Handle empty k-points list
+            node_features = torch.empty(0, 3, dtype=torch.float) # Assuming 3D k-points
+
+        # 2. Edge Index (edge_index): Connect sequential k-points along the path.
+        # This reflects the high-symmetry paths typically followed in band structure
+        # calculations (e.g., Gamma->X, X->M).
         edge_index = []
-        for i in range(n_k_points):
-            for j in range(i+1, n_k_points):
-                edge_index.extend([[i, j], [j, i]])  # Bidirectional edges
+        for i in range(n_k_points - 1):
+            # Create undirected edges: (i, i+1) and (i+1, i)
+            edge_index.append([i, i + 1])
+            edge_index.append([i + 1, i])
         
         if edge_index:
             edge_index = torch.tensor(edge_index, dtype=torch.long).t().contiguous()
         else:
+            # For graphs with 0 or 1 node, no edges can be formed.
             edge_index = torch.empty(2, 0, dtype=torch.long)
+        
+        # 3. Global Features (u): Store the band_rep_vector as a global graph-level feature.
+        # This vector likely summarizes the overall band representation and topological
+        # invariants, which are properties of the entire material's electronic structure,
+        # making it suitable as a global graph feature.
+        # Ensure it's 2D for PyG convention (num_graphs, num_global_features)
+        global_features = band_rep_vector.unsqueeze(0)
         
         return Data(
             x=node_features,
             edge_index=edge_index,
-            global_features=band_rep_vector.unsqueeze(0)  # Store full band rep as global feature
+            u=global_features # 'u' is a common attribute in PyG for global features
         )
     
-
 def get_jarvis_jids(max_jids: int = 1000) -> List[str]:
     """Get a list of JIDs from JARVIS database."""
     print(f"Fetching JID list from JARVIS (max: {max_jids})...")
@@ -559,18 +629,322 @@ def get_jarvis_jids(max_jids: int = 1000) -> List[str]:
     print(f"Generated {len(jid_list)} JIDs")
     return jid_list
 
+class KSpaceGraphBuilder:
+    """
+    A builder class to create physics-informed k-space graphs.
+    It manages vocabularies for categorical features (irreps, decomposition indices)
+    to ensure consistent numerical encoding across different materials.
+    """
+    def __init__(self,
+                 initial_df_kspace_data: Optional[pd.DataFrame] = None,
+                 irrep_label_vocab: Optional[Dict[str, int]] = None,
+                 branch_irrep_vocab: Optional[Dict[str, int]] = None,
+                 decomposition_index_vocab: Optional[Dict[Union[int, float, None], int]] = None):
+        """
+        Initializes the KSpaceGraphBuilder.
+
+        Args:
+            initial_df_kspace_data (pd.DataFrame, optional): An initial DataFrame
+                from _get_kspace_data_from_db to build vocabularies from.
+                Useful if you want to pre-build vocabularies once.
+            irrep_label_vocab (Dict, optional): Pre-existing vocabulary for k-point irrep labels.
+            branch_irrep_vocab (Dict, optional): Pre-existing vocabulary for branch irrep labels.
+            decomposition_index_vocab (Dict, optional): Pre-existing vocabulary for decomposition indices.
+        """
+        self.irrep_label_vocab = irrep_label_vocab if irrep_label_vocab is not None else {}
+        self.branch_irrep_vocab = branch_irrep_vocab if branch_irrep_vocab is not None else {}
+        self.decomposition_index_vocab = decomposition_index_vocab if decomposition_index_vocab is not None else {}
+
+        # If vocabularies are not provided, attempt to build them from initial data
+        if initial_df_kspace_data is not None and not initial_df_kspace_data.empty:
+            self._build_vocabularies(initial_df_kspace_data)
+        elif not (self.irrep_label_vocab and self.branch_irrep_vocab and self.decomposition_index_vocab):
+            print("Warning: No initial data or pre-built vocabularies provided. Vocabs will be built on the fly, which might lead to inconsistencies if not all possible values are seen during graph creation. Consider building them once from your full dataset.")
+
+
+    def _build_vocabularies(self, df: pd.DataFrame):
+        """
+        Builds or extends vocabularies for categorical features from a given DataFrame.
+        This should be run once on a representative sample or the entire dataset
+        to ensure consistent ID mapping.
+        """
+        # For irrep_label (local k-point irreps)
+        unique_irrep_labels = df['irrep_label'].dropna().unique()
+        for label in unique_irrep_labels:
+            if label not in self.irrep_label_vocab:
+                self.irrep_label_vocab[label] = len(self.irrep_label_vocab)
+
+        # For branch_irreps (can contain multiple comma-separated irreps per entry)
+        all_branch_irreps_flat = []
+        for col in ['branch1_irreps', 'branch2_irreps']:
+            if col in df.columns:
+                # Handle potential NaN values and split strings
+                for irrep_str in df[col].dropna():
+                    all_branch_irreps_flat.extend([s.strip() for s in irrep_str.split(',') if s.strip()])
+        unique_branch_irreps = sorted(list(set(all_branch_irreps_flat)))
+        for irrep in unique_branch_irreps:
+            if irrep not in self.branch_irrep_vocab:
+                self.branch_irrep_vocab[irrep] = len(self.branch_irrep_vocab)
+
+        # For decomposition_index
+        if 'decomposition_index' in df.columns:
+            unique_decomposition_indices = df['decomposition_index'].dropna().unique()
+            for idx in unique_decomposition_indices:
+                if idx not in self.decomposition_index_vocab:
+                    self.decomposition_index_vocab[idx] = len(self.decomposition_index_vocab)
+            # Add a category for NaN/None if it's expected to be present
+            if df['decomposition_index'].isnull().any() and None not in self.decomposition_index_vocab:
+                self.decomposition_index_vocab[None] = len(self.decomposition_index_vocab)
+
+
+    def _encode_irrep_label(self, label: str) -> torch.Tensor:
+        """One-hot encodes a single irrep_label based on the current vocabulary."""
+        # Ensure vocab is not empty if it's built on the fly
+        if not self.irrep_label_vocab:
+            # Fallback or error if vocab is empty (should ideally be pre-built)
+            print(f"Error: irrep_label_vocab is empty when encoding '{label}'.")
+            return torch.zeros(1) # Return a minimal tensor, but this indicates a problem
+
+        one_hot = torch.zeros(len(self.irrep_label_vocab))
+        if label in self.irrep_label_vocab:
+            one_hot[self.irrep_label_vocab[label]] = 1.0
+        else:
+            # Handle unseen labels: add to vocab on the fly, or assign to an 'unknown' index
+            # On-the-fly addition:
+            new_idx = len(self.irrep_label_vocab)
+            self.irrep_label_vocab[label] = new_idx
+            new_one_hot = torch.zeros(new_idx + 1) # Expand vector
+            new_one_hot[new_idx] = 1.0
+            return new_one_hot
+            # If you want a fixed vocabulary:
+            # print(f"Warning: Unseen irrep_label '{label}' encountered. Using zero vector.")
+            # return torch.zeros(len(self.irrep_label_vocab))
+        return one_hot
+
+    def _encode_branch_irreps(self, irreps_str: str) -> torch.Tensor:
+        """Multi-hot encodes a comma-separated string of branch irreps based on vocab."""
+        if not irreps_str:
+            return torch.zeros(len(self.branch_irrep_vocab))
+        
+        individual_irreps = [s.strip() for s in irreps_str.split(',') if s.strip()]
+        
+        # Ensure vocab is not empty if built on the fly
+        if not self.branch_irrep_vocab:
+            print(f"Error: branch_irrep_vocab is empty when encoding '{irreps_str}'.")
+            return torch.zeros(1)
+
+        multi_hot = torch.zeros(len(self.branch_irrep_vocab))
+        for irrep in individual_irreps:
+            if irrep in self.branch_irrep_vocab:
+                multi_hot[self.branch_irrep_vocab[irrep]] = 1.0
+            else:
+                # On-the-fly addition:
+                new_idx = len(self.branch_irrep_vocab)
+                self.branch_irrep_vocab[irrep] = new_idx
+                # Create a larger multi_hot if expanding vocab
+                temp_multi_hot = torch.zeros(new_idx + 1)
+                temp_multi_hot[:multi_hot.size(0)] = multi_hot # Copy old values
+                temp_multi_hot[new_idx] = 1.0
+                multi_hot = temp_multi_hot # Update reference
+                # If you want a fixed vocabulary:
+                # print(f"Warning: Unseen branch irrep '{irrep}' encountered. Not encoded.")
+        return multi_hot
+
+    def _encode_decomposition_index(self, index: Union[int, float, None]) -> torch.Tensor:
+        """Encodes decomposition index (one-hot if categorical)."""
+        # Ensure vocab is not empty if built on the fly
+        if not self.decomposition_index_vocab:
+            print(f"Error: decomposition_index_vocab is empty when encoding '{index}'.")
+            return torch.zeros(1) # Return a minimal tensor
+
+        # Handle NaN values explicitly, mapping to 'None' in vocab
+        if pd.isna(index):
+            index_key = None
+        else:
+            index_key = index
+
+        one_hot = torch.zeros(len(self.decomposition_index_vocab))
+        if index_key in self.decomposition_index_vocab:
+            one_hot[self.decomposition_index_vocab[index_key]] = 1.0
+        else:
+            # On-the-fly addition:
+            new_idx = len(self.decomposition_index_vocab)
+            self.decomposition_index_vocab[index_key] = new_idx
+            new_one_hot = torch.zeros(new_idx + 1) # Expand vector
+            new_one_hot[new_idx] = 1.0
+            return new_one_hot
+            # If you want a fixed vocabulary:
+            # print(f"Warning: Unseen decomposition_index '{index}' encountered. Using zero vector.")
+            # return torch.zeros(len(self.decomposition_index_vocab))
+        return one_hot
+
+
+    def create_kspace_graph(
+        self,
+        df_kspace_data: pd.DataFrame,
+        band_rep_vector: torch.Tensor,
+        electric_field_vector: Optional[torch.Tensor] = None, # e.g., torch.tensor([Ex, Ey, Ez])
+        space_group_number: Optional[int] = None
+    ) -> Data:
+        """
+        Generates a physics-informed k-space graph with enriched features for ML.
+
+        Args:
+            df_kspace_data (pd.DataFrame): DataFrame containing k_point, irrep_label,
+                                          branch1_irreps, branch2_irreps, decomposition_index
+                                          for a specific material/space group, typically from
+                                          _get_kspace_data_from_db.
+            band_rep_vector (torch.Tensor): A tensor representing the overall band
+                                            representation, used as a global graph feature.
+            electric_field_vector (Optional[torch.Tensor]): 3D vector representing an
+                                                               external electric field.
+                                                               If None, no field is applied.
+            space_group_number (Optional[int]): The space group number of the material,
+                                                added as a global feature.
+
+        Returns:
+            torch_geometric.data.Data: A PyTorch Geometric Data object with physics-informed
+                                       nodes, edges, and global features.
+        """
+        if df_kspace_data.empty:
+            print("Warning: Empty k-space data DataFrame provided. Returning empty graph.")
+            # Provide a dummy empty graph with consistent feature dimensions if possible
+            # This requires knowing the expected total feature sizes, which depend on vocab size.
+            # For simplicity, return a graph with 3D k-coords and 0 global features.
+            return Data(x=torch.empty(0, 3 + len(self.irrep_label_vocab) + 2*len(self.branch_irrep_vocab) + len(self.decomposition_index_vocab)),
+                        edge_index=torch.empty(2, 0, dtype=torch.long),
+                        u=torch.empty(1, band_rep_vector.size(0) + 3 + 1)) # Dummy based on expected features
+
+        # Ensure vocabularies are built/updated from the current dataframe
+        self._build_vocabularies(df_kspace_data)
+
+        # 1. Node Features (x):
+        # Group by k_point coordinates to ensure each unique k_point is one node.
+        # Aggregate features for k_points that might have multiple irrep_labels/decomposition_indices
+        # (e.g., if a k-point corresponds to multiple bands with different irreps).
+        grouped_k_points = df_kspace_data.groupby('k_point').agg({
+            'irrep_label': lambda x: list(x.dropna().unique()),
+            'branch1_irreps': lambda x: [s.strip() for val in x.dropna() for s in val.split(',') if s.strip()],
+            'branch2_irreps': lambda x: [s.strip() for val in x.dropna() for s in val.split(',') if s.strip()],
+            'decomposition_index': lambda x: list(x.dropna().unique())
+        }).reset_index()
+
+        node_features_list = []
+        k_point_coords_list = [] # Store numerical k-point coordinates for edge creation
+
+        for idx, row in grouped_k_points.iterrows():
+            k_point_str = row['k_point']
+            try:
+                # Robustly parse k_point string. It might be "(x,y,z)" or "x y z"
+                if '(' in k_point_str and ')' in k_point_str:
+                    coords = torch.tensor(ast.literal_eval(k_point_str), dtype=torch.float)
+                else:
+                    coords = torch.tensor([float(x) for x in k_point_str.split()], dtype=torch.float)
+                
+                # Handle 2D k-points by padding with a zero for the z-coordinate
+                if coords.shape[0] == 2:
+                    coords = torch.cat((coords, torch.zeros(1, dtype=torch.float)))
+                elif coords.shape[0] != 3:
+                    raise ValueError(f"K-point coordinates are not 2D or 3D: {coords.shape}")
+
+            except (ValueError, SyntaxError) as e:
+                print(f"Error parsing k_point string '{k_point_str}': {e}. Skipping this k-point.")
+                continue
+            
+            k_point_coords_list.append(coords) # Store for edge creation
+
+            # Encode irrep_label(s) - sum their one-hots if multiple irreps for this k-point
+            encoded_irrep_labels = torch.zeros(len(self.irrep_label_vocab))
+            for label in row['irrep_label']:
+                encoded_irrep_labels += self._encode_irrep_label(label)
+            # You might normalize or binarize `encoded_irrep_labels` if summing leads to values > 1
+
+            # Encode branch_irreps (multi-hot)
+            # Flatten lists of lists and take unique elements from collected branch irreps
+            all_branch_irreps_for_k = list(set(row['branch1_irreps'] + row['branch2_irreps']))
+            
+            encoded_branch_irreps = torch.zeros(len(self.branch_irrep_vocab))
+            for irrep in all_branch_irreps_for_k:
+                 if irrep in self.branch_irrep_vocab: # Check if it exists in the current vocab
+                    encoded_branch_irreps[self.branch_irrep_vocab[irrep]] = 1.0
+                 # If not in vocab, it implies a warning was already printed during _encode_branch_irreps call
+
+            # Encode decomposition_index (summing one-hots if multiple, or pick first and encode)
+            encoded_decomposition_index = torch.zeros(len(self.decomposition_index_vocab))
+            if row['decomposition_index']:
+                # For simplicity, let's just encode the first unique decomposition index found
+                encoded_decomposition_index += self._encode_decomposition_index(row['decomposition_index'][0])
+            else: # Handle case where decomposition_index is missing
+                encoded_decomposition_index = self._encode_decomposition_index(None)
+
+            # Concatenate all features for the node
+            node_feature = torch.cat([
+                coords,
+                encoded_irrep_labels,
+                encoded_branch_irreps,
+                encoded_decomposition_index
+            ])
+            node_features_list.append(node_feature)
+
+        if not node_features_list:
+            print("No valid node features generated. Returning empty graph.")
+            return Data(x=torch.empty(0, 3 + len(self.irrep_label_vocab) + len(self.branch_irrep_vocab) + len(self.decomposition_index_vocab)),
+                        edge_index=torch.empty(2, 0, dtype=torch.long),
+                        u=torch.empty(1, band_rep_vector.size(0) + 3 + 1)) # Match dummy dimensions
+
+        node_features = torch.stack(node_features_list)
+        
+        # 2. Edge Index (edge_index): Connect sequential k-points along the path.
+        # This assumes `k_point_coords_list` (and thus `grouped_k_points`) is ordered
+        # according to the desired path. If not, you'd need explicit path information.
+        n_unique_k_points = len(k_point_coords_list)
+        edge_index = []
+        for i in range(n_unique_k_points - 1):
+            edge_index.append([i, i + 1])
+            edge_index.append([i + 1, i]) # Undirected
+        
+        if edge_index:
+            edge_index = torch.tensor(edge_index, dtype=torch.long).t().contiguous()
+        else:
+            edge_index = torch.empty(2, 0, dtype=torch.long)
+
+        # 3. Global Features (u):
+        global_features_list = [band_rep_vector.unsqueeze(0)] # Start with band_rep_vector
+
+        if electric_field_vector is not None:
+            if electric_field_vector.dim() == 1:
+                electric_field_vector = electric_field_vector.unsqueeze(0) # Ensure 2D (1, 3)
+            global_features_list.append(electric_field_vector.to(torch.float))
+        else:
+            # If no electric field is applied, add a zero vector of same dimension for consistency
+            global_features_list.append(torch.zeros(1, 3, dtype=torch.float)) # Assuming 3D field
+
+        if space_group_number is not None:
+            # Add space group number as a scalar global feature.
+            # Could be one-hot encoded if desired, but for simplicity, directly as float.
+            global_features_list.append(torch.tensor([[float(space_group_number)]], dtype=torch.float))
+        else:
+            global_features_list.append(torch.tensor([[0.0]], dtype=torch.float)) # Placeholder for missing SG
+
+        # Concatenate all global features
+        global_features = torch.cat(global_features_list, dim=1)
+        
+        return Data(
+            x=node_features,
+            edge_index=edge_index,
+            u=global_features
+        )
+
+
 def main():
     """Main execution function."""
-    # --- Configuration ---
     csv_path = "/Users/abiralshakya/Documents/Research/GraphVectorTopological/materials_database.csv"
     db_path = "/Users/abiralshakya/Documents/Research/GraphVectorTopological/pebr_tr_nonmagnetic_rev4.db"
     output_dir = "./graph_vector_dataset"
     os.makedirs(output_dir, exist_ok=True)
     
-    # Configuration
-    max_materials = 100  # Start with a smaller number for testing
+    max_materials = 100  
     
-    # --- Initialize Analyzer ---
     print("Initializing Topological Material Analyzer...")
     analyzer = TopologicalMaterialAnalyzer(csv_path=csv_path, db_patah = db_path)
     
@@ -578,10 +952,8 @@ def main():
         print("ERROR: No materials loaded from local database. Please check the CSV file.")
         return
     
-    # --- Get JIDs to process ---
     jids_to_process = get_jarvis_jids(max_jids=max_materials)
     
-    # --- Main Processing Loop ---
     print(f"\nStarting data generation for up to {len(jids_to_process)} materials...")
     print(f"Looking for matches in local database with {len(analyzer.formula_lookup)} materials...")
     
@@ -590,20 +962,16 @@ def main():
     for i, jid in enumerate(tqdm(jids_to_process, desc="Processing JIDs")):
         output_path = os.path.join(output_dir, f"{jid}.pt")
         
-        # Skip if already processed
         if os.path.exists(output_path):
             successful_generations += 1
             continue
         
-        # Process the material
         material_block = analyzer.generate_data_block_with_sg_check(jid)
         
         if material_block:
-            # Save the data block
             torch.save(material_block, output_path)
             successful_generations += 1
             
-            # Save metadata as JSON for easy inspection
             metadata_path = os.path.join(output_dir, f"{jid}_metadata.json")
             metadata = {
                 'jid': material_block['jid'],
@@ -617,14 +985,11 @@ def main():
             with open(metadata_path, 'w') as f:
                 json.dump(metadata, f, indent=2)
         
-        # Print progress every 10 materials
         if (i + 1) % 10 == 0:
             print(f"\nProgress: {i+1}/{len(jids_to_process)} processed, {successful_generations} successful, {analyzer.matched_count} matches found")
         
-        # Small delay to be respectful to the API
         time.sleep(0.1)
     
-    # --- Final Report ---
     print(f"\n" + "="*60)
     print(f"DATASET GENERATION COMPLETE")
     print(f"="*60)
