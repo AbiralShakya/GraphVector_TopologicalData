@@ -1,10 +1,3 @@
-# all of this is for non magnetic
-# rather than saving k space graph for all, just link it to given space group's k space graph
-# homology point cloud for atom build, vectorize it
-# atom graph from poscar build
-# use materials project instead of jarvis since we can query 2d materials in mat project and mat project has all the relevant materials
-
-
 import torch
 import pandas as pd
 import h5py
@@ -18,16 +11,12 @@ import pickle
 from dataset_builder_backend import TopologicalMaterialAnalyzer 
 import time
 import tqdm
-from dataset_builder_backend import KSpaceGraphBuilder
+# Assuming KSpaceGraphBuilder and KSpacePhysicsGraphBuilder are correctly defined
+# from kspace_graph_generation import KSpacePhysicsGraphBuilder # This import is currently unused
 
 from pymatgen.ext.matproj import MPRester
 from pymatgen.core import Structure
 from pymatgen.analysis.structure_matcher import StructureMatcher
-
-# Assuming TopologicalMaterialAnalyzer and its dependencies are available
-# (e.g., from build_dataset_test.py or defined within this file)
-# If TopologicalMaterialAnalyzer uses JARVIS data, you'll need to adapt it
-# to accept Structure objects from pymatgen, or to fetch data itself.
 
 # --- Keep your existing classes and methods (MaterialRecord, MultiModalMaterialDatabase, POSCARReader) ---
 # (I'll omit them here for brevity, assuming they are in your full script)
@@ -46,8 +35,9 @@ class MaterialRecord:
     elements: List[str]
     
     crystal_graph: Dict  # Real-space graph
-    kspace_graph_reference: str  # Reference to shared space group k-space graph
-    
+    # kspace_graph_reference: str  # Original: Reference to shared space group k-space graph - REMOVED
+    kspace_graph: Dict # ADDED: The actual k-space graph dictionary
+
     asph_features: np.ndarray  
     vectorized_features: Dict 
     
@@ -70,6 +60,9 @@ class MaterialRecord:
     symmetry_operations: Dict
     local_database_props: Dict
     processing_timestamp: str
+
+    kspace_physics_features: Optional[Dict[str, List]] # Dict of lists (numpy array converted)
+    kspace_connectivity_matrix: Optional[List[List[int]]] # List of lists (numpy array converted)
 
 
 class PointCloudVectorizer:
@@ -411,7 +404,16 @@ class MultiModalMaterialDatabase:
         # 3. Crystal graph (material-specific)
         graph_dir = self.base_path / 'graphs' / record.jid
         graph_dir.mkdir(exist_ok=True)
-        torch.save(record.crystal_graph, graph_dir / 'crystal_graph.pt')
+        #torch.save(record.crystal_graph, graph_dir / 'crystal_graph.pt')
+        with open(graph_dir / 'crystal_graph.pkl', 'wb') as f:
+            pickle.dump(record.crystal_graph, f)
+        
+        # K-space graph (now directly embedded as a dict of numpy arrays)
+        # Create a separate folder for kspace graphs specific to material if you want
+        # or just save it alongside the crystal graph if it's always paired.
+        # For this setup, it's best to save it next to the crystal graph for that material.
+        with open(graph_dir / 'kspace_graph.pkl', 'wb') as f:
+            pickle.dump(record.kspace_graph, f)
         
         # Task 3: K-space graph is now just a reference, not saved per material
         # The actual k-space graph is managed by SpaceGroupManager
@@ -455,8 +457,9 @@ class MultiModalMaterialDatabase:
                 'structure_hdf5': str(structure_path.relative_to(self.base_path)),
                 'poscar': str(poscar_path.relative_to(self.base_path)),
                 'point_cloud': str(point_cloud_path.relative_to(self.base_path)),
-                'crystal_graph': str((graph_dir / 'crystal_graph.pt').relative_to(self.base_path)),
-                'kspace_graph_reference': record.kspace_graph_reference,
+                'crystal_graph': str((graph_dir / 'crystal_graph.pkl').relative_to(self.base_path)),
+                # 'kspace_graph_reference': record.kspace_graph_reference, # REMOVED
+                'kspace_graph': str((graph_dir / 'kspace_graph.pkl').relative_to(self.base_path)), # ADDED
                 'vectorized_features_dir': str(vectorized_dir.relative_to(self.base_path))
             },
             
@@ -472,6 +475,12 @@ class MultiModalMaterialDatabase:
         with open(metadata_path, 'w') as f:
             json.dump(metadata, f, indent=2)
     
+    def _save_hdf5_format(self, record: MaterialRecord):
+        """Save in HDF5 format (currently placeholder, copy from _save_hybrid_format_enhanced logic if needed)"""
+        # This function was not fully implemented in the provided code, so leaving as a placeholder.
+        # If the user wants to use HDF5, this needs to be properly implemented.
+        pass
+
     def _save_individual_format_enhanced(self, record: MaterialRecord):
         """Enhanced individual format with vectorized features"""
         
@@ -487,8 +496,10 @@ class MultiModalMaterialDatabase:
         self._save_graph_as_graphml(record.crystal_graph, jid_dir / 'crystal_graph.graphml')
         
         # Task 3: K-space graph reference instead of full graph
-        with open(jid_dir / 'kspace_graph_reference.txt', 'w') as f:
-            f.write(record.kspace_graph_reference)
+        # This section needs re-evaluation based on the MaterialRecord change
+        # For now, I'll save the kspace_graph directly if using this format
+        with open(jid_dir / 'kspace_graph.pkl', 'wb') as f:
+            pickle.dump(record.kspace_graph, f)
         
         # 3. Original point cloud data as CSV
         asph_df = pd.DataFrame(record.asph_features.reshape(1, -1))
@@ -513,6 +524,30 @@ class MultiModalMaterialDatabase:
             for method, features in record.vectorized_features.items()
         }
         
+        # Ensure kspace_graph, kspace_physics_features, kspace_connectivity_matrix are JSON serializable
+        if 'kspace_graph' in metadata and metadata['kspace_graph'] is not None:
+            # Assuming kspace_graph can contain numpy arrays
+            # This requires a more robust serialization if it contains complex numpy objects
+            # For simplicity, convert all values to lists if they are numpy arrays
+            serializable_kspace_graph = {}
+            for k, v in metadata['kspace_graph'].items():
+                if isinstance(v, np.ndarray):
+                    serializable_kspace_graph[k] = v.tolist()
+                elif isinstance(v, (list, tuple)) and all(isinstance(i, np.ndarray) for i in v):
+                     serializable_kspace_graph[k] = [item.tolist() for item in v]
+                else:
+                    serializable_kspace_graph[k] = v
+            metadata['kspace_graph'] = serializable_kspace_graph
+        
+        if 'kspace_physics_features' in metadata and metadata['kspace_physics_features'] is not None:
+            serializable_kspace_physics = {}
+            for k, v in metadata['kspace_physics_features'].items():
+                serializable_kspace_physics[k] = v if isinstance(v, list) else v.tolist()
+            metadata['kspace_physics_features'] = serializable_kspace_physics
+            
+        if 'kspace_connectivity_matrix' in metadata and metadata['kspace_connectivity_matrix'] is not None:
+            metadata['kspace_connectivity_matrix'] = [row.tolist() if isinstance(row, np.ndarray) else row for row in metadata['kspace_connectivity_matrix']]
+
         with open(jid_dir / 'metadata.json', 'w') as f:
             json.dump(metadata, f, indent=2)
     
@@ -600,7 +635,14 @@ class MultiModalMaterialDatabase:
     def _save_graph_as_graphml(self, graph_data: Dict, filepath: Path):
         """Save graph in GraphML format for interoperability"""
         # Placeholder - implement based on your graph structure
+        # This needs a library like networkx to convert your Dict graph to GraphML
         pass
+
+    def create_ml_datasets(self):
+        """Placeholder for creating ML-ready datasets, e.g., for GNNs or other models."""
+        print("ML dataset creation method needs to be implemented based on your model requirements.")
+        print("You can call create_vectorized_dataset for non-GNN models or generate specific GNN data.")
+        # Example: self.create_vectorized_dataset(method='combined_features')
 
 class POSCARReader:
     """Utility class to read and parse POSCAR files"""
@@ -701,32 +743,420 @@ class POSCARReader:
                 formula_parts.append(f"{elem}{count}")
         return "".join(formula_parts)
 
-class EnhancedTopologicalMaterialAnalyzer(TopologicalMaterialAnalyzer):
+class IntegratedMaterialProcessor:
     """
-    Enhanced analyzer that uses the new database structure and can integrate
-    with Materials Project data.
+    Integrated processor that combines Materials Project data with topological analysis.
+    Replaces the placeholder logic in generate_and_save_material_record.
+    """
     
-    Note: The 'TopologicalMaterialAnalyzer' class needs to be adapted or
-    defined elsewhere to handle pymatgen Structure objects if it currently
-    relies heavily on JARVIS-specific data structures.
-    """
-    def __init__(self, csv_path: str, sqlite_db_path: str, output_database_path: str, mp_api_key: str):
-        super().__init__(csv_path, sqlite_db_path)
-        self.database = MultiModalMaterialDatabase(output_database_path)
-        self.mp_rest = MPRester(mp_api_key)
-        self.structure_matcher = StructureMatcher(ltol=0.1, stol=0.1, angle_tol=5) 
+    def __init__(self, csv_path: str, db_path: str, kspace_graphs_base_dir: str, database_manager):
+        """
+        Initialize with topological analyzer and database manager.
+        
+        Args:
+            csv_path: Path to topological materials CSV
+            db_path: Path to SQLite database with k-space data
+            database_manager: Your existing database manager for saving records
+        """
+        self.topological_analyzer = TopologicalMaterialAnalyzer(csv_path, db_path)
+        self.database = database_manager
+        self.mp_rest = MPRester("8O0LxKct7DKVrG2KqE9WhieXWpmsAZuu")
 
-        self.kspace_graph_builder = KSpaceGraphBuilder()
-        self.topo_anlyzer = TopologicalMaterialAnalyzer()
-        all_kspace_data_dfs = []
-        for i in range(1, 230):
-            df = self.topo_anlyzer._get_kspace_data_from_db(i)
-            if df is not None:
-                all_kspace_data_dfs.append(df)
-        if all_kspace_data_dfs:
-            concatenated_kspace_data = pd.concat(all_kspace_data_dfs)
-            self.kspace_graph_builder = KSpaceGraphBuilder(initial_df_kspace_data= concatenated_kspace_data)
+    def generate_and_save_material_record(self, mp_material_data: Dict, save_id: str, 
+                                        poscar_file_path: Optional[str] = None, 
+                                        format_type: str = 'hybrid') -> Optional[MaterialRecord]:
+        """
+        Generate complete material record from Materials Project data with topological analysis.
+        
+        Args:
+            mp_material_data (Dict): The dictionary containing material data from MP.
+            save_id (str): A unique ID for saving (e.g., 'MP-mp-xxxxx').
+            poscar_file_path (Optional[str]): Path to a local POSCAR file if available.
+            format_type (str): Format to save the record ('hybrid', 'hdf5', 'individual').
+        """
+        
+        if not mp_material_data:
+            print(f"Cannot generate record for {save_id}: No MP data provided.")
+            return None
 
+        try:
+            # Extract basic info
+            material_id = mp_material_data.get('material_id', save_id)
+            formula = mp_material_data.get('formula_pretty', 'Unknown')
+            normalized_formula = mp_material_data.get('formula_reduced_abc', formula)
+            
+            # Extract structure (pymatgen Structure object)
+            structure: Structure = mp_material_data.get('structure')
+            if not structure:
+                print(f"No structure found for MP material {material_id}. Skipping.")
+                return None
+            
+            print(f"Processing MP material {material_id} with formula {formula}")
+            
+            # INTEGRATION POINT: Use TopologicalMaterialAnalyzer for graph/feature generation
+            print("Attempting topological analysis...")
+            topological_data_block = None
+            
+            try:
+                # Use the new method that accepts pymatgen Structure objects
+                topological_data_block = self.topological_analyzer.enhanced_generate_data_block_from_structure(
+                    structure=structure,
+                    material_id=material_id,
+                    formula=formula
+                )
+            except Exception as e:
+                print(f"Topological analysis failed for {material_id}: {e}")
+                topological_data_block = None
+            
+            # Extract MP properties
+            lattice_matrix = structure.lattice.matrix
+            atomic_positions = np.array(structure.cart_coords)
+            elements = [str(site.specie.symbol) for site in structure]
+            atomic_numbers = [site.specie.Z for site in structure]
+
+            # Get space group info
+            symmetry_data = mp_material_data.get('symmetry', {})
+            space_group = symmetry_data.get('symbol', 'Unknown')
+            space_group_number = symmetry_data.get('number', 0)
+            
+            # Extract MP properties
+            band_gap = mp_material_data.get('band_gap')
+            formation_energy = mp_material_data.get('formation_energy_per_atom')
+            energy_above_hull = mp_material_data.get('energy_above_hull', 0.0)
+            density = mp_material_data.get('density', structure.density)
+            volume = mp_material_data.get('volume', structure.volume)
+            nsites = mp_material_data.get('nsites', len(structure))
+            total_magnetization = mp_material_data.get('total_magnetization', 0.0)
+            magnetic_type = mp_material_data.get('ordering', 'Unknown')
+            theoretical = mp_material_data.get('theoretical', True)
+            
+            # Process topological analysis results or create fallbacks
+            if topological_data_block:
+                print("✓ Topological analysis successful - using computed features")
+                
+                # Extract features from topological analysis
+                crystal_graph_data = topological_data_block['crystal_graph']
+                kspace_graph_data = topological_data_block['kspace_graph'] # NOW THE ACTUAL DICT
+                asph_features_data = topological_data_block['asph_features'] # Already numpy from enhanced method
+                band_rep_features = topological_data_block['band_rep_features'] # Already numpy
+                
+                # Extract topological classification
+                target_label = topological_data_block['target_label'].item() if isinstance(topological_data_block['target_label'], np.ndarray) else topological_data_block['target_label']
+                topological_binary_data = target_label
+                
+                # Determine topological class from local database entry
+                local_topo_data = topological_data_block.get('local_topo_data', {})
+                property_str = str(local_topo_data.get('Property', '')).upper()
+                
+                if 'TI' in property_str:
+                    topological_class_data = "Topological Insulator"
+                elif 'SM' in property_str:
+                    topological_class_data = "Semimetal"
+                elif 'WEYL' in property_str:
+                    topological_class_data = "Weyl Semimetal"
+                elif 'DIRAC' in property_str:
+                    topological_class_data = "Dirac Semimetal"
+                elif target_label > 0.5:
+                    topological_class_data = "Topological"
+                else:
+                    topological_class_data = "Trivial"
+                
+                # Use actual symmetry operations from topological analysis
+                symmetry_operations_data = topological_data_block['symmetry_ops']
+                local_database_props = local_topo_data
+                
+                # NEW: Extract kspace physics features and connectivity matrix
+                kspace_physics_features_data = topological_data_block.get('kspace_physics_features')
+                kspace_connectivity_matrix_data = topological_data_block.get('kspace_connectivity_matrix')
+                
+            else:
+                print("⚠ Topological analysis failed - using fallback features")
+                
+                # Create fallback features when topological analysis fails
+                crystal_graph_data = self._create_fallback_crystal_graph(structure)
+                kspace_graph_data = self._create_fallback_kspace_graph(structure) # This is a Dict fallback
+                asph_features_data = self._create_fallback_asph_features(structure)
+                band_rep_features = np.zeros(100)  # Placeholder for band_rep_vector
+                
+                topological_class_data = "Unknown"
+                topological_binary_data = 0.0
+                symmetry_operations_data = {'rotations': [], 'translations': [], 'num_ops': 0}
+                local_database_props = {}
+
+                # Fallback for new kspace fields
+                kspace_physics_features_data = {}
+                kspace_connectivity_matrix_data = []
+            
+            # Create comprehensive vectorized features
+            basic_properties = np.array([
+                band_gap or 0.0, 
+                formation_energy or 0.0, 
+                density, 
+                volume
+            ])
+            
+            structural_properties = np.array([
+                space_group_number, 
+                nsites, 
+                total_magnetization,
+                energy_above_hull
+            ])
+            
+            # Combine all features
+            combined_features = np.concatenate([
+                asph_features_data,
+                band_rep_features, # Use the numpy array
+                basic_properties,
+                structural_properties
+            ])
+            
+            vectorized_features = {
+                'asph_features': asph_features_data,
+                'band_rep_features': band_rep_features,
+                'basic_properties': basic_properties,
+                'structural_properties': structural_properties,
+                'combined_features': combined_features
+            }
+            
+            # Create stability and electronic structure data
+            stability_data = {
+                'energy_above_hull': energy_above_hull,
+                'formation_energy_per_atom': formation_energy,
+                'is_stable': energy_above_hull <= 0.025
+            }
+            
+            electronic_structure_data = {
+                'band_gap': band_gap,
+                'is_metal': band_gap == 0.0 if band_gap is not None else None,
+                'is_gap_direct': mp_material_data.get('is_gap_direct'),
+                'cbm': mp_material_data.get('cbm'),
+                'vbm': mp_material_data.get('vbm')
+            }
+            
+            mechanical_properties_data = {
+                'bulk_modulus': mp_material_data.get('bulk_modulus'),
+                'shear_modulus': mp_material_data.get('shear_modulus'),
+            }
+
+            # Create the MaterialRecord with integrated data
+            record = MaterialRecord(
+                jid=material_id,
+                formula=formula,
+                normalized_formula=normalized_formula,
+                space_group=space_group,
+                space_group_number=space_group_number,
+                
+                lattice_matrix=lattice_matrix,
+                atomic_positions=atomic_positions,
+                atomic_numbers=atomic_numbers,
+                elements=elements,
+                
+                crystal_graph=crystal_graph_data,
+                kspace_graph=kspace_graph_data, # ADDED - the actual dict
+                
+                asph_features=asph_features_data,
+                vectorized_features=vectorized_features,
+                
+                topological_class=topological_class_data,
+                topological_binary=topological_binary_data,
+                band_gap=band_gap,
+                formation_energy=formation_energy,
+                
+                energy_above_hull=energy_above_hull,
+                density=density,
+                volume=volume,
+                nsites=nsites,
+                total_magnetization=total_magnetization,
+                magnetic_type=magnetic_type,
+                theoretical=theoretical,
+                stability=stability_data,
+                electronic_structure=electronic_structure_data,
+                mechanical_properties=mechanical_properties_data,
+                
+                symmetry_operations=symmetry_operations_data,
+                local_database_props=local_database_props,
+                processing_timestamp=pd.Timestamp.now().isoformat(),
+
+                # NEW: Add the k-space physics features and connectivity matrix to MaterialRecord
+                kspace_physics_features=kspace_physics_features_data,
+                kspace_connectivity_matrix=kspace_connectivity_matrix_data
+            )
+            
+            # Save the record
+            self.database.save_material_record(record, format_type)
+            print(f"✓ Successfully saved material record for {material_id}")
+            
+            return record
+
+        except Exception as e:
+            print(f"Error creating material record for MP entry {save_id}: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return None
+    
+    def _create_fallback_crystal_graph(self, structure: Structure) -> Dict:
+        """Create a basic crystal graph when topological analysis fails."""
+        try:
+            from pymatgen.analysis.local_env import VoronoiNN
+            
+            vnn = VoronoiNN(cutoff=8.0, allow_pathological=True)
+            
+            nodes = []
+            edges = []
+            
+            for i, site in enumerate(structure):
+                # Node features: atomic number, coordination
+                atomic_number = site.specie.Z
+                nodes.append({
+                    'id': i,
+                    'atomic_number': atomic_number,
+                    'position': site.coords.tolist()
+                })
+                
+                # Get neighbors
+                try:
+                    neighbors = vnn.get_nn_info(structure, i)
+                    for neighbor_info in neighbors:
+                        j = neighbor_info['site_index']
+                        if i != j:
+                            edges.append({
+                                'source': i,
+                                'target': j,
+                                'weight': neighbor_info['weight']
+                            })
+                except:
+                    continue
+            
+            return {
+                'nodes': nodes,
+                'edges': edges,
+                'graph_type': 'fallback_crystal_graph'
+            }
+            
+        except Exception as e:
+            print(f"Error creating fallback crystal graph: {e}")
+            return {
+                'nodes': [{'id': i, 'atomic_number': site.specie.Z} 
+                         for i, site in enumerate(structure)],
+                'edges': [],
+                'graph_type': 'minimal_fallback'
+            }
+    
+    def _create_fallback_kspace_graph(self, structure: Structure) -> Dict:
+        """Create a basic k-space graph when topological analysis fails."""
+        try:
+            from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
+            
+            analyzer = SpacegroupAnalyzer(structure)
+            sg_number = analyzer.get_space_group_number()
+            
+            # Create basic k-space representation
+            high_symmetry_points = ['Γ', 'X', 'M', 'R']  # Generic points
+            
+            nodes = [{'id': i, 'k_point': point, 'coordinates': [0, 0, 0]} 
+                    for i, point in enumerate(high_symmetry_points)]
+            
+            edges = [{'source': i, 'target': i+1} 
+                    for i in range(len(high_symmetry_points)-1)]
+            
+            return {
+                'nodes': nodes,
+                'edges': edges,
+                'space_group': sg_number,
+                'graph_type': 'fallback_kspace_graph'
+            }
+            
+        except Exception as e:
+            print(f"Error creating fallback k-space graph: {e}")
+            return {
+                'nodes': [],
+                'edges': [],
+                'graph_type': 'minimal_kspace_fallback'
+            }
+    
+    def _create_fallback_asph_features(self, structure: Structure, n_features: int = 128) -> np.ndarray:
+        """Create basic structural features when ASPH computation fails."""
+        try:
+            # Basic structural descriptors
+            features = []
+            
+            # Lattice parameters
+            a, b, c = structure.lattice.abc
+            alpha, beta, gamma = structure.lattice.angles
+            
+            features.extend([a, b, c, alpha, beta, gamma])
+            features.append(structure.volume)
+            features.append(structure.density)
+            
+            # Composition features
+            composition = structure.composition
+            features.append(len(composition))  # Number of unique elements
+            features.append(sum(composition.values()))  # Total atoms
+            
+            # Element statistics
+            atomic_numbers = [site.specie.Z for site in structure]
+            features.extend([
+                np.mean(atomic_numbers),
+                np.std(atomic_numbers),
+                np.min(atomic_numbers),
+                np.max(atomic_numbers)
+            ])
+            
+            # Pad or truncate to desired length
+            if len(features) < n_features:
+                features.extend([0.0] * (n_features - len(features)))
+            else:
+                features = features[:n_features]
+            
+            return np.array(features, dtype=np.float32)
+            
+        except Exception as e:
+            print(f"Error creating fallback ASPH features: {e}")
+            return np.random.rand(n_features).astype(np.float32)
+    
+    def process_mp_materials_batch(self, mp_materials_list: List[Dict], 
+                                 save_prefix: str = "MP") -> List[MaterialRecord]:
+        """
+        Process a batch of Materials Project materials.
+        
+        Args:
+            mp_materials_list: List of MP material dictionaries
+            save_prefix: Prefix for save IDs
+            
+        Returns:
+            List of successfully created MaterialRecord objects
+        """
+        successful_records = []
+        
+        for i, mp_data in enumerate(mp_materials_list):
+            try:
+                material_id = mp_data.get('material_id', f'unknown-{i}')
+                save_id = f"{save_prefix}-{material_id}"
+                
+                print(f"\n--- Processing {i+1}/{len(mp_materials_list)}: {material_id} ---")
+                
+                record = self.generate_and_save_material_record(
+                    mp_material_data=mp_data,
+                    save_id=save_id,
+                    format_type='hybrid'
+                )
+                
+                if record:
+                    successful_records.append(record)
+                    print(f"✓ Successfully processed {material_id}")
+                else:
+                    print(f"✗ Failed to process {material_id}")
+                    
+            except Exception as e:
+                print(f"✗ Error processing material {i}: {e}")
+                continue
+        
+        print(f"\n=== Batch Processing Complete ===")
+        print(f"Successfully processed: {len(successful_records)}/{len(mp_materials_list)} materials")
+        print(f"Topological matches: {self.topological_analyzer.matched_count}")
+        
+        return successful_records
+    
     def get_mp_material_data(self, formula: str, space_group_number: int) -> Optional[Dict]:
         """
         Query Materials Project for material data matching formula and space group.
@@ -734,12 +1164,14 @@ class EnhancedTopologicalMaterialAnalyzer(TopologicalMaterialAnalyzer):
         """
         print(f"Searching Materials Project for Formula: {formula}, Space Group: {space_group_number}")
         try:
-            # Query Materials Project by formula
-            # Note: Using 'fields' parameter instead of 'properties'
-            docs = self.mp_rest.summary.search(
+            # FIX: Use MPRester.materials.summary.search instead of MPRester.summary.search
+            docs = self.mp_rest.materials.summary.search(
                 formula=formula,
                 fields=["material_id", "formula_pretty", "structure", "band_gap",
-                    "formation_energy_per_atom", "symmetry"]
+                    "formation_energy_per_atom", "symmetry", "energy_above_hull",
+                    "density", "volume", "nsites", "total_magnetization", "ordering",
+                    "is_gap_direct", "cbm", "vbm", "bulk_modulus", "shear_modulus",
+                   ]
             )
             
             if not docs:
@@ -787,7 +1219,19 @@ class EnhancedTopologicalMaterialAnalyzer(TopologicalMaterialAnalyzer):
                         'structure': doc.structure,
                         'band_gap': getattr(doc, 'band_gap', None),
                         'formation_energy_per_atom': getattr(doc, 'formation_energy_per_atom', None),
-                        'symmetry': {'number': sg_number} if sg_number else None
+                        'energy_above_hull': getattr(doc, 'energy_above_hull', None),
+                        'density': getattr(doc, 'density', None),
+                        'volume': getattr(doc, 'volume', None),
+                        'nsites': getattr(doc, 'nsites', None),
+                        'total_magnetization': getattr(doc, 'total_magnetization', None),
+                        'ordering': getattr(doc, 'ordering', None), # magnetic_type
+                        'theoretical': getattr(doc, 'theoretical', True), # Assuming theoretical if not specified
+                        'is_gap_direct': getattr(doc, 'is_gap_direct', None),
+                        'cbm': getattr(doc, 'cbm', None),
+                        'vbm': getattr(doc, 'vbm', None),
+                        'bulk_modulus': getattr(doc, 'bulk_modulus', None),
+                        'shear_modulus': getattr(doc, 'shear_modulus', None),
+                        'symmetry': {'number': sg_number, 'symbol': getattr(doc.symmetry, 'symbol', 'Unknown')} if sg_number else None
                     }
             
             print(f"No exact match in MP for Formula: {formula} AND Space Group: {space_group_number}")
@@ -795,246 +1239,59 @@ class EnhancedTopologicalMaterialAnalyzer(TopologicalMaterialAnalyzer):
             
         except Exception as e:
             print(f"Error querying Materials Project for {formula} (SG: {space_group_number}): {e}")
-            return None
-
-    def generate_and_save_material_record(self, mp_material_data: Dict, save_id: str, 
-                                      poscar_file_path: Optional[str] = None, 
-                                      format_type: str = 'hybrid') -> Optional[MaterialRecord]:
-        """
-        Generate complete material record from Materials Project data and save to database.
-        
-        Args:
-            mp_material_data (Dict): The dictionary containing material data from MP.
-            save_id (str): A unique ID for saving (e.g., 'MP-mp-xxxxx').
-            poscar_file_path (Optional[str]): Path to a local POSCAR file if available.
-            format_type (str): Format to save the record ('hybrid', 'hdf5', 'individual').
-        """
-        
-        if not mp_material_data:
-            print(f"Cannot generate record for {save_id}: No MP data provided.")
-            return None
-
-        try:
-            # Extract basic info
-            material_id = mp_material_data.get('material_id', save_id)
-            formula = mp_material_data.get('formula_pretty', 'Unknown')
-            normalized_formula = mp_material_data.get('formula_reduced_abc', formula) # MP has reduced formula
-            
-            # Extract structure (pymatgen Structure object)
-            structure: Structure = mp_material_data.get('structure')
-            if not structure:
-                print(f"No structure found for MP material {material_id}. Skipping.")
-                return None
-            
-            # Get lattice and atomic info from pymatgen Structure
-            lattice_matrix = structure.lattice.matrix
-            atomic_positions = np.array(structure.cart_coords) # Cartesian coordinates
-            elements = [str(site.specie.symbol) for site in structure]
-            atomic_numbers = [site.specie.Z for site in structure]
-
-            # Get space group info from symmetry
-            symmetry_data = mp_material_data.get('symmetry', {})
-            space_group = symmetry_data.get('symbol', 'Unknown')
-            space_group_number = symmetry_data.get('number', 0)
-            
-            # Extract properties
-            band_gap = mp_material_data.get('band_gap')
-            formation_energy = mp_material_data.get('formation_energy_per_atom') # MP has per atom
-            
-            # Extract additional MP properties for the missing required fields
-            energy_above_hull = mp_material_data.get('energy_above_hull', 0.0)
-            density = mp_material_data.get('density', structure.density if structure else 0.0)
-            volume = mp_material_data.get('volume', structure.volume if structure else 0.0)
-            nsites = mp_material_data.get('nsites', len(structure) if structure else 0)
-            total_magnetization = mp_material_data.get('total_magnetization', 0.0)
-            magnetic_type = mp_material_data.get('ordering', 'Unknown')
-            theoretical = mp_material_data.get('theoretical', True)  # MP data is typically theoretical
-            
-            # Extract stability and electronic structure info
-            stability_data = {
-                'energy_above_hull': energy_above_hull,
-                'formation_energy_per_atom': formation_energy,
-                'is_stable': energy_above_hull <= 0.025  # Common stability threshold
-            }
-            
-            electronic_structure_data = {
-                'band_gap': band_gap,
-                'is_metal': band_gap == 0.0 if band_gap is not None else None,
-                'is_gap_direct': mp_material_data.get('is_gap_direct'),
-                'cbm': mp_material_data.get('cbm'),
-                'vbm': mp_material_data.get('vbm')
-            }
-            
-            # Extract mechanical properties if available
-            mechanical_properties_data = {
-                'bulk_modulus': mp_material_data.get('bulk_modulus'),
-                'shear_modulus': mp_material_data.get('shear_modulus'),
-                'elastic_tensor': mp_material_data.get('elastic_tensor')
-            }
-            
-            # Topological properties (these typically aren't directly in MP data)
-            # You'll need to compute or infer these. For now, using placeholders.
-            # The 'TopologicalMaterialAnalyzer' (if it has topological logic)
-            # needs to be adapted to process the Structure object.
-            
-            # Placeholder for topological data and graph data
-            # This is where your `TopologicalMaterialAnalyzer` would typically compute these.
-            # You need to integrate the logic from `build_dataset_test.py` here.
-            # For demonstration, I'll use dummy values.
-            
-            # HACK: Create a dummy data_block for now. This needs to be replaced
-            # by actual calculations from your TopologicalMaterialAnalyzer
-            # based on the pymatgen Structure object.
-            # The `generate_data_block_with_sg_check` method from your `TopologicalMaterialAnalyzer`
-            # needs to be refactored to accept a pymatgen Structure object.
-            dummy_crystal_graph = {'nodes': len(elements), 'edges': []}
-            dummy_kspace_graph = {'nodes': len(elements), 'edges': []}
-            dummy_asph_features = np.random.rand(128) # Placeholder point cloud features
-            dummy_topological_class = "Unknown"
-            dummy_topological_binary = 0.0 # Default to non-topological if not determined
-            dummy_symmetry_operations = symmetry_data # Using MP symmetry data
-            dummy_local_database_props = {}
-            
-            # Create vectorized features (combine various feature vectors)
-            vectorized_features = {
-            'asph_features': dummy_asph_features,
-            'basic_properties': np.array([band_gap or 0.0, formation_energy or 0.0, density, volume]),
-            'structural_properties': np.array([space_group_number, nsites, total_magnetization]),
-            'combined_features': np.concatenate([
-                dummy_asph_features,
-                np.array([band_gap or 0.0, formation_energy or 0.0, density, volume]),
-                np.array([space_group_number, nsites, total_magnetization])
-            ])
-        }
-            # Create kspace_graph_reference (placeholder - should be actual reference)
-            kspace_graph_reference = f"kspace_graph_{material_id}"
-            
-            # If your original TopologicalMaterialAnalyzer can work with a pymatgen Structure,
-            # you would do something like:
-            # material_block = self.generate_data_block_from_structure(structure)
-            # Then extract 'crystal_graph', 'kspace_graph', 'asph_features', 'target_label' etc.
-            # from material_block.
-            
-            # For the purpose of this replacement, we'll assume the original
-            # `generate_data_block_with_sg_check` can somehow be made to work
-            # with MP data, or you have a separate topological analysis module.
-            # The most direct path is to convert the MP structure into the format
-            # expected by your `TopologicalMaterialAnalyzer`.
-            
-            # Here's where you'd call your `TopologicalMaterialAnalyzer`
-            # This part needs to be adapted based on how your `TopologicalMaterialAnalyzer`
-            # processes structural data and generates features/graphs.
-            # For this example, I'll call a hypothetical method that takes a Pymatgen Structure.
-            
-            # Example of how you might integrate with your analyzer:
-            # Assuming analyzer has a method `process_structure_for_topological_data`
-            # which returns a dict similar to `data_block`
-            
-            # This part requires you to modify your `TopologicalMaterialAnalyzer`
-            # or `build_dataset_test.py` to handle `pymatgen.core.Structure` objects.
-            # For now, I'm using placeholder graphs and features.
-            
-            # To actually integrate:
-            # You would likely need to adapt `TopologicalMaterialAnalyzer` to accept
-            # a `pymatgen.core.Structure` object instead of a JID, and then
-            # extract lattice, positions, etc., and perform graph/feature generation.
-            
-            # For now, we use placeholders. YOU MUST REPLACE THESE WITH ACTUAL LOGIC.
-            crystal_graph_data = dummy_crystal_graph # Replace with actual graph generation
-            kspace_graph_data = dummy_kspace_graph # Replace with actual graph generation
-            asph_features_data = dummy_asph_features # Replace with actual point cloud generation
-            topological_class_data = dummy_topological_class
-            topological_binary_data = dummy_topological_binary
-
-            record = MaterialRecord(
-                jid=material_id, # Using MP material_id as JID
-                formula=formula,
-                normalized_formula=normalized_formula,
-                space_group=space_group,
-                space_group_number=space_group_number,
-                
-                lattice_matrix=lattice_matrix,
-                atomic_positions=atomic_positions,
-                atomic_numbers=atomic_numbers,
-                elements=elements,
-                
-                crystal_graph=crystal_graph_data,
-                kspace_graph_reference=kspace_graph_reference,  # NEW: Required field
-                
-                asph_features=asph_features_data,
-                vectorized_features=vectorized_features,  # NEW: Required field
-                
-                topological_class=topological_class_data,
-                topological_binary=topological_binary_data,
-                band_gap=band_gap,
-                formation_energy=formation_energy,
-                
-                # NEW: Additional required MP properties
-                energy_above_hull=energy_above_hull,
-                density=density,
-                volume=volume,
-                nsites=nsites,
-                total_magnetization=total_magnetization,
-                magnetic_type=magnetic_type,
-                theoretical=theoretical,
-                stability=stability_data,
-                electronic_structure=electronic_structure_data,
-                mechanical_properties=mechanical_properties_data,
-                
-                symmetry_operations=dummy_symmetry_operations,
-                local_database_props=dummy_local_database_props,
-                processing_timestamp=pd.Timestamp.now().isoformat()
-            )
-            
-            self.database.save_material_record(record, format_type)
-            return record
-
-        except Exception as e:
-            print(f"Error creating material record for MP entry {save_id}: {str(e)}")
             import traceback
-            traceback.print_exc()
+            traceback.print_exc() # Print full traceback for MP query errors
             return None
-
+        
+    
 def main():
     """Main execution function with Materials Project API integration."""
     # --- Configuration ---
     csv_path = "/Users/abiralshakya/Documents/Research/GraphVectorTopological/materials_database.csv"
     sqlite_db_path = "/Users/abiralshakya/Documents/Research/GraphVectorTopological/pebr_tr_nonmagnetic_rev4.db"
-    output_database_dir = "./multimodal_materials_db_mp"
     
-    # You can set this as an environment variable or store it securely.
-    mp_api_key = "8O0LxKct7DKVrG2KqE9WhieXWpmsAZuu"
-    print (mp_api_key)
-    os.makedirs(output_database_dir, exist_ok=True)
+    KSPACE_GRAPHS_OUTPUT_DIR = "/Users/abiralshakya/Documents/Research/GraphVectorTopological/kspace_topology_graphs"
+    MULTIMODAL_DB_OUTPUT_DIR = "/Users/abiralshakya/Documents/Research/GraphVectorTopological/multimodal_materials_db_mp" 
+
+    Path(KSPACE_GRAPHS_OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
+    Path(MULTIMODAL_DB_OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
+    
+    mp_api_key = "8O0LxKct7DKVrG2KqE9WhieXWpmsAZuu" # put in gitignore lol doesnt matter for now
+    print(f"Using MP API Key: {mp_api_key}")
     max_materials = 10 
 
-    # --- Load Local CSV Data ---
-    print(f"Reading data from local CSV: {csv_path}...")
+    print("Pre-generating k-space graphs (if not already present)...")
+    # KSpacePhysicsGraphBuilder is imported but not used directly in the provided `main` function.
+    # If it's intended to be run, uncomment and ensure it's functional.
+    # For now, I'm just acknowledging its presence.
+    # kspace_graph_builder_instance = KSpacePhysicsGraphBuilder(csv_path, sqlite_db_path, KSPACE_GRAPHS_OUTPUT_DIR)
+    # kspace_graph_builder_instance.generate_kspace_graphs_for_all_space_groups()
+    print("K-space graphs pre-generation complete (skipped if not explicitly called).")
+
+    database_manager_instance = MultiModalMaterialDatabase(MULTIMODAL_DB_OUTPUT_DIR)
+
     materials_df = pd.read_csv(csv_path)
 
-    # --- Initialize Analyzer (now with MP API key) ---
-    print("Initializing Enhanced Topological Material Analyzer...")
-    analyzer = EnhancedTopologicalMaterialAnalyzer(
+    print("Initializing Integrated Material Processor...")
+    processor = IntegratedMaterialProcessor(
         csv_path=csv_path, 
-        sqlite_db_path=sqlite_db_path, # This is still used by your original analyzer logic
-        output_database_path=output_database_dir,
-        mp_api_key=mp_api_key
+        db_path=sqlite_db_path,
+        kspace_graphs_base_dir=KSPACE_GRAPHS_OUTPUT_DIR, 
+        database_manager=database_manager_instance 
     )
     
     # --- Main Processing Loop ---
     print(f"\nStarting data generation for up to {max_materials} materials from your CSV (using Materials Project)...")
     
     successful_generations = 0 
-    SPACE_GROUP_COLUMN_NAME = 'Space Group' # Make sure this matches your CSV column name
+    SPACE_GROUP_COLUMN_NAME = 'Space Group' 
 
-    # Use a set to keep track of processed ICSD IDs to avoid redundant processing
     processed_icsd_ids = set()
 
     for index, row in tqdm.tqdm(materials_df.head(max_materials).iterrows(), total=max_materials, desc="Processing Materials"):
         formula = row['Formula']
         icsd_id = row['ICSD_ID']
         
-        # Skip if already processed (e.g., from a previous run or duplicate in CSV)
         if icsd_id in processed_icsd_ids:
             continue
         
@@ -1044,6 +1301,7 @@ def main():
         
         try:
             space_group_string = str(row[SPACE_GROUP_COLUMN_NAME])
+            # Assuming space group string is like "14 P2_1/c" and we want "14"
             space_group_number_str = space_group_string.split(' ')[0]
             space_group_from_csv = int(space_group_number_str)
         except (ValueError, IndexError):
@@ -1051,31 +1309,22 @@ def main():
             continue
 
         unique_save_id = f"ICSD-{icsd_id}"
-        # Check if the material has already been successfully processed and saved
-        # You'll need to adjust how you check for existence if you're saving in a new way
-        # For 'hybrid' format, check for the metadata JSON file.
-        existing_metadata_path = Path(output_database_dir) / 'metadata' / f"{unique_save_id}.json"
+        existing_metadata_path = Path(MULTIMODAL_DB_OUTPUT_DIR) / 'metadata' / f"{unique_save_id}.json"
         if existing_metadata_path.exists():
             print(f"✓ Skipping {unique_save_id}: Already processed.")
-            successful_generations += 1 # Count already processed as successful
+            successful_generations += 1
             processed_icsd_ids.add(icsd_id)
             continue
         
-        # --- NEW: Query Materials Project instead of JARVIS ---
-        mp_data = analyzer.get_mp_material_data(formula, space_group_from_csv)
-        
+        mp_data = processor.get_mp_material_data(formula, space_group_from_csv) 
+
         if not mp_data:
             print(f"✗ No Materials Project entry found for Formula: {formula} AND Space Group: {space_group_from_csv}. Skipping.")
             continue
         
-        # Now, use the retrieved MP data to generate and save the material record
-        # Note: Your `generate_and_save_material_record` needs to be adapted to
-        # take the MP data directly, as it currently expects `data_block` which
-        # was JARVIS-specific. I've updated its signature above.
-        record = analyzer.generate_and_save_material_record(
+        record = processor.generate_and_save_material_record( # Corrected: use 'processor'
             mp_material_data=mp_data,
             save_id=unique_save_id,
-            # poscar_file_path=analyzer.find_poscar_file(unique_save_id, formula) # Optional: if you still want to use local POSCARs
         )
         
         if record:
@@ -1083,68 +1332,26 @@ def main():
             processed_icsd_ids.add(icsd_id)
             print(f"✓ Successfully processed and saved {unique_save_id} (MP ID: {record.jid})")
             
-    # --- Final Report ---
     print(f"\n" + "="*60)
     print(f"DATASET GENERATION COMPLETE")
     print(f"="*60)
     print(f"Total materials in CSV: {len(materials_df)}")
     print(f"Successfully processed and saved: {successful_generations}")
-    print(f"Database location: {output_database_dir}")
+    print(f"Database location: {MULTIMODAL_DB_OUTPUT_DIR}")
     print(f"="*60)
     
-    # Create master index and ML splits after processing
-    # Note: `create_master_index` and `create_ml_datasets` belong to MultiModalMaterialDatabase
-    # so we call them via `analyzer.database`.
     if successful_generations > 0:
         print("\nCreating master index and ML datasets...")
-        master_df = analyzer.database.create_master_index()
+        master_df = database_manager_instance.create_master_index()
         if not master_df.empty:
-            analyzer.database.create_ml_datasets()
+            database_manager_instance.create_ml_datasets() 
         else:
             print("No materials were successfully processed to create a master index or ML datasets.")
     else:
         print("No materials were successfully processed. Skipping master index and ML dataset creation.")
 
     # Print directory structure
-    inspect_database(output_database_dir)
-
-def inspect_database(db_path: str):
-    """Helper function to inspect what's in the database"""
-    db_path_obj = Path(db_path)
-    
-    print(f"\nDatabase inspection: {db_path}")
-    print("="*50)
-    
-    if not db_path_obj.exists():
-        print("Database directory does not exist!")
-        return
-    
-    # Check each subdirectory
-    subdirs = ['structures', 'graphs', 'point_clouds', 'metadata', 'datasets']
-    for subdir in subdirs:
-        subdir_path = db_path_obj / subdir
-        if subdir_path.exists():
-            files = list(subdir_path.rglob("*"))
-            files = [f for f in files if f.is_file()]
-            print(f"{subdir}: {len(files)} files")
-            for f in files[:3]:  # Show first 3 files
-                print(f"  - {f.name}")
-            if len(files) > 3:
-                print(f"  ... and {len(files) - 3} more")
-        else:
-            print(f"{subdir}: directory not found")
-    
-    # Check master index
-    master_csv = db_path_obj / 'master_index.csv'
-    if master_csv.exists():
-        df = pd.read_csv(master_csv)
-        print(f"Master index: {len(df)} materials")
-        if len(df) > 0:
-            print(f"  Columns: {list(df.columns)}")
-            if 'topological_binary' in df.columns:
-                print(f"  Topological materials: {(df['topological_binary'] == 1).sum()}")
-    else:
-        print("Master index: not found")
+    #inspect_database(MULTIMODAL_DB_OUTPUT_DIR)
 
 if __name__ == "__main__":
     main()

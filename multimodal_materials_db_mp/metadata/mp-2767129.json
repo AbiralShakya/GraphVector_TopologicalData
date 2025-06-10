@@ -2,57 +2,58 @@
   "jid": "mp-2767129",
   "formula": "KGa2Cl7",
   "normalized_formula": "KGa2Cl7",
-  "space_group": "Unknown",
+  "space_group": "Pna2_1",
   "space_group_number": 33,
   "topological_class": "Unknown",
   "topological_binary": 0.0,
   "band_gap": 4.9561,
   "formation_energy": -1.7557762807250001,
-  "energy_above_hull": 0.0,
-  "density": 2.461318456680831,
+  "energy_above_hull": 0.005753124750004001,
+  "density": 2.4613184566808313,
   "volume": 1151.5412384653046,
   "nsites": 40,
   "total_magnetization": 0.0,
-  "magnetic_type": "Unknown",
-  "theoretical": true,
+  "magnetic_type": "NM",
+  "theoretical": null,
   "stability": {
-    "energy_above_hull": 0.0,
+    "energy_above_hull": 0.005753124750004001,
     "formation_energy_per_atom": -1.7557762807250001,
     "is_stable": true
   },
   "electronic_structure": {
     "band_gap": 4.9561,
     "is_metal": false,
-    "is_gap_direct": null,
-    "cbm": null,
-    "vbm": null
+    "is_gap_direct": true,
+    "cbm": 3.3672,
+    "vbm": -1.5889
   },
   "mechanical_properties": {
     "bulk_modulus": null,
-    "shear_modulus": null,
-    "elastic_tensor": null
+    "shear_modulus": null
   },
-  "processing_timestamp": "2025-06-10T11:39:21.201257",
+  "processing_timestamp": "2025-06-10T16:29:45.079328",
   "local_database_props": {},
   "num_atoms": 40,
   "file_locations": {
     "structure_hdf5": "structures/mp-2767129.h5",
     "poscar": "structures/mp-2767129_POSCAR",
     "point_cloud": "point_clouds/mp-2767129_asph.npy",
-    "crystal_graph": "graphs/mp-2767129/crystal_graph.pt",
-    "kspace_graph_reference": "kspace_graph_mp-2767129",
+    "crystal_graph": "graphs/mp-2767129/crystal_graph.pkl",
+    "kspace_graph": "graphs/mp-2767129/kspace_graph.pkl",
     "vectorized_features_dir": "vectorized_features/mp-2767129"
   },
   "vectorized_methods": [
     "asph_features",
+    "band_rep_features",
     "basic_properties",
     "structural_properties",
     "combined_features"
   ],
   "vectorized_feature_sizes": {
     "asph_features": 128,
+    "band_rep_features": 100,
     "basic_properties": 4,
-    "structural_properties": 3,
-    "combined_features": 135
+    "structural_properties": 4,
+    "combined_features": 236
   }
 }

@@ -2,57 +2,58 @@
   "jid": "mp-554288",
   "formula": "NaPH4O5",
   "normalized_formula": "NaPH4O5",
-  "space_group": "Unknown",
+  "space_group": "Pna2_1",
   "space_group_number": 33,
   "topological_class": "Unknown",
   "topological_binary": 0.0,
   "band_gap": 5.4573,
   "formation_energy": -1.9025312148656521,
-  "energy_above_hull": 0.0,
-  "density": 2.0138288957365544,
+  "energy_above_hull": 0.0074185804545410005,
+  "density": 2.013828895736554,
   "volume": 455.1361658285836,
   "nsites": 44,
-  "total_magnetization": 0.0,
-  "magnetic_type": "Unknown",
-  "theoretical": true,
+  "total_magnetization": 0.0007465999999990001,
+  "magnetic_type": "NM",
+  "theoretical": null,
   "stability": {
-    "energy_above_hull": 0.0,
+    "energy_above_hull": 0.0074185804545410005,
     "formation_energy_per_atom": -1.9025312148656521,
     "is_stable": true
   },
   "electronic_structure": {
     "band_gap": 5.4573,
     "is_metal": false,
-    "is_gap_direct": null,
-    "cbm": null,
-    "vbm": null
+    "is_gap_direct": true,
+    "cbm": 4.5154,
+    "vbm": -0.9419000000000001
   },
   "mechanical_properties": {
     "bulk_modulus": null,
-    "shear_modulus": null,
-    "elastic_tensor": null
+    "shear_modulus": null
   },
-  "processing_timestamp": "2025-06-10T11:39:20.688864",
+  "processing_timestamp": "2025-06-10T16:29:43.095460",
   "local_database_props": {},
   "num_atoms": 44,
   "file_locations": {
     "structure_hdf5": "structures/mp-554288.h5",
     "poscar": "structures/mp-554288_POSCAR",
     "point_cloud": "point_clouds/mp-554288_asph.npy",
-    "crystal_graph": "graphs/mp-554288/crystal_graph.pt",
-    "kspace_graph_reference": "kspace_graph_mp-554288",
+    "crystal_graph": "graphs/mp-554288/crystal_graph.pkl",
+    "kspace_graph": "graphs/mp-554288/kspace_graph.pkl",
     "vectorized_features_dir": "vectorized_features/mp-554288"
   },
   "vectorized_methods": [
     "asph_features",
+    "band_rep_features",
     "basic_properties",
     "structural_properties",
     "combined_features"
   ],
   "vectorized_feature_sizes": {
     "asph_features": 128,
+    "band_rep_features": 100,
     "basic_properties": 4,
-    "structural_properties": 3,
-    "combined_features": 135
+    "structural_properties": 4,
+    "combined_features": 236
   }
 }

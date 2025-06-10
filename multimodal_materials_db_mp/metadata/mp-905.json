@@ -2,7 +2,7 @@
   "jid": "mp-905",
   "formula": "LaF3",
   "normalized_formula": "LaF3",
-  "space_group": "Unknown",
+  "space_group": "P-3c1",
   "space_group_number": 165,
   "topological_class": "Unknown",
   "topological_binary": 0.0,
@@ -12,9 +12,9 @@
   "density": 5.984096220582201,
   "volume": 326.1652750807279,
   "nsites": 24,
-  "total_magnetization": 0.0,
-  "magnetic_type": "Unknown",
-  "theoretical": true,
+  "total_magnetization": 0.000257299999999,
+  "magnetic_type": "NM",
+  "theoretical": null,
   "stability": {
     "energy_above_hull": 0.0,
     "formation_energy_per_atom": -4.508268510833333,
@@ -23,36 +23,45 @@
   "electronic_structure": {
     "band_gap": 6.042899999999999,
     "is_metal": false,
-    "is_gap_direct": null,
-    "cbm": null,
-    "vbm": null
+    "is_gap_direct": true,
+    "cbm": 8.2655,
+    "vbm": 2.2226
   },
   "mechanical_properties": {
-    "bulk_modulus": null,
-    "shear_modulus": null,
-    "elastic_tensor": null
+    "bulk_modulus": {
+      "voigt": 102.33,
+      "reuss": 101.894,
+      "vrh": 102.112
+    },
+    "shear_modulus": {
+      "voigt": 41.132,
+      "reuss": 37.65,
+      "vrh": 39.391
+    }
   },
-  "processing_timestamp": "2025-06-10T11:39:20.421148",
+  "processing_timestamp": "2025-06-10T16:29:41.405338",
   "local_database_props": {},
   "num_atoms": 24,
   "file_locations": {
     "structure_hdf5": "structures/mp-905.h5",
     "poscar": "structures/mp-905_POSCAR",
     "point_cloud": "point_clouds/mp-905_asph.npy",
-    "crystal_graph": "graphs/mp-905/crystal_graph.pt",
-    "kspace_graph_reference": "kspace_graph_mp-905",
+    "crystal_graph": "graphs/mp-905/crystal_graph.pkl",
+    "kspace_graph": "graphs/mp-905/kspace_graph.pkl",
     "vectorized_features_dir": "vectorized_features/mp-905"
   },
   "vectorized_methods": [
     "asph_features",
+    "band_rep_features",
     "basic_properties",
     "structural_properties",
     "combined_features"
   ],
   "vectorized_feature_sizes": {
     "asph_features": 128,
+    "band_rep_features": 100,
     "basic_properties": 4,
-    "structural_properties": 3,
-    "combined_features": 135
+    "structural_properties": 4,
+    "combined_features": 236
   }
 }

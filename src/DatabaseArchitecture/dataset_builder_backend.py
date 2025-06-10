@@ -3,15 +3,17 @@
 # graph 2 for k space
 # point cloud for atom homology
 
+from dataclasses import dataclass
 import torch
 import pandas as pd
 import os
 import re
 from tqdm import tqdm
 import numpy as np
-from typing import Dict, Optional, List, Tuple, Union
+from typing import Dict, Optional, List, Tuple, Union, Any
 import json
 import time
+import pickle
 
 from pymatgen.core import Structure
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
@@ -40,6 +42,18 @@ class TopologicalMaterialAnalyzer:
         self.db_path = db_path
         self.conn = sqlite3.connect(self.db_path)
         self._load_and_prepare_databases()
+
+    @dataclass
+    class KSpaceTopologyData:
+        """Data structure to capture k-space topology physics"""
+        space_group_number: int
+        ebr_data: Dict[str, Any]  # Elementary Band Representations
+        topological_indices: Dict[str, float]  # Chern, Z2, etc.
+        decomposition_branches: Dict[str, List]  # Band decomposition info
+        kspace_graph: Data  # PyTorch Geometric graph
+        connectivity_matrix: np.ndarray  # K-point connectivity
+        physics_features: Dict[str, torch.Tensor]  # Physics-informed features
+
 
     def normalize_formula(self, formula: str) -> str:
         """Normalizes a chemical formula string for consistent lookups."""
@@ -89,7 +103,6 @@ class TopologicalMaterialAnalyzer:
         to build the vocabularies for k-points and irreps.
         """
         print(f"Loading local topological data from {self.csv_path}...")
-        # This part for loading the CSV remains the same
         df = pd.read_csv(self.csv_path)
         df.columns = df.columns.str.strip()
         for idx, row in df.iterrows():
@@ -98,7 +111,7 @@ class TopologicalMaterialAnalyzer:
                 self.formula_lookup[norm_formula] = row.to_dict()
         print(f"Loaded {len(self.formula_lookup)} unique materials from local CSV.")
 
-        # --- NEW: Build vocabularies by querying the SQLite DB ---
+        # Build vocabularies by querying the SQLite DB
         print(f"Building vocabularies from SQLite DB: {self.db_path}...")
         try:
             # Query for all unique k-points
@@ -114,32 +127,10 @@ class TopologicalMaterialAnalyzer:
         except Exception as e:
             print(f"✗ ERROR: Could not build vocabularies from SQLite DB. {e}")
 
-    # def _get_kspace_data_from_db(self, space_group_number: int) -> Optional[pd.DataFrame]:
-    #     """
-    #     Queries the SQLite DB to get all k-points and irrep labels
-    #     for a given space group number.
-    #     """
-    #     try:
-    #         query = """
-    #             SELECT
-    #               ir.k_point,
-    #               ir.irrep_label
-    #             FROM irreps AS ir
-    #             LEFT JOIN ebrs ON ir.ebr_id = ebrs.id
-    #             LEFT JOIN space_groups AS sg ON ebrs.space_group_id = sg.id
-    #             WHERE
-    #               sg.number = ?;
-    #         """
-    #         df = pd.read_sql_query(query, self.conn, params=(space_group_number,))
-    #         if not df.empty:
-    #             return df
-    #     except Exception as e:
-    #         print(f"  ✗ Warning: Could not query k-space data for SG {space_group_number}: {e}")
-    #     return None
     def _connect(self):
         """Establishes the database connection."""
         if self.conn is None:
-            self.conn = sqlite3.connect(self.sqlite_db_path)
+            self.conn = sqlite3.connect(self.db_path)
 
     def _close(self):
         """Closes the database connection."""
@@ -152,20 +143,20 @@ class TopologicalMaterialAnalyzer:
         Queries the SQLite DB to get all k-points, irrep labels,
         and associated decomposition branch information for a given space group number.
         """
-        self._connect() # Ensure connection is open
+        self._connect()
 
         try:
             query = """
                 SELECT
                   ir.k_point,
                   ir.irrep_label,
-                  b.branch1_irreps,        -- NEW: Irreps for decomposition branch 1
-                  b.branch2_irreps,        -- NEW: Irreps for decomposition branch 2
-                  b.decomposition_index    -- NEW: Index of the specific EBR decomposition
+                  b.branch1_irreps,
+                  b.branch2_irreps,
+                  b.decomposition_index
                 FROM irreps AS ir
                 LEFT JOIN ebrs ON ir.ebr_id = ebrs.id
                 LEFT JOIN space_groups AS sg ON ebrs.space_group_id = sg.id
-                LEFT JOIN ebr_decomposition_branches AS b ON ebrs.id = b.ebr_id -- NEW JOIN to get branch info
+                LEFT JOIN ebr_decomposition_branches AS b ON ebrs.id = b.ebr_id
                 WHERE
                   sg.number = ?;
             """
@@ -177,8 +168,142 @@ class TopologicalMaterialAnalyzer:
         finally:
             self._close() 
         return None
-    
+
+    def generate_data_block_from_structure(self, structure: Structure, material_id: str, 
+                                         formula: str = None) -> Optional[Dict]:
+        """
+        NEW METHOD: Generate data block directly from pymatgen Structure object.
+        This is the key method that replaces generate_data_block_with_sg_check for MP data.
+        
+        Args:
+            structure: pymatgen Structure object
+            material_id: unique identifier (e.g., MP-12345)
+            formula: chemical formula (optional, will be derived from structure if not provided)
+        """
+        self.processed_count += 1
+        print(f"Processing Material ID: {material_id}")
+
+        if structure is None:
+            print(f"  ERROR: No structure provided for {material_id}")
+            return None
+
+        # Get formula from structure if not provided
+        if formula is None:
+            formula = structure.composition.reduced_formula
+        
+        print(f"  Formula: {formula}")
+        norm_formula = self.normalize_formula(formula)
+        print(f"  Normalized formula: {norm_formula}")
+
+        # Check if material is in local topological dataset
+        if norm_formula not in self.formula_lookup:
+            print(f"  Formula {norm_formula} not found in local topological database")
+            return None
+
+        local_data_entry = self.formula_lookup[norm_formula]
+
+        # Analyze space group
+        try:
+            analyzer = SpacegroupAnalyzer(structure, symprec=0.1)
+            sg_number = analyzer.get_space_group_number()
+            space_group = analyzer.get_space_group_symbol()
+            
+            # Check space group match with local data
+            local_sg = local_data_entry.get('Spacegroup_Number')
+            if local_sg and local_sg != sg_number:
+                print(f"  Skipping {material_id} ({norm_formula}, SG {sg_number}): "
+                      f"Space group mismatch with local DB (local: {local_sg})")
+                return None
+                
+        except Exception as e:
+            print(f"  Error in space group analysis: {e}")
+            return None
+
+        self.matched_count += 1
+        print(f"  ✓ Match found! ({self.matched_count}/{self.processed_count})")
+        print(f"  Space group: {space_group} ({sg_number})")
+
+        # Get primitive structure and symmetry operations
+        try:
+            primitive_structure = analyzer.get_primitive_standard_structure()
+            symm_ops = analyzer.get_symmetry_operations(cartesian=True)
+            print(f"  Symmetry operations: {len(symm_ops)}")
+        except Exception as e:
+            print(f"  Error in symmetry analysis: {e}")
+            primitive_structure = structure
+            symm_ops = []
+
+        # Query k-space data from database
+        print("  Querying SQLite DB for k-space data...")
+        kspace_df = self._get_kspace_data_from_db(sg_number)
+        if kspace_df is None:
+            print(f"  Skipping {material_id}: No k-space data found for SG {sg_number}")
+            return None
+        
+        print(f"  ✓ Found {len(kspace_df)} k-space entries for SG {sg_number}")
+
+        # Generate features using existing methods
+        band_rep_vector, target_y = self._featurize_kspace_data(local_data_entry, kspace_df)
+        
+        print("  Generating features...")
+        crystal_graph = self._create_crystal_graph(primitive_structure)
+        asph_vector = self._compute_asph_features(structure)
+        kspace_graph = self._create_kspace_graph(band_rep_vector)
+
+        kspace_topology_data = self._load_pregenerated_kspace_data(sg_number)
+        
+        if kspace_topology_data:
+            kspace_graph = kspace_topology_data.kspace_graph # Get the PyG Data object
+            # Also capture other physics features if needed in the data block
+            physics_features_tensor = kspace_topology_data.physics_features
+            connectivity_matrix = kspace_topology_data.connectivity_matrix
+            data_block['kspace_physics_features'] = physics_features_tensor
+            data_block['kspace_connectivity_matrix'] = connectivity_matrix
+        else:
+            print(f"  Warning: No pre-generated k-space topology data found for SG {sg_number}. Creating fallback k-space graph.")
+            # Fallback to creating a generic k-space graph if pre-generated data isn't available
+            kspace_graph = self._create_fallback_kspace_graph(structure) # Re-using your fallback
+            physics_features_tensor = {} # Empty dict for fallback
+            connectivity_matrix = np.array([]) # Empty array for fallback
+
+        
+        crystal_graph.y = target_y
+
+        # Create basic properties dictionary from structure
+        basic_props = {
+            'density': structure.density,
+            'volume': structure.volume,
+            'nsites': len(structure),
+            'space_group': space_group,
+            'space_group_number': sg_number
+        }
+
+        # Assemble the final data block
+        data_block = {
+            'jid': material_id,  # Using material_id as jid for compatibility
+            'formula': formula,
+            'normalized_formula': norm_formula,
+            'crystal_graph': crystal_graph,
+            'kspace_graph': kspace_graph,
+            'asph_features': asph_vector,
+            'band_rep_features': band_rep_vector,
+            'target_label': target_y,
+            'symmetry_ops': {
+                'rotations': torch.stack([torch.tensor(op.rotation_matrix, dtype=torch.float) 
+                                        for op in symm_ops]) if symm_ops else torch.empty(0, 3, 3),
+                'translations': torch.stack([torch.tensor(op.translation_vector, dtype=torch.float) 
+                                           for op in symm_ops]) if symm_ops else torch.empty(0, 3)
+            },
+            'structure_props': basic_props,
+            'local_topo_data': local_data_entry
+        }
+        
+        print(f"  ✓ Data block generated successfully")
+        return data_block
+
+    # Keep the original JARVIS method for backward compatibility
     def generate_data_block_with_sg_check(self, jid: str) -> Optional[Dict]:
+        """Original method for JARVIS data - kept for backward compatibility"""
         self.processed_count += 1
         print(f"Processing JID: {jid}")
 
@@ -202,13 +327,9 @@ class TopologicalMaterialAnalyzer:
             print(f"  Formula {norm_formula} not found in local database")
             return None
         
-        # Get the local data entry first
         local_data_entry = self.formula_lookup[norm_formula]
         
-        # Debug: Check what keys are available in jid_data
-        print(f"  Available keys in jid_data: {list(jid_data.keys())}")
-        
-        # Create structure - try different possible keys
+        # Create structure from JARVIS data (existing logic)
         structure = None
         structure_keys_to_try = ['atoms', 'structure', 'final_str', 'initial_structure']
         
@@ -217,7 +338,6 @@ class TopologicalMaterialAnalyzer:
                 try:
                     print(f"  Trying to create structure from key: {key}")
                     if isinstance(jid_data[key], dict):
-                        print(f"    Structure data keys: {list(jid_data[key].keys())}")
                         structure = Structure.from_dict(jid_data[key])
                         print(f"  ✓ Structure created from '{key}': {len(structure)} atoms")
                         break
@@ -247,42 +367,38 @@ class TopologicalMaterialAnalyzer:
                         
                         structure = Structure(lattice, elements, coords, coords_are_cartesian=coords_are_cartesian)
                         print(f"  ✓ Structure built from JARVIS format: {len(structure)} atoms")
-                        print(f"    Lattice: {lattice.abc}")
-                        print(f"    Elements: {elements}")
-                        print(f"    Coordinates type: {'cartesian' if coords_are_cartesian else 'fractional'}")
                 
-                elif 'lattice_mat' in jid_data and 'coords' in jid_data and 'elements' in jid_data:
-                    from pymatgen.core import Lattice
-                    lattice = Lattice(jid_data['lattice_mat'])
-                    coords = jid_data['coords']
-                    elements = jid_data['elements']
-                    structure = Structure(lattice, elements, coords)
-                    print(f"  ✓ Structure built from top-level JARVIS data: {len(structure)} atoms")
-                    
             except Exception as e:
                 print(f"    Manual structure building failed: {e}")
-                print(f"    Error details: {type(e).__name__}: {str(e)}")
                 
-                if 'atoms' in jid_data:
-                    atoms_data = jid_data['atoms']
-                    print(f"    Debug - lattice_mat shape: {np.array(atoms_data.get('lattice_mat', [])).shape if 'lattice_mat' in atoms_data else 'missing'}")
-                    print(f"    Debug - coords shape: {np.array(atoms_data.get('coords', [])).shape if 'coords' in atoms_data else 'missing'}")
-                    print(f"    Debug - elements length: {len(atoms_data.get('elements', [])) if 'elements' in atoms_data else 'missing'}")
-                    print(f"    Debug - cartesian flag: {atoms_data.get('cartesian', 'missing')}")
-        
         if structure is None:
             print(f"  ERROR: Could not create structure for {jid}")
             return None
 
+        # Now use the unified structure processing method
+        return self._process_structure_common(structure, jid, formula, local_data_entry, 
+                                            additional_props={'jarvis_props': {
+                                                'formation_energy': jid_data.get('form_energy_per_atom'),
+                                                'band_gap': jid_data.get('optb88vdw_bandgap')
+                                            }})
+
+    def _process_structure_common(self, structure: Structure, material_id: str, 
+                                formula: str, local_data_entry: dict, 
+                                additional_props: dict = None) -> Optional[Dict]:
+        """
+        Common structure processing logic for both JARVIS and MP data.
+        This eliminates code duplication between the two methods.
+        """
         # Check space group match
         try:
             analyzer = SpacegroupAnalyzer(structure, symprec=0.1)
-            sg_number_from_jarvis = analyzer.get_space_group_number()
+            sg_number = analyzer.get_space_group_number()
+            space_group = analyzer.get_space_group_symbol()
             
-            # Check if space groups match (assuming your CSV has 'Spacegroup_Number' column)
             local_sg = local_data_entry.get('Spacegroup_Number')
-            if local_sg and local_sg != sg_number_from_jarvis:
-                print(f"  Skipping {jid} ({norm_formula}, SG {sg_number_from_jarvis}): Space group mismatch with local DB (local: {local_sg})")
+            if local_sg and local_sg != sg_number:
+                print(f"  Skipping {material_id}: Space group mismatch "
+                      f"(computed: {sg_number}, local: {local_sg})")
                 return None
                 
         except Exception as e:
@@ -292,92 +408,91 @@ class TopologicalMaterialAnalyzer:
         self.matched_count += 1
         print(f"  ✓ Match found! ({self.matched_count}/{self.processed_count})")
         
-        # Extract Asymmetric Unit & Symmetry
+        # Get primitive structure and symmetry operations
         try:
-            space_group = analyzer.get_space_group_symbol()
-            print(f"  Space group: {space_group}")
-            
-            # Get primitive structure for graph generation
             primitive_structure = analyzer.get_primitive_standard_structure()
             symm_ops = analyzer.get_symmetry_operations(cartesian=True)
             print(f"  Symmetry operations: {len(symm_ops)}")
-            
         except Exception as e:
             print(f"  Error in symmetry analysis: {e}")
             primitive_structure = structure
             symm_ops = []
         
+        # Query k-space data
         print("  Querying SQLite DB for k-space data...")
-        kspace_df = self._get_kspace_data_from_db(sg_number_from_jarvis)
+        kspace_df = self._get_kspace_data_from_db(sg_number)
         if kspace_df is None:
-            print(f"  Skipping {jid}: No k-space data found for SG {sg_number_from_jarvis}")
+            print(f"  Skipping {material_id}: No k-space data found for SG {sg_number}")
             return None
         
-        print(f"  ✓ Found {len(kspace_df)} k-space entries for SG {sg_number_from_jarvis}")
+        print(f"  ✓ Found {len(kspace_df)} k-space entries for SG {sg_number}")
         
-        # Now call the featurizer with the structured data
+        # Generate features
         band_rep_vector, target_y = self._featurize_kspace_data(local_data_entry, kspace_df)
-        # --- End of major changes ---
-
-        # The rest of the generation process uses these outputs
+        
         print("  Generating features...")
         crystal_graph = self._create_crystal_graph(primitive_structure)
         asph_vector = self._compute_asph_features(structure)
-        kspace_graph = self._create_kspace_graph(band_rep_vector) # This now gets the clean vector
+        kspace_graph = self._create_kspace_graph(band_rep_vector)
         
-        crystal_graph.y = target_y # Set the correct label
+        crystal_graph.y = target_y
         
         # Assemble the final data block
         data_block = {
-            'jid': jid,
+            'jid': material_id,
             'formula': formula,
-            'normalized_formula': norm_formula,
+            'normalized_formula': self.normalize_formula(formula),
             'crystal_graph': crystal_graph,
             'kspace_graph': kspace_graph,
             'asph_features': asph_vector,
             'band_rep_features': band_rep_vector,
             'target_label': target_y,
             'symmetry_ops': {
-                'rotations': torch.stack([torch.tensor(op.rotation_matrix, dtype=torch.float) for op in symm_ops]) if symm_ops else torch.empty(0, 3, 3),
-                'translations': torch.stack([torch.tensor(op.translation_vector, dtype=torch.float) for op in symm_ops]) if symm_ops else torch.empty(0, 3)
+                'rotations': torch.stack([torch.tensor(op.rotation_matrix, dtype=torch.float) 
+                                        for op in symm_ops]) if symm_ops else torch.empty(0, 3, 3),
+                'translations': torch.stack([torch.tensor(op.translation_vector, dtype=torch.float) 
+                                           for op in symm_ops]) if symm_ops else torch.empty(0, 3)
             },
-            'jarvis_props': {
-                'formation_energy': jid_data.get('form_energy_per_atom'),
-                'band_gap': jid_data.get('optb88vdw_bandgap'),
-                'space_group': space_group if 'space_group' in locals() else None
+            'structure_props': {
+                'space_group': space_group,
+                'space_group_number': sg_number,
+                'density': structure.density,
+                'volume': structure.volume,
+                'nsites': len(structure)
             },
             'local_topo_data': local_data_entry
         }
+        
+        # Add any additional properties
+        if additional_props:
+            data_block.update(additional_props)
         
         print(f"  ✓ Data block generated successfully")
         return data_block
 
     def _get_elemental_features(self, atomic_number: int) -> torch.Tensor:
         """Creates a feature vector for a given element using basic atomic properties."""
-        # Basic atomic properties - you can expand this with more sophisticated features
-        # For now, using atomic number, period, and group as basic features
-        periods = {1: 1, 2: 1, 3: 2, 4: 2, 5: 2, 6: 2, 7: 2, 8: 2, 9: 2, 10: 2, 11: 3, 12: 3, 13: 3, 14: 3, 15: 3, 16: 3, 17: 3, 18: 3}
-        period = periods.get(atomic_number, 4)  # Default to period 4 for higher elements
+        periods = {1: 1, 2: 1, 3: 2, 4: 2, 5: 2, 6: 2, 7: 2, 8: 2, 9: 2, 10: 2, 
+                  11: 3, 12: 3, 13: 3, 14: 3, 15: 3, 16: 3, 17: 3, 18: 3}
+        period = periods.get(atomic_number, 4)
         
-        # Simple features: atomic number, period, group approximation
         features = [
-            atomic_number / 100.0,  # Normalized atomic number
-            period / 8.0,           # Normalized period
-            (atomic_number % 18) / 18.0  # Rough group approximation
+            atomic_number / 100.0,
+            period / 8.0,
+            (atomic_number % 18) / 18.0
         ]
         
         return torch.tensor(features, dtype=torch.float)
 
     def _compute_asph_features(self, structure: Structure, n_bins=20) -> torch.Tensor:
-        """Computes Atom-Specific Persistent Homology (ASPH) feature vector."""
+        """Computes Atom-Specific Persistent Homology (ASPH) feature vector.""" 
         try:
-            # Get atomic coordinates
-            coords = np.array(structure.cart_coords)
+            from gtda.homology import VietorisRipsPersistence
+            from gtda.diagrams import BettiCurve, PersistenceEntropy
             
-            # Reshape for giotto-tda (expects shape: n_samples, n_points, n_features)
+            coords = np.array(structure.cart_coords)
             points = coords.reshape(1, -1, 3)
             
-            # Compute persistent homology
             vr = VietorisRipsPersistence(
                 homology_dimensions=[0, 1, 2], 
                 max_edge_length=10.0,
@@ -385,15 +500,12 @@ class TopologicalMaterialAnalyzer:
             )
             diagrams = vr.fit_transform(points)
             
-            # Convert to Betti curves
             bc = BettiCurve(n_bins=n_bins)
             betti_curves = bc.fit_transform(diagrams)
             
-            # Also compute persistence entropy for additional topological features
             pe = PersistenceEntropy()
             entropy_features = pe.fit_transform(diagrams)
             
-            # Combine features
             combined_features = np.concatenate([
                 betti_curves.flatten(),
                 entropy_features.flatten()
@@ -403,30 +515,26 @@ class TopologicalMaterialAnalyzer:
             
         except Exception as e:
             print(f"Error computing ASPH features: {e}")
-            # Return zero vector if computation fails
-            return torch.zeros(n_bins * 3 + 3, dtype=torch.float)  # 3 homology dims + 3 entropy features
+            return torch.zeros(n_bins * 3 + 3, dtype=torch.float)
         
     def _featurize_kspace_data(self, local_data_entry: dict, kspace_df: pd.DataFrame) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Converts structured k-space data from the DB into a feature vector
         and gets the classification label from the local CSV data.
         """
-        # --- Part 1: Determine the target label (same as before) ---
-        # This still comes from your high-level 'Property' column in the CSV
+        # Determine the target label from CSV 'Property' column
         property_str = str(local_data_entry.get('Property', '')).upper()
         is_topological = any(indicator in property_str for indicator in ['TI', 'SM', 'WEYL', 'DIRAC'])
         target_y = torch.tensor([1.0 if is_topological else 0.0], dtype=torch.float)
 
-        # --- Part 2: Build the feature vector from the database query ---
+        # Build the feature vector from the database query
         feature_dim = len(self.master_k_points) + len(self.master_irreps)
         band_rep_vector = torch.zeros(feature_dim, dtype=torch.float)
 
         if kspace_df is not None:
-            # Create sets for fast lookups
             present_k_points = set(kspace_df['k_point'])
             present_irreps = set(kspace_df['irrep_label'])
 
-            # Populate the vector based on the queried data
             for i, k_point in enumerate(self.master_k_points):
                 if k_point in present_k_points:
                     band_rep_vector[i] = 1.0
@@ -438,78 +546,28 @@ class TopologicalMaterialAnalyzer:
         
         return band_rep_vector, target_y
 
-    def _featurize_bilbao_data(self, local_data_entry: dict) -> Tuple[torch.Tensor, torch.Tensor]:
-        """Converts raw topological data into numerical vectors."""
-        try:
-            # Initialize feature vector
-            feature_dim = len(self.master_k_points) + len(self.master_irreps)
-            band_rep_vector = torch.zeros(feature_dim, dtype=torch.float)
-            
-            # Look for topological data in various columns
-            topological_data = ""
-            for col in ['Property', 'BandReps', 'Band_Representations', 'Topology']:
-                if col in local_data_entry and pd.notna(local_data_entry[col]):
-                    topological_data += str(local_data_entry[col]) + " "
-            
-            # Parse k-points and irreps from the data
-            if topological_data:
-                # Count occurrences of k-points and irreps
-                for i, k_point in enumerate(self.master_k_points):
-                    if k_point in topological_data:
-                        band_rep_vector[i] = 1.0
-                
-                for i, irrep in enumerate(self.master_irreps):
-                    if irrep in topological_data:
-                        band_rep_vector[len(self.master_k_points) + i] = 1.0
-            
-            # Create binary classification target
-            property_str = topological_data.upper()
-            
-            # Look for topological indicators
-            topological_indicators = ['TI', 'SM', 'ESFD', 'TOPOLOGICAL', 'NONTRIVIAL', 'WEYL', 'DIRAC']
-            trivial_indicators = ['TRIVIAL', 'NORMAL', 'INSULATOR']
-            
-            is_topological = any(indicator in property_str for indicator in topological_indicators)
-            is_trivial = any(indicator in property_str for indicator in trivial_indicators)
-            
-            if is_topological and not is_trivial:
-                binary_label = 1.0  # Topological
-            elif is_trivial and not is_topological:
-                binary_label = 0.0  # Trivial
-            else:
-                # Default classification based on any non-empty topological data
-                binary_label = 1.0 if topological_data.strip() else 0.0
-            
-            return band_rep_vector, torch.tensor([binary_label], dtype=torch.float)
-            
-        except Exception as e:
-            print(f"Error featurizing Bilbao data: {e}")
-            # Return default vectors
-            feature_dim = len(self.master_k_points) + len(self.master_irreps)
-            return torch.zeros(feature_dim, dtype=torch.float), torch.tensor([0.0], dtype=torch.float)
-
     def _create_crystal_graph(self, structure: Structure) -> Data:
         """Generates the real-space atomic graph using Voronoi tessellation."""
         try:
+            from pymatgen.analysis.local_env import VoronoiNN
+            from torch_geometric.data import Data
+            
             vnn = VoronoiNN(cutoff=13.0, allow_pathological=True, tol=0.8)
             
             edge_index_list = []
             edge_weight_list = []
             
-            # Get all neighbors for each site
             for i, site in enumerate(structure):
                 try:
                     neighbors = vnn.get_nn_info(structure, i)
                     for neighbor_info in neighbors:
                         j = neighbor_info['site_index']
-                        if i != j:  # Avoid self-loops
+                        if i != j:
                             edge_index_list.append([i, j])
                             edge_weight_list.append(neighbor_info['weight'])
                 except Exception as e:
-                    # Skip problematic sites
                     continue
             
-            # Create node features
             node_features = []
             for site in structure:
                 atomic_number = site.specie.Z
@@ -518,7 +576,6 @@ class TopologicalMaterialAnalyzer:
             node_features = torch.stack(node_features) if node_features else torch.empty(0, 3)
             node_positions = torch.tensor(structure.cart_coords, dtype=torch.float)
             
-            # Create edge tensors
             if edge_index_list:
                 edge_index = torch.tensor(edge_index_list, dtype=torch.long).t().contiguous()
                 edge_weight = torch.tensor(edge_weight_list, dtype=torch.float)
@@ -535,7 +592,6 @@ class TopologicalMaterialAnalyzer:
             
         except Exception as e:
             print(f"Error creating crystal graph: {e}")
-            # Return minimal graph with just node features
             node_features = torch.stack([self._get_elemental_features(site.specie.Z) for site in structure])
             return Data(
                 x=node_features,
@@ -544,78 +600,281 @@ class TopologicalMaterialAnalyzer:
                 edge_attr=torch.empty(0, 1)
             )
 
-    def _create_kspace_graph(self, band_rep_vector: torch.Tensor) -> Data:
+    def _load_pregenerated_kspace_data(self, space_group_number: int) -> Optional[KSpaceTopologyData]:
         """
-        Generates a physics-informed reciprocal-space k-point graph.
-
-        Each node in the graph represents a k-point. Its features are its 3D
-        coordinates in reciprocal space. Edges are created between adjacent k-points
-        along the defined high-symmetry path, reflecting the typical flow of band
-        structure analysis. The comprehensive band representation vector is stored
-        as a global feature for the entire graph.
-
-        Args:
-            band_rep_vector (torch.Tensor): A tensor encoding the overall band
-                                            representation (e.g., from an irreducible
-                                            representation analysis). This tensor serves
-                                            as a global, graph-level feature.
-
-        Returns:
-            torch_geometric.data.Data: A PyTorch Geometric Data object representing
-                                    the k-space graph.
-                                    - x (torch.Tensor): Node features (N_k_points x 3),
-                                        where N_k_points is the number of k-points.
-                                    - edge_index (torch.Tensor): Graph connectivity (2 x E),
-                                        where E is the number of edges.
-                                    - u (torch.Tensor): Global graph features (1 x F),
-                                        where F is the dimensionality of band_rep_vector.
+        Loads the pre-generated KSpaceTopologyData object for a given space group.
         """
-        n_k_points = len(self.master_k_points)
-
-        # 1. Node Features (x): Use actual 3D k-point coordinates.
-        # This provides direct geometric information about the k-point's position
-        # in the Brillouin zone, which is physically crucial.
-        if isinstance(self.master_k_points, list):
-            node_features = torch.tensor(self.master_k_points, dtype=torch.float)
-        else: # Assume it's already a numpy array or torch tensor
-            node_features = torch.tensor(self.master_k_points, dtype=torch.float)
+        sg_folder = self.kspace_graphs_base_dir / f"SG_{space_group_number:03d}"
+        pkl_path = sg_folder / "topology_data.pkl"
         
-        # Ensure node_features is 2D (num_nodes, num_node_features)
-        if node_features.dim() == 1:
-            # Handle case of a single k-point, reshape to (1, 3)
-            node_features = node_features.unsqueeze(0)
-        elif node_features.dim() == 0 or node_features.shape[0] == 0:
-            # Handle empty k-points list
-            node_features = torch.empty(0, 3, dtype=torch.float) # Assuming 3D k-points
-
-        # 2. Edge Index (edge_index): Connect sequential k-points along the path.
-        # This reflects the high-symmetry paths typically followed in band structure
-        # calculations (e.g., Gamma->X, X->M).
-        edge_index = []
-        for i in range(n_k_points - 1):
-            # Create undirected edges: (i, i+1) and (i+1, i)
-            edge_index.append([i, i + 1])
-            edge_index.append([i + 1, i])
-        
-        if edge_index:
-            edge_index = torch.tensor(edge_index, dtype=torch.long).t().contiguous()
+        if pkl_path.exists():
+            try:
+                with open(pkl_path, 'rb') as f:
+                    return pickle.load(f)
+            except Exception as e:
+                print(f"  Error loading pre-generated k-space data for SG {space_group_number}: {e}")
         else:
-            # For graphs with 0 or 1 node, no edges can be formed.
-            edge_index = torch.empty(2, 0, dtype=torch.long)
-        
-        # 3. Global Features (u): Store the band_rep_vector as a global graph-level feature.
-        # This vector likely summarizes the overall band representation and topological
-        # invariants, which are properties of the entire material's electronic structure,
-        # making it suitable as a global graph feature.
-        # Ensure it's 2D for PyG convention (num_graphs, num_global_features)
-        global_features = band_rep_vector.unsqueeze(0)
-        
-        return Data(
-            x=node_features,
-            edge_index=edge_index,
-            u=global_features # 'u' is a common attribute in PyG for global features
-        )
+            print(f"  Pre-generated k-space data not found for SG {space_group_number} at {pkl_path}")
+        return None
     
+    def enhanced_generate_data_block_from_structure(self, structure: Structure, material_id: str, 
+                                     formula: str = None) -> Optional[Dict]:
+        """
+        ENHANCED VERSION: Generate data block directly from pymatgen Structure object.
+        This version includes better error handling and serialization for database storage.
+        
+        Args:
+            structure: pymatgen Structure object
+            material_id: unique identifier (e.g., MP-12345)
+            formula: chemical formula (optional, will be derived from structure if not provided)
+        """
+        self.processed_count += 1
+        print(f"Processing Material ID: {material_id}")
+
+        if structure is None:
+            print(f"  ERROR: No structure provided for {material_id}")
+            return None
+
+        # Get formula from structure if not provided
+        if formula is None:
+            formula = structure.composition.reduced_formula
+        
+        print(f"  Formula: {formula}")
+        norm_formula = self.normalize_formula(formula)
+        print(f"  Normalized formula: {norm_formula}")
+
+        # Check if material is in local topological dataset
+        if norm_formula not in self.formula_lookup:
+            print(f"  Formula {norm_formula} not found in local topological database")
+            return None
+
+        local_data_entry = self.formula_lookup[norm_formula]
+
+        # Analyze space group
+        try:
+            analyzer = SpacegroupAnalyzer(structure, symprec=0.1)
+            sg_number = analyzer.get_space_group_number()
+            space_group = analyzer.get_space_group_symbol()
+            
+            # Check space group match with local data
+            local_sg = local_data_entry.get('Spacegroup_Number')
+            if local_sg and local_sg != sg_number:
+                print(f"  Skipping {material_id} ({norm_formula}, SG {sg_number}): "
+                    f"Space group mismatch with local DB (local: {local_sg})")
+                return None
+                
+        except Exception as e:
+            print(f"  Error in space group analysis: {e}")
+            return None
+
+        self.matched_count += 1
+        print(f"  ✓ Match found! ({self.matched_count}/{self.processed_count})")
+        print(f"  Space group: {space_group} ({sg_number})")
+
+        # Get primitive structure and symmetry operations
+        try:
+            primitive_structure = analyzer.get_primitive_standard_structure()
+            symm_ops = analyzer.get_symmetry_operations(cartesian=True)
+            print(f"  Symmetry operations: {len(symm_ops)}")
+        except Exception as e:
+            print(f"  Error in symmetry analysis: {e}")
+            primitive_structure = structure
+            symm_ops = []
+
+        # Query k-space data from database
+        print("  Querying SQLite DB for k-space data...")
+        kspace_df = self._get_kspace_data_from_db(sg_number)
+        if kspace_df is None:
+            print(f"  Skipping {material_id}: No k-space data found for SG {sg_number}")
+            return None
+        
+        print(f"  ✓ Found {len(kspace_df)} k-space entries for SG {sg_number}")
+
+        # Generate features using existing methods
+        band_rep_vector, target_y = self._featurize_kspace_data(local_data_entry, kspace_df)
+        
+        print("  Generating features...")
+        crystal_graph = self._create_crystal_graph(primitive_structure)
+        asph_vector = self._compute_asph_features(structure)
+        kspace_graph = self._create_kspace_graph(band_rep_vector)
+        
+        crystal_graph.y = target_y
+
+        # Create basic properties dictionary from structure
+        basic_props = {
+            'density': structure.density,
+            'volume': structure.volume,
+            'nsites': len(structure),
+            'space_group': space_group,
+            'space_group_number': sg_number
+        }
+        
+        # ENHANCED: Convert torch tensors to serializable formats for database storage
+        try:
+            # Convert crystal graph to serializable format
+            crystal_graph_dict = {
+                'x': crystal_graph.x.numpy() if hasattr(crystal_graph.x, 'numpy') else crystal_graph.x,
+                'pos': crystal_graph.pos.numpy() if hasattr(crystal_graph.pos, 'numpy') else crystal_graph.pos,
+                'edge_index': crystal_graph.edge_index.numpy() if hasattr(crystal_graph.edge_index, 'numpy') else crystal_graph.edge_index,
+                'edge_attr': crystal_graph.edge_attr.numpy() if hasattr(crystal_graph.edge_attr, 'numpy') else crystal_graph.edge_attr,
+                'y': crystal_graph.y.numpy() if hasattr(crystal_graph.y, 'numpy') else crystal_graph.y,
+                'num_nodes': crystal_graph.num_nodes if hasattr(crystal_graph, 'num_nodes') else len(crystal_graph.x)
+            }
+            
+            # Convert k-space graph to serializable format
+            kspace_graph_dict = {
+                'x': kspace_graph.x.numpy() if hasattr(kspace_graph.x, 'numpy') else kspace_graph.x,
+                'edge_index': kspace_graph.edge_index.numpy() if hasattr(kspace_graph.edge_index, 'numpy') else kspace_graph.edge_index,
+                'u': kspace_graph.u.numpy() if hasattr(kspace_graph.u, 'numpy') else kspace_graph.u,
+                'num_nodes': kspace_graph.num_nodes if hasattr(kspace_graph, 'num_nodes') else len(kspace_graph.x)
+            }
+            
+            # Convert symmetry operations to serializable format
+            symmetry_ops_dict = {
+                'rotations': symm_ops[0].rotation_matrix.tolist() if symm_ops else [],
+                'translations': symm_ops[0].translation_vector.tolist() if symm_ops else [],
+                'num_ops': len(symm_ops)
+            }
+            
+        except Exception as e:
+            print(f"  Warning: Error converting tensors to serializable format: {e}")
+            # Fallback to original torch objects
+            crystal_graph_dict = crystal_graph
+            kspace_graph_dict = kspace_graph
+            symmetry_ops_dict = {
+                'rotations': torch.stack([torch.tensor(op.rotation_matrix, dtype=torch.float) 
+                                        for op in symm_ops]) if symm_ops else torch.empty(0, 3, 3),
+                'translations': torch.stack([torch.tensor(op.translation_vector, dtype=torch.float) 
+                                        for op in symm_ops]) if symm_ops else torch.empty(0, 3)
+            }
+
+        # Assemble the final data block with enhanced serialization
+        data_block = {
+            'jid': material_id,
+            'formula': formula,
+            'normalized_formula': norm_formula,
+            'crystal_graph': crystal_graph_dict,  # Now serializable
+            'kspace_graph': kspace_graph_dict,    # Now serializable
+            'asph_features': asph_vector.numpy() if hasattr(asph_vector, 'numpy') else asph_vector,
+            'band_rep_features': band_rep_vector.numpy() if hasattr(band_rep_vector, 'numpy') else band_rep_vector,
+            'target_label': target_y.numpy() if hasattr(target_y, 'numpy') else target_y,
+            'symmetry_ops': symmetry_ops_dict,    # Now serializable
+            'structure_props': basic_props,
+            'local_topo_data': local_data_entry,
+            
+            # Additional metadata for better tracking
+            'processing_metadata': {
+                'analyzer_version': '1.0',
+                'processing_timestamp': pd.Timestamp.now().isoformat(),
+                'primitive_structure_formula': primitive_structure.composition.reduced_formula,
+                'symmetry_precision': 0.1,
+                'kspace_entries_count': len(kspace_df),
+                'feature_dimensions': {
+                    'asph': len(asph_vector) if hasattr(asph_vector, '__len__') else 0,
+                    'band_rep': len(band_rep_vector) if hasattr(band_rep_vector, '__len__') else 0,
+                    'crystal_graph_nodes': len(crystal_graph.x) if hasattr(crystal_graph, 'x') else 0,
+                    'kspace_graph_nodes': len(kspace_graph.x) if hasattr(kspace_graph, 'x') else 0
+                }
+            }
+        }
+        
+        print(f"  ✓ Data block generated successfully with serializable format")
+        return data_block
+
+    def get_topological_summary_stats(self) -> Dict:
+        """Get summary statistics about the topological analysis process."""
+        return {
+            'total_processed': self.processed_count,
+            'total_matched': self.matched_count,
+            'match_rate': self.matched_count / max(self.processed_count, 1),
+            'vocabulary_sizes': {
+                'k_points': len(self.master_k_points),
+                'irreps': len(self.master_irreps)
+            },
+            'database_info': {
+                'csv_path': self.csv_path,
+                'db_path': self.db_path,
+                'formula_lookup_size': len(self.formula_lookup)
+            }
+        }
+
+    def validate_data_block(self, data_block: Dict) -> bool:
+        """Validate that a data block contains all required fields."""
+        required_fields = [
+            'jid', 'formula', 'normalized_formula', 'crystal_graph', 
+            'kspace_graph', 'asph_features', 'band_rep_features', 
+            'target_label', 'structure_props', 'local_topo_data'
+        ]
+        
+        missing_fields = [field for field in required_fields if field not in data_block]
+        
+        if missing_fields:
+            print(f"Data block validation failed. Missing fields: {missing_fields}")
+            return False
+        
+        # Check for empty or None values in critical fields
+        critical_checks = {
+            'asph_features': lambda x: x is not None and len(x) > 0,
+            'band_rep_features': lambda x: x is not None and len(x) > 0,
+            'crystal_graph': lambda x: x is not None,
+            'kspace_graph': lambda x: x is not None
+        }
+        
+        for field, check_func in critical_checks.items():
+            if not check_func(data_block[field]):
+                print(f"Data block validation failed. Invalid {field}")
+                return False
+        
+        return True
+
+    def export_features_for_ml(self, data_blocks: List[Dict], output_path: str = None) -> Dict:
+        """
+        Export processed data blocks in a format suitable for machine learning.
+        
+        Args:
+            data_blocks: List of data blocks from topological analysis
+            output_path: Optional path to save the exported data
+            
+        Returns:
+            Dictionary containing organized ML-ready data
+        """
+        if not data_blocks:
+            print("No data blocks provided for export")
+            return {}
+        
+        # Organize data for ML
+        ml_data = {
+            'features': {
+                'asph': [],
+                'band_rep': [],
+                'combined': []
+            },
+            'targets': {
+                'binary': [],
+                'class_labels': []
+            },
+            'metadata': {
+                'jids': [],
+                'formulas': [],
+                'space_groups': []
+            },
+            'graphs': {
+                'crystal': [],
+                'kspace': []
+            }
+        }
+        
+        for data_block in data_blocks:
+            if not self.validate_data_block(data_block):
+                continue
+                
+            # Extract features
+            asph_features = data_block['asph_features']
+            band_rep_features = data_block['band_rep_features']
+            
+            # Convert to numpy arrays if needed
+
+            
 def get_jarvis_jids(max_jids: int = 1000) -> List[str]:
     """Get a list of JIDs from JARVIS database."""
     print(f"Fetching JID list from JARVIS (max: {max_jids})...")

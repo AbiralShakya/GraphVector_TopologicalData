@@ -2,7 +2,7 @@
   "jid": "mp-504451",
   "formula": "Cs3MnCl5",
   "normalized_formula": "Cs3MnCl5",
-  "space_group": "Unknown",
+  "space_group": "I4/mcm",
   "space_group_number": 140,
   "topological_class": "Unknown",
   "topological_binary": 0.0,
@@ -12,9 +12,9 @@
   "density": 3.300196207122193,
   "volume": 634.9115307006463,
   "nsites": 18,
-  "total_magnetization": 0.0,
-  "magnetic_type": "Unknown",
-  "theoretical": true,
+  "total_magnetization": 10.0000002,
+  "magnetic_type": "FM",
+  "theoretical": null,
   "stability": {
     "energy_above_hull": 0.0,
     "formation_energy_per_atom": -2.031326017998083,
@@ -23,36 +23,37 @@
   "electronic_structure": {
     "band_gap": 2.8966000000000003,
     "is_metal": false,
-    "is_gap_direct": null,
-    "cbm": null,
-    "vbm": null
+    "is_gap_direct": false,
+    "cbm": 2.848799999999999,
+    "vbm": -0.0478
   },
   "mechanical_properties": {
     "bulk_modulus": null,
-    "shear_modulus": null,
-    "elastic_tensor": null
+    "shear_modulus": null
   },
-  "processing_timestamp": "2025-06-10T11:39:22.302459",
+  "processing_timestamp": "2025-06-10T16:29:48.492951",
   "local_database_props": {},
   "num_atoms": 18,
   "file_locations": {
     "structure_hdf5": "structures/mp-504451.h5",
     "poscar": "structures/mp-504451_POSCAR",
     "point_cloud": "point_clouds/mp-504451_asph.npy",
-    "crystal_graph": "graphs/mp-504451/crystal_graph.pt",
-    "kspace_graph_reference": "kspace_graph_mp-504451",
+    "crystal_graph": "graphs/mp-504451/crystal_graph.pkl",
+    "kspace_graph": "graphs/mp-504451/kspace_graph.pkl",
     "vectorized_features_dir": "vectorized_features/mp-504451"
   },
   "vectorized_methods": [
     "asph_features",
+    "band_rep_features",
     "basic_properties",
     "structural_properties",
     "combined_features"
   ],
   "vectorized_feature_sizes": {
     "asph_features": 128,
+    "band_rep_features": 100,
     "basic_properties": 4,
-    "structural_properties": 3,
-    "combined_features": 135
+    "structural_properties": 4,
+    "combined_features": 236
   }
 }
