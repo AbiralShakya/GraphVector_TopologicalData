@@ -211,6 +211,13 @@ class MultiModalMaterialDatabase:
                 records.append(metadata)
         
         df = pd.DataFrame(records)
+
+        for col in df.columns: 
+            if df[col].dtype == "object":
+                df[col] = df[col].apply(lambda x: 
+                                        json.dumps(x) if isinstance(x , (dict, list)) and x 
+                                else None if isinstance(x, (dict, list)) and not x
+                                else x)
         
         # Save as both CSV (human-readable) and parquet (efficient)
         df.to_csv(self.base_path / 'master_index.csv', index=False)
