@@ -1,11 +1,58 @@
 {
   "space_group_number": 9,
-  "ebr_data": {},
+  "ebr_data": {
+    "irreps": [
+      "A1A2",
+      "\u03931(1)\u00a0\u2295\u00a0\u03932",
+      "M1M2",
+      "Y1(1)\u00a0\u2295\u00a0Y2",
+      "2\u00a0L1",
+      "2\u00a0V1",
+      "B1(1)\u00a0\u2295\u00a0B2",
+      "2\u00a0GP1",
+      "2\u00a0\u039b1",
+      "U1U1",
+      "A3A3(2)\u00a0\u2295A4A4",
+      "2\u03933\u03934",
+      "M3M3(2)\u00a0\u2295M4M4",
+      "2Y3Y4",
+      "2L2L2",
+      "2V2V2",
+      "2B3(1)\u00a0\u2295\u00a02B4",
+      "4GP2",
+      "4\u039b2",
+      "2U2U2"
+    ],
+    "irrep_multiplicities": {
+      "A1A2": 1,
+      "\u03931(1)\u00a0\u2295\u00a0\u03932": 1,
+      "4\u039b2": 1,
+      "4GP2": 1,
+      "2B3(1)\u00a0\u2295\u00a02B4": 1,
+      "2V2V2": 1,
+      "2L2L2": 1,
+      "2Y3Y4": 1,
+      "M3M3(2)\u00a0\u2295M4M4": 1,
+      "2\u03933\u03934": 1,
+      "A3A3(2)\u00a0\u2295A4A4": 1,
+      "U1U1": 1,
+      "2\u00a0\u039b1": 1,
+      "2\u00a0GP1": 1,
+      "B1(1)\u00a0\u2295\u00a0B2": 1,
+      "2\u00a0V1": 1,
+      "2\u00a0L1": 1,
+      "Y1(1)\u00a0\u2295\u00a0Y2": 1,
+      "M1M2": 1,
+      "2U2U2": 1
+    }
+  },
   "topological_indices": {},
-  "decomposition_branches": {},
+  "decomposition_branches": {
+    "decomposition_indices": []
+  },
   "graph_info": {
-    "num_nodes": 1,
-    "num_edges": 0,
+    "num_nodes": 10,
+    "num_edges": 45,
     "node_feature_dim": 10
   }
 }

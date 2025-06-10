@@ -1,11 +1,54 @@
 {
   "space_group_number": 1,
-  "ebr_data": {},
+  "ebr_data": {
+    "irreps": [
+      "R1",
+      "T1",
+      "U1",
+      "V1",
+      "X1",
+      "Y1",
+      "Z1",
+      "\u03931",
+      "GP1",
+      "R2R2",
+      "T2T2",
+      "U2U2",
+      "V2V2",
+      "X2X2",
+      "Y2Y2",
+      "Z2Z2",
+      "\u03932\u03932",
+      "2GP2"
+    ],
+    "irrep_multiplicities": {
+      "R1": 1,
+      "T1": 1,
+      "\u03932\u03932": 1,
+      "Z2Z2": 1,
+      "Y2Y2": 1,
+      "X2X2": 1,
+      "V2V2": 1,
+      "U2U2": 1,
+      "T2T2": 1,
+      "R2R2": 1,
+      "GP1": 1,
+      "\u03931": 1,
+      "Z1": 1,
+      "Y1": 1,
+      "X1": 1,
+      "V1": 1,
+      "U1": 1,
+      "2GP2": 1
+    }
+  },
   "topological_indices": {},
-  "decomposition_branches": {},
+  "decomposition_branches": {
+    "decomposition_indices": []
+  },
   "graph_info": {
-    "num_nodes": 1,
-    "num_edges": 0,
+    "num_nodes": 9,
+    "num_edges": 36,
     "node_feature_dim": 10
   }
 }

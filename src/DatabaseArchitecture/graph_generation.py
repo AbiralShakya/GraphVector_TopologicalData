@@ -1,3 +1,4 @@
+
 import torch
 import numpy as np
 import pandas as pd
@@ -43,19 +44,6 @@ class KSpacePhysicsGraphBuilder:
         """
         Get k-space data for a specific space group from database by joining
         the new table names: space_groups, ebr_decomposition_branches, irreps, ebrs.
-
-        Assumptions for table schema and join keys:
-        - `ebr_decomposition_branches` is the main table containing k-point, energy,
-          band_index, ebr_label, irrep, topological indices (z2, chern, etc.).
-          It should have a `space_group_number` column.
-        - `space_groups` table has a `number` column that corresponds to `space_group_number`
-          in `ebr_decomposition_branches`.
-        - `irreps` table has a `label` column that corresponds to the `irrep` column
-          in `ebr_decomposition_branches`.
-        - `ebrs` table has a `label` column that corresponds to the `ebr_label` column
-          in `ebr_decomposition_branches`.
-        - Example columns (`sg.name`, `ir.description`, `ebr.type`) are placeholders;
-          adjust `SELECT` clause to include actual columns you need from joined tables.
         """
         try:
             conn = sqlite3.connect(self.db_path)
@@ -106,10 +94,22 @@ class KSpacePhysicsGraphBuilder:
             ebr_features['ebr_multiplicities'] = ebr_counts.to_dict()
         
         # Extract irreducible representations
-        if 'irrep' in kspace_df.columns:
-            irreps = kspace_df['irrep'].dropna().unique()
+        if 'irrep' in kspace_df.columns or 'irrep_label' in kspace_df.columns:
+            irrep_col = 'irrep' if 'irrep' in kspace_df.columns else 'irrep_label'
+            irreps = kspace_df[irrep_col].dropna().unique()
             ebr_features['irreps'] = irreps.tolist()
-            ebr_features['irrep_multiplicities'] = kspace_df['irrep'].value_counts().to_dict()
+            ebr_features['irrep_multiplicities'] = kspace_df[irrep_col].value_counts().to_dict()
+        
+        # Process branch information if available
+        if 'branch1_irreps' in kspace_df.columns:
+            branch1_data = kspace_df['branch1_irreps'].dropna()
+            if len(branch1_data) > 0:
+                ebr_features['branch1_irreps'] = branch1_data.tolist()
+        
+        if 'branch2_irreps' in kspace_df.columns:
+            branch2_data = kspace_df['branch2_irreps'].dropna()
+            if len(branch2_data) > 0:
+                ebr_features['branch2_irreps'] = branch2_data.tolist()
         
         # Wyckoff position information
         if 'wyckoff_position' in kspace_df.columns:
@@ -175,15 +175,21 @@ class KSpacePhysicsGraphBuilder:
         """
         decomp_branches = {}
         
+        # Process decomposition indices
+        if 'decomposition_index' in kspace_df.columns:
+            decomp_indices = sorted(kspace_df['decomposition_index'].dropna().unique())
+            decomp_branches['decomposition_indices'] = decomp_indices
+        
         # Band indices and their decomposition
         if 'band_index' in kspace_df.columns:
             band_indices = sorted(kspace_df['band_index'].dropna().unique())
             decomp_branches['band_indices'] = band_indices
         
         # Energy levels and band connectivity
-        if 'energy' in kspace_df.columns and 'kpoint' in kspace_df.columns:
+        if 'energy' in kspace_df.columns and ('kpoint' in kspace_df.columns or 'k_point' in kspace_df.columns):
+            kpoint_col = 'kpoint' if 'kpoint' in kspace_df.columns else 'k_point'
             # Group by k-points to understand band connectivity
-            kpoint_groups = kspace_df.groupby('kpoint')
+            kpoint_groups = kspace_df.groupby(kpoint_col)
             
             band_connectivity = {}
             for kpoint, group in kpoint_groups:
@@ -198,11 +204,12 @@ class KSpacePhysicsGraphBuilder:
             decomp_branches['band_connectivity'] = band_connectivity
         
         # Irrep decomposition per band
-        if all(col in kspace_df.columns for col in ['band_index', 'irrep']):
+        irrep_col = 'irrep' if 'irrep' in kspace_df.columns else 'irrep_label'
+        if 'band_index' in kspace_df.columns and irrep_col in kspace_df.columns:
             band_irrep_decomp = {}
             for band_idx in kspace_df['band_index'].dropna().unique():
                 band_data = kspace_df[kspace_df['band_index'] == band_idx]
-                irreps = band_data['irrep'].dropna().tolist()
+                irreps = band_data[irrep_col].dropna().tolist()
                 band_irrep_decomp[str(int(band_idx))] = irreps
             
             decomp_branches['band_irrep_decomposition'] = band_irrep_decomp
@@ -224,78 +231,114 @@ class KSpacePhysicsGraphBuilder:
                                        topo_indices: Dict,
                                        decomp_branches: Dict) -> Tuple[Data, np.ndarray]:
         """
-        Build physics-informed k-space connectivity graph
+        Build physics-informed k-space connectivity graph - FIXED VERSION
         """
         # Create nodes based on k-points and their properties
         nodes = []
         node_features = []
         kpoint_to_idx = {}
         
-        # Process k-points as nodes
+        # Process k-points as nodes - handle both 'kpoint' and 'k_point' columns
+        kpoint_col = None
         if 'kpoint' in kspace_df.columns:
-            unique_kpoints = kspace_df['kpoint'].dropna().unique()
+            kpoint_col = 'kpoint'
+        elif 'k_point' in kspace_df.columns:
+            kpoint_col = 'k_point'
+        
+        if kpoint_col:
+            unique_kpoints = kspace_df[kpoint_col].dropna().unique()
             
             for idx, kpoint in enumerate(unique_kpoints):
                 kpoint_to_idx[kpoint] = idx
                 nodes.append(kpoint)
                 
                 # Extract features for this k-point
-                kpoint_data = kspace_df[kspace_df['kpoint'] == kpoint]
+                kpoint_data = kspace_df[kspace_df[kpoint_col] == kpoint]
                 features = self._extract_kpoint_features(kpoint_data, ebr_features, topo_indices)
                 node_features.append(features)
         
         # If no k-points, create nodes based on irreps or EBR labels
-        elif 'irrep' in kspace_df.columns:
-            unique_irreps = kspace_df['irrep'].dropna().unique()
+        elif 'irrep' in kspace_df.columns or 'irrep_label' in kspace_df.columns:
+            irrep_col = 'irrep' if 'irrep' in kspace_df.columns else 'irrep_label'
+            unique_irreps = kspace_df[irrep_col].dropna().unique()
             
             for idx, irrep in enumerate(unique_irreps):
                 kpoint_to_idx[irrep] = idx
                 nodes.append(irrep)
                 
-                irrep_data = kspace_df[kspace_df['irrep'] == irrep]
+                irrep_data = kspace_df[kspace_df[irrep_col] == irrep]
                 features = self._extract_irrep_features(irrep_data, ebr_features, topo_indices)
                 node_features.append(features)
+        
+        # Fallback: create nodes based on decomposition indices
+        elif 'decomposition_index' in kspace_df.columns:
+            unique_decomp = kspace_df['decomposition_index'].dropna().unique()
+            
+            for idx, decomp_idx in enumerate(unique_decomp):
+                kpoint_to_idx[decomp_idx] = idx
+                nodes.append(f"decomp_{decomp_idx}")
+                
+                decomp_data = kspace_df[kspace_df['decomposition_index'] == decomp_idx]
+                features = self._extract_decomp_features(decomp_data, ebr_features, topo_indices)
+                node_features.append(features)
+        
+        # Ensure we have at least some nodes
+        if not nodes:
+            print("Warning: No nodes could be created, creating default node")
+            nodes = ["default_node"]
+            node_features = [[1.0] * 10]
+            kpoint_to_idx = {"default_node": 0}
+        
+        print(f"  Created {len(nodes)} nodes: {nodes[:5]}..." if len(nodes) > 5 else f"  Created {len(nodes)} nodes: {nodes}")
         
         # Create edges based on physical connectivity
         edge_indices = []
         edge_attributes = []
         
         # Method 1: Band connectivity edges
-        if 'band_connectivity' in decomp_branches:
+        if 'band_connectivity' in decomp_branches and decomp_branches['band_connectivity']:
+            print("  Creating band connectivity edges...")
             connectivity = decomp_branches['band_connectivity']
             edges, edge_attrs = self._create_band_connectivity_edges(
                 connectivity, kpoint_to_idx, kspace_df
             )
             edge_indices.extend(edges)
             edge_attributes.extend(edge_attrs)
+            print(f"    Added {len(edges)} band connectivity edges")
         
         # Method 2: Symmetry-based edges
+        print("  Creating symmetry-based edges...")
         symmetry_edges, symmetry_attrs = self._create_symmetry_edges(
             kspace_df, kpoint_to_idx, ebr_features
         )
         edge_indices.extend(symmetry_edges)
         edge_attributes.extend(symmetry_attrs)
+        print(f"    Added {len(symmetry_edges)} symmetry edges")
         
         # Method 3: Topological proximity edges
+        print("  Creating topological proximity edges...")
         topo_edges, topo_attrs = self._create_topological_edges(
             nodes, node_features, topo_indices
         )
         edge_indices.extend(topo_edges)
         edge_attributes.extend(topo_attrs)
+        print(f"    Added {len(topo_edges)} topological edges")
+        
+        # Method 4: If still no edges, create a basic connectivity structure
+        if not edge_indices and len(nodes) > 1:
+            print("  No edges found, creating basic linear connectivity...")
+            for i in range(len(nodes) - 1):
+                edge_indices.append([i, i + 1])
+                edge_attributes.append([1.0])
+            print(f"    Added {len(edge_indices)} basic connectivity edges")
         
         # Convert to tensors
         if not node_features:
             # Fallback: create minimal features
             node_features = [[1.0] * 10 for _ in nodes]
         
-        if not edge_indices:
-            # Create a simple connectivity if no edges found
-            if len(nodes) > 1:
-                edge_indices = [[i, i+1] for i in range(len(nodes)-1)]
-                edge_attributes = [[1.0] for _ in edge_indices]
-        
         # Ensure we have valid tensors
-        x = torch.tensor(node_features, dtype=torch.float32) if node_features else torch.randn(1, 10)
+        x = torch.tensor(node_features, dtype=torch.float32)
         
         if edge_indices:
             edge_index = torch.tensor(edge_indices, dtype=torch.long).t().contiguous()
@@ -304,17 +347,25 @@ class KSpacePhysicsGraphBuilder:
             edge_index = torch.empty((2, 0), dtype=torch.long)
             edge_attr = None
         
-        # Create connectivity matrix
-        num_nodes = len(nodes) if nodes else 1
+        print(f"  Final graph: {len(nodes)} nodes, {len(edge_indices)} edges")
+        
+        # Create connectivity matrix - FIXED VERSION
+        num_nodes = len(nodes)
         connectivity_matrix = np.zeros((num_nodes, num_nodes))
         
         if edge_indices:
             for edge in edge_indices:
                 if len(edge) >= 2:
-                    i, j = edge[0], edge[1]
+                    i, j = int(edge[0]), int(edge[1])
                     if 0 <= i < num_nodes and 0 <= j < num_nodes:
                         connectivity_matrix[i, j] = 1
                         connectivity_matrix[j, i] = 1  # Undirected graph
+        
+        # Debug: Print connectivity matrix info
+        total_connections = np.sum(connectivity_matrix)
+        print(f"  Connectivity matrix: {num_nodes}x{num_nodes}, total connections: {int(total_connections)}")
+        if total_connections == 0:
+            print("  WARNING: Connectivity matrix is all zeros!")
         
         # Create PyG Data object
         pyg_data = Data(
@@ -325,8 +376,11 @@ class KSpacePhysicsGraphBuilder:
         )
         
         # Add global features
-        pyg_data.space_group = torch.tensor([kspace_df.iloc[0].get('space_group_number', 0)] if not kspace_df.empty else [0])
-        pyg_data.num_bands = torch.tensor([len(kspace_df['band_index'].dropna().unique())] if 'band_index' in kspace_df.columns else [0])
+        sg_num = kspace_df.iloc[0].get('space_group_number', 0) if not kspace_df.empty else 0
+        num_bands = len(kspace_df['band_index'].dropna().unique()) if 'band_index' in kspace_df.columns else 0
+        
+        pyg_data.space_group = torch.tensor([sg_num])
+        pyg_data.num_bands = torch.tensor([num_bands])
         
         return pyg_data, connectivity_matrix
     
@@ -359,8 +413,9 @@ class KSpacePhysicsGraphBuilder:
             features.append(0.0)
         
         # Irrep diversity
-        if 'irrep' in kpoint_data.columns:
-            num_irreps = len(kpoint_data['irrep'].dropna().unique())
+        irrep_col = 'irrep' if 'irrep' in kpoint_data.columns else 'irrep_label'
+        if irrep_col in kpoint_data.columns:
+            num_irreps = len(kpoint_data[irrep_col].dropna().unique())
             features.append(float(num_irreps))
         else:
             features.append(0.0)
@@ -376,7 +431,7 @@ class KSpacePhysicsGraphBuilder:
         topo_contribution = 0.0
         topo_count = 0
         for key, value in topo_indices.items():
-            if isinstance(value, (int, float)):
+            if isinstance(value, (int, float)) and not np.isnan(value):
                 topo_contribution += abs(float(value))
                 topo_count += 1
         
@@ -421,6 +476,58 @@ class KSpacePhysicsGraphBuilder:
         # Band participation
         if 'band_index' in irrep_data.columns:
             features.append(float(len(irrep_data['band_index'].dropna().unique())))
+        else:
+            features.append(0.0)
+        
+        # Decomposition index info
+        if 'decomposition_index' in irrep_data.columns:
+            features.append(float(len(irrep_data['decomposition_index'].dropna().unique())))
+        else:
+            features.append(0.0)
+        
+        # Branch information
+        if 'branch1_irreps' in irrep_data.columns:
+            features.append(float(len(irrep_data['branch1_irreps'].dropna())))
+        else:
+            features.append(0.0)
+        
+        # Pad to fixed size
+        while len(features) < 10:
+            features.append(0.0)
+        
+        return features[:10]
+    
+    def _extract_decomp_features(self, decomp_data: pd.DataFrame,
+                               ebr_features: Dict,
+                               topo_indices: Dict) -> List[float]:
+        """Extract features for decomposition indices"""
+        features = []
+        
+        # Basic statistics
+        features.append(float(len(decomp_data)))  # Number of entries for this decomposition
+        
+        # K-point diversity
+        kpoint_col = 'k_point' if 'k_point' in decomp_data.columns else 'kpoint'
+        if kpoint_col in decomp_data.columns:
+            features.append(float(len(decomp_data[kpoint_col].dropna().unique())))
+        else:
+            features.append(0.0)
+        
+        # Irrep diversity
+        irrep_col = 'irrep_label' if 'irrep_label' in decomp_data.columns else 'irrep'
+        if irrep_col in decomp_data.columns:
+            features.append(float(len(decomp_data[irrep_col].dropna().unique())))
+        else:
+            features.append(0.0)
+        
+        # Branch information
+        if 'branch1_irreps' in decomp_data.columns:
+            features.append(float(len(decomp_data['branch1_irreps'].dropna())))
+        else:
+            features.append(0.0)
+        
+        if 'branch2_irreps' in decomp_data.columns:
+            features.append(float(len(decomp_data['branch2_irreps'].dropna())))
         else:
             features.append(0.0)
         
@@ -470,13 +577,16 @@ class KSpacePhysicsGraphBuilder:
         edge_attrs = []
         
         # Connect nodes with shared symmetry properties
-        if 'irrep' in kspace_df.columns:
+        irrep_col = 'irrep' if 'irrep' in kspace_df.columns else 'irrep_label'
+        kpoint_col = 'kpoint' if 'kpoint' in kspace_df.columns else 'k_point'
+        
+        if irrep_col in kspace_df.columns:
             # Group by irrep and connect k-points with same irrep
-            irrep_groups = kspace_df.groupby('irrep')
+            irrep_groups = kspace_df.groupby(irrep_col)
             
             for irrep, group in irrep_groups:
-                if 'kpoint' in group.columns:
-                    kpoints_with_irrep = group['kpoint'].dropna().unique()
+                if kpoint_col in group.columns:
+                    kpoints_with_irrep = group[kpoint_col].dropna().unique()
                     
                     # Create clique among k-points with same irrep
                     for i, kp1 in enumerate(kpoints_with_irrep):
@@ -485,6 +595,27 @@ class KSpacePhysicsGraphBuilder:
                                 idx1, idx2 = kpoint_to_idx[kp1], kpoint_to_idx[kp2]
                                 edges.append([idx1, idx2])
                                 edge_attrs.append([0.8])  # Symmetry connection strength
+                elif irrep in kpoint_to_idx:
+                    # If nodes are irreps themselves, connect based on co-occurrence
+                    continue
+        
+        # Connect based on branch information
+        if 'branch1_irreps' in kspace_df.columns or 'branch2_irreps' in kspace_df.columns:
+            # Group by decomposition index and connect related entries
+            if 'decomposition_index' in kspace_df.columns:
+                decomp_groups = kspace_df.groupby('decomposition_index')
+                
+                for decomp_idx, group in decomp_groups:
+                    if kpoint_col in group.columns:
+                        kpoints_in_decomp = group[kpoint_col].dropna().unique()
+                        
+                        # Connect k-points within same decomposition
+                        for i, kp1 in enumerate(kpoints_in_decomp):
+                            for kp2 in kpoints_in_decomp[i+1:]:
+                                if kp1 in kpoint_to_idx and kp2 in kpoint_to_idx:
+                                    idx1, idx2 = kpoint_to_idx[kp1], kpoint_to_idx[kp2]
+                                    edges.append([idx1, idx2])
+                                    edge_attrs.append([0.6])  # Decomposition connection strength
         
         return edges, edge_attrs
     

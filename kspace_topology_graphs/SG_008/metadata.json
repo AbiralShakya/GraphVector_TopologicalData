@@ -1,11 +1,68 @@
 {
   "space_group_number": 8,
-  "ebr_data": {},
+  "ebr_data": {
+    "irreps": [
+      "A1",
+      "\u03931",
+      "M1",
+      "Y1",
+      "L1",
+      "V1",
+      "B1",
+      "GP1",
+      "\u039b1",
+      "U1",
+      "A2",
+      "\u03932",
+      "M2",
+      "Y2",
+      "B2",
+      "A3A4",
+      "\u03933\u03934",
+      "M3M4",
+      "Y3Y4",
+      "L2L2",
+      "V2V2",
+      "B3(1)\u00a0\u2295B4",
+      "2GP2",
+      "2\u039b2",
+      "2U2"
+    ],
+    "irrep_multiplicities": {
+      "L1": 2,
+      "V1": 2,
+      "GP1": 2,
+      "\u039b1": 2,
+      "U1": 2,
+      "A1": 1,
+      "A3A4": 1,
+      "2\u039b2": 1,
+      "2GP2": 1,
+      "B3(1)\u00a0\u2295B4": 1,
+      "V2V2": 1,
+      "L2L2": 1,
+      "Y3Y4": 1,
+      "M3M4": 1,
+      "\u03933\u03934": 1,
+      "M2": 1,
+      "B2": 1,
+      "Y2": 1,
+      "\u03931": 1,
+      "\u03932": 1,
+      "A2": 1,
+      "B1": 1,
+      "Y1": 1,
+      "M1": 1,
+      "2U2": 1
+    }
+  },
   "topological_indices": {},
-  "decomposition_branches": {},
+  "decomposition_branches": {
+    "decomposition_indices": []
+  },
   "graph_info": {
-    "num_nodes": 1,
-    "num_edges": 0,
+    "num_nodes": 10,
+    "num_edges": 20,
     "node_feature_dim": 10
   }
 }
