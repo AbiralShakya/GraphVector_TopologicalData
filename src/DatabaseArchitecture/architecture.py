@@ -273,66 +273,373 @@ class MultiModalMaterialDatabase:
         # This is a simplified version - you'd need to implement
         # conversion from your graph format to NetworkX/GraphML
         pass
+import torch
+import pandas as pd
+import h5py
+import json
+import os
+from pathlib import Path
+from typing import Dict, Optional, List, Tuple, Union
+import numpy as np
+from dataclasses import dataclass, asdict
+import pickle
+from build_dataset_test import TopologicalMaterialAnalyzer
+import time
+import tqdm
+import re
+
+class POSCARReader:
+    """Utility class to read and parse POSCAR files"""
+    
+    @staticmethod
+    def read_poscar(poscar_path: str) -> Dict:
+        """
+        Read POSCAR file and extract structure information
+        Returns dict with lattice_matrix, atomic_positions, elements, etc.
+        """
+        try:
+            with open(poscar_path, 'r') as f:
+                lines = [line.strip() for line in f.readlines()]
+            
+            # Parse POSCAR format
+            comment = lines[0]
+            scale_factor = float(lines[1])
+            
+            # Lattice vectors (lines 2-4)
+            lattice_matrix = np.zeros((3, 3))
+            for i in range(3):
+                vector = [float(x) for x in lines[2 + i].split()]
+                lattice_matrix[i] = vector
+            
+            # Scale the lattice
+            lattice_matrix *= scale_factor
+            
+            # Element names (line 5)
+            element_line = lines[5].split()
+            elements = element_line
+            
+            # Element counts (line 6)
+            count_line = [int(x) for x in lines[6].split()]
+            
+            # Create full element list
+            full_elements = []
+            atomic_numbers = []
+            for elem, count in zip(elements, count_line):
+                full_elements.extend([elem] * count)
+                # Convert element symbol to atomic number
+                atomic_numbers.extend([POSCARReader.element_to_atomic_number(elem)] * count)
+            
+            # Coordinate mode (line 7)
+            coord_mode = lines[7].lower()
+            direct_coords = coord_mode.startswith('d')
+            
+            # Atomic positions (starting from line 8)
+            total_atoms = sum(count_line)
+            positions = []
+            for i in range(8, 8 + total_atoms):
+                pos = [float(x) for x in lines[i].split()[:3]]  # Take only x,y,z
+                positions.append(pos)
+            
+            positions = np.array(positions)
+            
+            # Convert direct to cartesian if needed
+            if direct_coords:
+                # Convert fractional coordinates to cartesian
+                positions = positions @ lattice_matrix
+            
+            return {
+                'comment': comment,
+                'lattice_matrix': lattice_matrix,
+                'atomic_positions': positions,
+                'elements': full_elements,
+                'atomic_numbers': atomic_numbers,
+                'total_atoms': total_atoms,
+                'formula': POSCARReader.create_formula(elements, count_line)
+            }
+            
+        except Exception as e:
+            print(f"Error reading POSCAR file {poscar_path}: {str(e)}")
+            return None
+    
+    @staticmethod
+    def element_to_atomic_number(element: str) -> int:
+        """Convert element symbol to atomic number"""
+        element_to_z = {
+            'H': 1, 'He': 2, 'Li': 3, 'Be': 4, 'B': 5, 'C': 6, 'N': 7, 'O': 8,
+            'F': 9, 'Ne': 10, 'Na': 11, 'Mg': 12, 'Al': 13, 'Si': 14, 'P': 15,
+            'S': 16, 'Cl': 17, 'Ar': 18, 'K': 19, 'Ca': 20, 'Sc': 21, 'Ti': 22,
+            'V': 23, 'Cr': 24, 'Mn': 25, 'Fe': 26, 'Co': 27, 'Ni': 28, 'Cu': 29,
+            'Zn': 30, 'Ga': 31, 'Ge': 32, 'As': 33, 'Se': 34, 'Br': 35, 'Kr': 36,
+            'Rb': 37, 'Sr': 38, 'Y': 39, 'Zr': 40, 'Nb': 41, 'Mo': 42, 'Tc': 43,
+            'Ru': 44, 'Rh': 45, 'Pd': 46, 'Ag': 47, 'Cd': 48, 'In': 49, 'Sn': 50,
+            'Sb': 51, 'Te': 52, 'I': 53, 'Xe': 54, 'Cs': 55, 'Ba': 56, 'La': 57,
+            'Ce': 58, 'Pr': 59, 'Nd': 60, 'Pm': 61, 'Sm': 62, 'Eu': 63, 'Gd': 64,
+            'Tb': 65, 'Dy': 66, 'Ho': 67, 'Er': 68, 'Tm': 69, 'Yb': 70, 'Lu': 71,
+            'Hf': 72, 'Ta': 73, 'W': 74, 'Re': 75, 'Os': 76, 'Ir': 77, 'Pt': 78,
+            'Au': 79, 'Hg': 80, 'Tl': 81, 'Pb': 82, 'Bi': 83, 'Po': 84, 'At': 85,
+            'Rn': 86, 'Fr': 87, 'Ra': 88, 'Ac': 89, 'Th': 90, 'Pa': 91, 'U': 92
+        }
+        return element_to_z.get(element, 0)
+    
+    @staticmethod
+    def create_formula(elements: List[str], counts: List[int]) -> str:
+        """Create chemical formula from elements and counts"""
+        formula_parts = []
+        for elem, count in zip(elements, counts):
+            if count == 1:
+                formula_parts.append(elem)
+            else:
+                formula_parts.append(f"{elem}{count}")
+        return "".join(formula_parts)
+
+
+class MultiModalMaterialDatabase:
+    """Enhanced database structure for multi-modal materials data"""
+    
+    def __init__(self, base_path: str):
+        self.base_path = Path(base_path)
+        self.setup_directory_structure()
+        
+    def setup_directory_structure(self):
+        """Create organized directory structure"""
+        directories = [
+            'raw_data',           # Original JARVIS + local data
+            'structures',         # POSCAR files and structure data
+            'graphs',            # Graph representations
+            'point_clouds',      # Topological/ASPH features (separate files)
+            'metadata',          # JSON metadata and indices
+            'datasets',          # Processed datasets for ML
+            'analysis'           # Analysis results and visualizations
+        ]
+        
+        for dir_name in directories:
+            (self.base_path / dir_name).mkdir(parents=True, exist_ok=True)
+    
+    def save_material_record(self, record: 'MaterialRecord', 
+                           format_type: str = 'hybrid') -> None:
+        """Save material record in specified format"""
+        
+        if format_type == 'hybrid':
+            self._save_hybrid_format(record)
+        elif format_type == 'hdf5':
+            self._save_hdf5_format(record)
+        elif format_type == 'individual':
+            self._save_individual_format(record)
+        else:
+            raise ValueError(f"Unknown format: {format_type}")
+    
+    def _save_hybrid_format(self, record: 'MaterialRecord'):
+        """Hybrid format: HDF5 for arrays, JSON for metadata, separate files for graphs and point clouds"""
+        
+        # 1. Structure data in HDF5 (efficient for arrays)
+        structure_path = self.base_path / 'structures' / f"{record.jid}.h5"
+        with h5py.File(structure_path, 'w') as f:
+            f.create_dataset('lattice_matrix', data=record.lattice_matrix)
+            f.create_dataset('atomic_positions', data=record.atomic_positions)
+            f.create_dataset('atomic_numbers', data=record.atomic_numbers)
+            
+            # Store strings as variable-length strings
+            dt = h5py.special_dtype(vlen=str)
+            f.create_dataset('elements', data=record.elements, dtype=dt)
+        
+        # 2. Point cloud data as separate numpy file
+        point_cloud_path = self.base_path / 'point_clouds' / f"{record.jid}_asph.npy"
+        np.save(point_cloud_path, record.asph_features)
+        
+        # 3. Graph data as PyTorch files (preserves tensor structure)
+        graph_dir = self.base_path / 'graphs' / record.jid
+        graph_dir.mkdir(exist_ok=True)
+        
+        torch.save(record.crystal_graph, graph_dir / 'crystal_graph.pt')
+        torch.save(record.kspace_graph, graph_dir / 'kspace_graph.pt')
+        
+        # 4. Create POSCAR file
+        poscar_path = self.base_path / 'structures' / f"{record.jid}_POSCAR"
+        poscar_content = self._create_poscar_string(record)
+        with open(poscar_path, 'w') as f:
+            f.write(poscar_content)
+        
+        # 5. Metadata as JSON (human-readable)
+        metadata = {
+            'jid': record.jid,
+            'formula': record.formula,
+            'normalized_formula': record.normalized_formula,
+            'space_group': record.space_group,
+            'space_group_number': record.space_group_number,
+            'topological_class': record.topological_class,
+            'topological_binary': record.topological_binary,
+            'band_gap': record.band_gap,
+            'formation_energy': record.formation_energy,
+            'processing_timestamp': record.processing_timestamp,
+            'local_database_props': record.local_database_props,
+            'num_atoms': len(record.elements),
+            'file_locations': {
+                'structure_hdf5': str(structure_path.relative_to(self.base_path)),
+                'poscar': str(poscar_path.relative_to(self.base_path)),
+                'point_cloud': str(point_cloud_path.relative_to(self.base_path)),
+                'crystal_graph': str((graph_dir / 'crystal_graph.pt').relative_to(self.base_path)),
+                'kspace_graph': str((graph_dir / 'kspace_graph.pt').relative_to(self.base_path))
+            }
+        }
+        
+        metadata_path = self.base_path / 'metadata' / f"{record.jid}.json"
+        with open(metadata_path, 'w') as f:
+            json.dump(metadata, f, indent=2)
+    
+    def _create_poscar_string(self, record: 'MaterialRecord') -> str:
+        """Create POSCAR format string from material record"""
+        lines = []
+        lines.append(f"{record.formula} # {record.jid}")
+        lines.append("1.0")  # Scaling factor
+        
+        # Lattice vectors
+        for row in record.lattice_matrix:
+            lines.append(f"  {row[0]:12.6f}  {row[1]:12.6f}  {row[2]:12.6f}")
+        
+        # Element symbols and counts
+        unique_elements = []
+        element_counts = []
+        for element in record.elements:
+            if element not in unique_elements:
+                unique_elements.append(element)
+                element_counts.append(1)
+            else:
+                idx = unique_elements.index(element)
+                element_counts[idx] += 1
+        
+        lines.append("  ".join(unique_elements))
+        lines.append("  ".join(map(str, element_counts)))
+        lines.append("Direct")  # Fractional coordinates
+        
+        # Convert cartesian to fractional coordinates
+        lattice_inv = np.linalg.inv(record.lattice_matrix)
+        fractional_positions = record.atomic_positions @ lattice_inv
+        
+        # Atomic positions
+        for pos in fractional_positions:
+            lines.append(f"  {pos[0]:12.6f}  {pos[1]:12.6f}  {pos[2]:12.6f}")
+        
+        return "\n".join(lines)
+    
+    def create_master_index(self) -> pd.DataFrame:
+        """Create a master index/catalog of all materials"""
+        
+        records = []
+        metadata_dir = self.base_path / 'metadata'
+        
+        for json_file in metadata_dir.glob('*.json'):
+            with open(json_file, 'r') as f:
+                metadata = json.load(f)
+                records.append(metadata)
+        
+        if not records:
+            print("No metadata files found!")
+            return pd.DataFrame()
+        
+        df = pd.DataFrame(records)
+        
+        # Save as both CSV (human-readable) and parquet (efficient)
+        df.to_csv(self.base_path / 'master_index.csv', index=False)
+        df.to_parquet(self.base_path / 'master_index.parquet', index=False)
+        
+        return df
+
 
 class EnhancedTopologicalMaterialAnalyzer(TopologicalMaterialAnalyzer):
-    """Enhanced analyzer that uses the new database structure"""
+    """Enhanced analyzer that uses the new database structure and reads POSCAR files"""
     
     def __init__(self, csv_path: str, database_path: str):
         super().__init__(csv_path)
         self.database = MultiModalMaterialDatabase(database_path)
+        
+    def find_poscar_file(self, jid: str, formula: str) -> Optional[str]:
+        """Find POSCAR file for given JID or formula"""
+        if not self.poscar_dir or not self.poscar_dir.exists():
+            return None
+        
+        # Search patterns for POSCAR files
+        search_patterns = [
+            f"{jid}*POSCAR*",
+            f"*{jid}*POSCAR*",
+            f"*{formula}*POSCAR*",
+            f"POSCAR*{jid}*",
+            f"POSCAR*{formula}*"
+        ]
+        
+        for pattern in search_patterns:
+            matches = list(self.poscar_dir.glob(pattern))
+            if matches:
+                return str(matches[0])
+        
+        # Also search in subdirectories
+        for pattern in search_patterns:
+            matches = list(self.poscar_dir.rglob(pattern))
+            if matches:
+                return str(matches[0])
+        
+        return None
     
-    def generate_and_save_material_record(self, jid: str, 
-                                    format_type: str = 'hybrid') -> Optional[MaterialRecord]:
+    def generate_and_save_material_record(self, identifier: str, save_id: str, poscar_file_path : Optional[str] = None, 
+                                        format_type: str = 'hybrid') -> Optional['MaterialRecord']:
         """Generate complete material record and save to database"""
-    
-        data_block = self.generate_data_block_with_sg_check(jid)
+        
+        data_block = self.generate_data_block_with_sg_check(identifier)
         if not data_block:
+            # The identifier might have been a JID, so let's use the save_id for the message
+            print(f"Could not generate data block for {save_id} using identifier '{identifier}'")
             return None
         
         try:
-            # Extract crystal graph data safely
-            crystal_graph = data_block['crystal_graph']
+            poscar_data = None
+            if poscar_file_path and Path(poscar_file_path).exists():
+                poscar_data = POSCARReader.read_poscar(poscar_file_path)
+                print(f"✓ Using provided POSCAR file for {save_id}: {poscar_file_path}")
             
-            # Get atomic positions from crystal graph
-            if hasattr(crystal_graph, 'pos') and crystal_graph.pos is not None:
-                atomic_positions = crystal_graph.pos.numpy()
+            # Extract structure data (prefer POSCAR if available)
+            if poscar_data:
+                lattice_matrix = poscar_data['lattice_matrix']
+                atomic_positions = poscar_data['atomic_positions']
+                atomic_numbers = poscar_data['atomic_numbers']
+                elements = poscar_data['elements']
+                formula = poscar_data['formula']
             else:
-                print(f"Warning: No atomic positions found for {jid}")
-                return None
+                # Fallback to crystal graph data
+                crystal_graph = data_block['crystal_graph']
+                
+                if hasattr(crystal_graph, 'pos') and crystal_graph.pos is not None:
+                    atomic_positions = crystal_graph.pos.numpy()
+                else:
+                    print(f"Warning: No atomic positions found for {save_id}")
+                    return None
+                
+                if hasattr(crystal_graph, 'x') and crystal_graph.x is not None:
+                    # Assuming first column contains normalized atomic numbers
+                    atomic_numbers = [int(z * 100) for z in crystal_graph.x[:, 0].numpy()]
+                else:
+                    print(f"Warning: No atomic features found for {save_id}")
+                    return None
+                
+                # Get lattice matrix from JARVIS properties or create default
+                jarvis_props = data_block.get('jarvis_props', {})
+                if 'lattice_abc' in jarvis_props and 'lattice_angles' in jarvis_props:
+                    lattice_matrix = self._abc_angles_to_matrix(
+                        jarvis_props['lattice_abc'], 
+                        jarvis_props['lattice_angles']
+                    )
+                else:
+                    lattice_matrix = np.eye(3) * 10.0  # Default 10 Angstrom cell
+                
+                elements = data_block.get('elements', [])
+                formula = data_block.get('formula', 'Unknown')
             
-            # Get atomic numbers from crystal graph features
-            if hasattr(crystal_graph, 'x') and crystal_graph.x is not None:
-                # Assuming first column contains normalized atomic numbers
-                atomic_numbers = [int(z * 100) for z in crystal_graph.x[:, 0].numpy()]
-            else:
-                print(f"Warning: No atomic features found for {jid}")
-                return None
-            
-            # Get lattice matrix from JARVIS properties
+            # Get JARVIS properties
             jarvis_props = data_block.get('jarvis_props', {})
-            
-            # Try to get lattice from JARVIS data
-            if 'lattice_abc' in jarvis_props and 'lattice_angles' in jarvis_props:
-                # Convert from abc + angles to matrix (you'll need to implement this)
-                lattice_matrix = self._abc_angles_to_matrix(
-                    jarvis_props['lattice_abc'], 
-                    jarvis_props['lattice_angles']
-                )
-            else:
-                # Fallback: create identity matrix scaled by average position
-                lattice_matrix = np.eye(3) * 10.0  # Default 10 Angstrom cell
-            
-            # Get elements list
-            elements = data_block.get('elements', [])
-            if not elements and 'formula' in data_block:
-                # Try to extract elements from formula
-                elements = self._extract_elements_from_formula(data_block['formula'])
             
             # Create the record
             record = MaterialRecord(
-                jid=data_block['jid'],
-                formula=data_block.get('formula', 'Unknown'),
-                normalized_formula=data_block.get('normalized_formula', 'Unknown'),
+                jid= save_id,
+                formula=formula,
+                normalized_formula=data_block.get('normalized_formula', formula),
                 space_group=jarvis_props.get('space_group', 'Unknown'),
                 space_group_number=jarvis_props.get('space_group_number', 0),
                 
@@ -366,9 +673,11 @@ class EnhancedTopologicalMaterialAnalyzer(TopologicalMaterialAnalyzer):
             return record
             
         except Exception as e:
-            print(f"Error creating material record for {jid}: {str(e)}")
+            print(f"Error creating material record for {save_id}: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return None
-
+    
     def _abc_angles_to_matrix(self, abc: List[float], angles: List[float]) -> np.ndarray:
         """Convert lattice parameters (a,b,c,alpha,beta,gamma) to matrix"""
         a, b, c = abc
@@ -399,14 +708,7 @@ class EnhancedTopologicalMaterialAnalyzer(TopologicalMaterialAnalyzer):
             [cx, cy, cz]
         ])
 
-    def _extract_elements_from_formula(self, formula: str) -> List[str]:
-        """Extract element symbols from chemical formula"""
-        import re
-        
-        # Find all element symbols (capital letter followed by optional lowercase)
-        elements = re.findall(r'[A-Z][a-z]?', formula)
-        return elements
-    
+
 def main():
     """Main execution function with proper database integration."""
     # --- Configuration ---
@@ -418,76 +720,72 @@ def main():
     
     # Configuration
     max_materials = 10  # Start with a smaller number for testing
+
+    print(f"Reading data from {csv_path}...")
+    try:
+        materials_df = pd.read_csv(csv_path)
+    except FileNotFoundError:
+        print(f"ERROR: CSV file not found at path: {csv_path}")
+        return
+    
+    poscarlinks = materials_df['POSCAR_link']
+
     
     # --- Initialize Enhanced Analyzer ---
     print("Initializing Enhanced Topological Material Analyzer...")
-    analyzer = EnhancedTopologicalMaterialAnalyzer(csv_path=csv_path, database_path=db_path)
+    analyzer = EnhancedTopologicalMaterialAnalyzer(
+        csv_path=csv_path, 
+        database_path=db_path,
+    )
     
     if not analyzer.formula_lookup:
         print("ERROR: No materials loaded from local database. Please check the CSV file.")
         return
     
-    # --- Get JIDs to process ---
-    jids_to_process = get_jarvis_jids(max_jids=max_materials)
-    
     # --- Main Processing Loop ---
-    print(f"\nStarting data generation for up to {len(jids_to_process)} materials...")
+    print(f"\nStarting data generation for up to {max_materials} materials from your CSV...")
     print(f"Looking for matches in local database with {len(analyzer.formula_lookup)} materials...")
     print(f"Database will be saved to: {db_path}")
+    # if analyzer.poscar_dir:
+    #     print(f"POSCAR files directory: {analyzer.poscar_dir}")
     
     successful_generations = 0
     successful_db_saves = 0
     
-    for i, jid in enumerate(tqdm.tqdm(jids_to_process, desc="Processing JIDs")):
-        # Check if already processed in database
-        metadata_path = Path(db_path) / 'metadata' / f"{jid}.json"
+    for index, row in tqdm.tqdm(materials_df.head(max_materials).iterrows(), total=max_materials, desc="Processing Materials"):
+        
+        # 1. Get data directly from the current row
+        formula = row['Formula']
+        icsd_id = row['ICSD_ID']
+        poscar_path = row['POSCAR_link']
+        
+        # 2. Create a unique ID for saving files (e.g., "ICSD-3")
+        unique_save_id = f"ICSD-{icsd_id}"
+
+        # 3. Check if this material has already been processed
+        metadata_path = Path(db_path) / 'metadata' / f"{unique_save_id}.json"
         if metadata_path.exists():
-            print(f"Skipping {jid} - already exists in database")
-            successful_generations += 1
-            successful_db_saves += 1
+            print(f"Skipping {unique_save_id} - already exists in database")
             continue
         
-        # Generate and save material record using the enhanced analyzer
         try:
-            record = analyzer.generate_and_save_material_record(jid, format_type='hybrid')
+            # 4. Call the modified method
+            record = analyzer.generate_and_save_material_record(
+                identifier=formula,         # Use the formula to find data
+                save_id=unique_save_id,     # Use the ICSD ID for saving
+                poscar_file_path=poscar_path
+            )
             
             if record:
-                successful_generations += 1
-                successful_db_saves += 1
-                
-                # Also save old format for backward compatibility (optional)
-                old_output_path = os.path.join(output_dir, f"{jid}.pt")
-                if not os.path.exists(old_output_path):
-                    # Generate the old data block format
-                    material_block = analyzer.generate_data_block_with_sg_check(jid)
-                    if material_block:
-                        torch.save(material_block, old_output_path)
-                        
-                        # Save metadata as JSON for easy inspection
-                        metadata_path = os.path.join(output_dir, f"{jid}_metadata.json")
-                        metadata = {
-                            'jid': material_block['jid'],
-                            'formula': material_block['formula'],
-                            'normalized_formula': material_block['normalized_formula'],
-                            'target_label': material_block['target_label'].item(),
-                            'num_atoms': material_block['crystal_graph'].x.shape[0],
-                            'num_edges': material_block['crystal_graph'].edge_index.shape[1],
-                            'jarvis_props': material_block['jarvis_props']
-                        }
-                        with open(metadata_path, 'w') as f:
-                            json.dump(metadata, f, indent=2)
-                
-                print(f"✓ Successfully processed and saved {jid} to database")
-            else:
-                print(f"✗ Failed to process {jid}")
+                print(f"✓ Successfully processed and saved {unique_save_id}")
                 
         except Exception as e:
-            print(f"✗ Error processing {jid}: {str(e)}")
+            print(f"✗ Error processing {unique_save_id} ({formula}): {str(e)}")
             continue
         
         # Print progress every 5 materials
-        if (i + 1) % 5 == 0:
-            print(f"\nProgress: {i+1}/{len(jids_to_process)} processed")
+        if (index + 1) % 5 == 0:
+            print(f"\nProgress: {index+1}/{max_materials} processed")
             print(f"  Database saves: {successful_db_saves}")
             print(f"  Matches found: {analyzer.matched_count}")
         
@@ -506,10 +804,13 @@ def main():
             print(f"✓ Master index created with {len(master_df)} materials")
             
             # Create ML datasets
-            split_paths = analyzer.database.create_ml_datasets()
-            print("✓ ML dataset splits created:")
-            for split_name, path in split_paths.items():
-                print(f"  {split_name}: {path}")
+            if len(master_df) > 5:  # Only create splits if we have enough data
+                split_paths = analyzer.database.create_ml_datasets()
+                print("✓ ML dataset splits created:")
+                for split_name, path in split_paths.items():
+                    print(f"  {split_name}: {path}")
+            else:
+                print("⚠ Not enough materials for train/val/test splits")
                 
         except Exception as e:
             print(f"✗ Error creating master index/datasets: {str(e)}")
@@ -525,24 +826,17 @@ def main():
     print(f"Success rate: {successful_generations/analyzer.processed_count*100:.1f}% (processing)")
     print(f"Database save rate: {successful_db_saves/analyzer.processed_count*100:.1f}% (database)")
     print(f"Database location: {db_path}")
-    print(f"Legacy dataset location: {output_dir}")
     print(f"="*60)
     
     # Print directory structure
-    db_path_obj = Path(db_path)
-    if db_path_obj.exists():
-        print(f"\nDatabase structure:")
-        for item in sorted(db_path_obj.rglob("*")):
-            if item.is_file():
-                rel_path = item.relative_to(db_path_obj)
-                print(f"  {rel_path}")
+    inspect_database(db_path)
 
 
 def inspect_database(db_path: str):
     """Helper function to inspect what's in the database"""
     db_path_obj = Path(db_path)
     
-    print(f"Database inspection: {db_path}")
+    print(f"\nDatabase inspection: {db_path}")
     print("="*50)
     
     if not db_path_obj.exists():
@@ -550,7 +844,7 @@ def inspect_database(db_path: str):
         return
     
     # Check each subdirectory
-    subdirs = ['structures', 'graphs', 'metadata', 'datasets']
+    subdirs = ['structures', 'graphs', 'point_clouds', 'metadata', 'datasets']
     for subdir in subdirs:
         subdir_path = db_path_obj / subdir
         if subdir_path.exists():
@@ -566,26 +860,16 @@ def inspect_database(db_path: str):
     
     # Check master index
     master_csv = db_path_obj / 'master_index.csv'
-    master_parquet = db_path_obj / 'master_index.parquet'
-    
     if master_csv.exists():
         df = pd.read_csv(master_csv)
         print(f"Master index: {len(df)} materials")
         if len(df) > 0:
             print(f"  Columns: {list(df.columns)}")
-            print(f"  Topological materials: {(df['topological_binary'] == 1).sum()}")
+            if 'topological_binary' in df.columns:
+                print(f"  Topological materials: {(df['topological_binary'] == 1).sum()}")
     else:
         print("Master index: not found")
 
-
-# Add this at the end of main() if you want to inspect right after
-def main_with_inspection():
-    """Main function with database inspection"""
-    main()
-    
-    # Inspect the database after processing
-    db_path = "/Users/abiralshakya/Documents/Research/GraphVectorTopological/src/db_all"
-    inspect_database(db_path)
 
 if __name__ == "__main__":
     main()
