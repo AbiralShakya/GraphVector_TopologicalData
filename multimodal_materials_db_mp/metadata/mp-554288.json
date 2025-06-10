@@ -1,0 +1,21 @@
+{
+  "jid": "mp-554288",
+  "formula": "NaPH4O5",
+  "normalized_formula": "NaPH4O5",
+  "space_group": "Unknown",
+  "space_group_number": 33,
+  "topological_class": "Unknown",
+  "topological_binary": 0.0,
+  "band_gap": 5.4573,
+  "formation_energy": -1.9025312148656521,
+  "processing_timestamp": "2025-06-10T10:12:06.947249",
+  "local_database_props": {},
+  "num_atoms": 44,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-554288.h5",
+    "poscar": "structures/mp-554288_POSCAR",
+    "point_cloud": "point_clouds/mp-554288_asph.npy",
+    "crystal_graph": "graphs/mp-554288/crystal_graph.pt",
+    "kspace_graph": "graphs/mp-554288/kspace_graph.pt"
+  }
+}

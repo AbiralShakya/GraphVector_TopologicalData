@@ -1,0 +1,21 @@
+{
+  "jid": "mp-24350",
+  "formula": "K2CoH8(CO5)2",
+  "normalized_formula": "K2CoH8(CO5)2",
+  "space_group": "Unknown",
+  "space_group_number": 14,
+  "topological_class": "Unknown",
+  "topological_binary": 0.0,
+  "band_gap": 1.7805,
+  "formation_energy": -1.5629499323695661,
+  "processing_timestamp": "2025-06-10T10:12:07.863312",
+  "local_database_props": {},
+  "num_atoms": 46,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-24350.h5",
+    "poscar": "structures/mp-24350_POSCAR",
+    "point_cloud": "point_clouds/mp-24350_asph.npy",
+    "crystal_graph": "graphs/mp-24350/crystal_graph.pt",
+    "kspace_graph": "graphs/mp-24350/kspace_graph.pt"
+  }
+}

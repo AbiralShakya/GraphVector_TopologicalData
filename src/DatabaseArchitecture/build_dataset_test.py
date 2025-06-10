@@ -20,11 +20,12 @@ from torch_geometric.data import Data
 from gtda.homology import VietorisRipsPersistence
 from gtda.diagrams import BettiCurve, PersistenceEntropy
 from sklearn.preprocessing import StandardScaler
+import sqlite3
 
 from jarvis.db.figshare import get_jid_data
 
 class TopologicalMaterialAnalyzer:
-    def __init__(self, csv_path: str):
+    def __init__(self, csv_path: str, db_path: str):
         """
         Initialize the analyzer. This will load the local materials database
         and pre-compute necessary vocabularies for feature generation.
@@ -35,8 +36,9 @@ class TopologicalMaterialAnalyzer:
         self.master_irreps = []
         self.processed_count = 0
         self.matched_count = 0
-
-        self._load_and_prepare_local_database()
+        self.db_path = db_path
+        self.conn = sqlite3.connect(self.db_path)
+        self._load_and_prepare_databases()
 
     def normalize_formula(self, formula: str) -> str:
         """Normalizes a chemical formula string for consistent lookups."""
@@ -80,73 +82,61 @@ class TopologicalMaterialAnalyzer:
         
         return "".join(normalized_parts)
 
-    def _load_and_prepare_local_database(self):
+    def _load_and_prepare_databases(self):
         """
-        Loads the local CSV, creates the formula lookup, and pre-computes
-        the vocabularies for k-points and irreps needed for feature engineering.
+        Loads the local CSV for labels and queries the SQLite DB
+        to build the vocabularies for k-points and irreps.
         """
         print(f"Loading local topological data from {self.csv_path}...")
+        # This part for loading the CSV remains the same
+        df = pd.read_csv(self.csv_path)
+        df.columns = df.columns.str.strip()
+        for idx, row in df.iterrows():
+            norm_formula = self.normalize_formula(row.get('Formula', ''))
+            if norm_formula:
+                self.formula_lookup[norm_formula] = row.to_dict()
+        print(f"Loaded {len(self.formula_lookup)} unique materials from local CSV.")
+
+        # --- NEW: Build vocabularies by querying the SQLite DB ---
+        print(f"Building vocabularies from SQLite DB: {self.db_path}...")
         try:
-            df = pd.read_csv(self.csv_path)
-            df.columns = df.columns.str.strip()
-            
-            print(f"CSV columns: {list(df.columns)}")
-            print(f"CSV shape: {df.shape}")
+            # Query for all unique k-points
+            k_points_df = pd.read_sql_query("SELECT DISTINCT k_point FROM irreps", self.conn)
+            self.master_k_points = sorted(k_points_df['k_point'].tolist())
 
-            # --- Create Formula Lookup Dictionary ---
-            for idx, row in df.iterrows():
-                formula = row.get('Formula', '')
-                if pd.notna(formula) and formula != '':
-                    norm_formula = self.normalize_formula(formula)
-                    if norm_formula:  # Only add if normalization succeeded
-                        self.formula_lookup[norm_formula] = row.to_dict()
+            # Query for all unique irrep labels
+            irreps_df = pd.read_sql_query("SELECT DISTINCT irrep_label FROM irreps", self.conn)
+            self.master_irreps = sorted(irreps_df['irrep_label'].tolist())
             
-            print(f"Loaded {len(self.formula_lookup)} unique materials from local file.")
-            
-            # Show some examples of normalized formulas
-            example_formulas = list(self.formula_lookup.keys())[:5]
-            print(f"Example normalized formulas: {example_formulas}")
-
-            # --- Pre-compute Vocabularies for Band Representations ---
-            all_k_points = set()
-            all_irreps = set()
-            
-            # Parse band representation data to build vocabularies
-            for entry in self.formula_lookup.values():
-                # Look for band representation or topological data columns
-                for col in ['BandReps', 'Band_Representations', 'Topology', 'Property']:
-                    if col in entry and pd.notna(entry[col]):
-                        band_data = str(entry[col])
-                        # Parse k-points (assume format like "G:A1g+T2u;X:X1")
-                        k_point_matches = re.findall(r'([A-Z]\d?):([^;]+)', band_data)
-                        for k_point, irreps_str in k_point_matches:
-                            all_k_points.add(k_point)
-                            # Parse irreps (split by + and other delimiters)
-                            irreps = re.split(r'[+\-\s]+', irreps_str)
-                            for irrep in irreps:
-                                if irrep.strip():
-                                    all_irreps.add(irrep.strip())
-            
-            # Use default vocabularies if parsing didn't work
-            if not all_k_points:
-                all_k_points = {'G', 'K', 'L', 'M', 'X', 'A', 'H', 'P', 'N', 'Z'}
-            if not all_irreps:
-                all_irreps = {'A1g', 'A2g', 'Eg', 'T1g', 'T2g', 'A1u', 'A2u', 'Eu', 'T1u', 'T2u'}
-            
-            self.master_k_points = sorted(list(all_k_points))
-            self.master_irreps = sorted(list(all_irreps))
-            
-            print(f"Master K-Point Vocabulary Size: {len(self.master_k_points)}")
-            print(f"Master Irrep Vocabulary Size: {len(self.master_irreps)}")
-            print(f"K-points: {self.master_k_points[:10]}...")  # Show first 10
-            print(f"Irreps: {self.master_irreps[:10]}...")      # Show first 10
-
+            print(f"✓ Master K-Point Vocabulary Size: {len(self.master_k_points)}")
+            print(f"✓ Master Irrep Vocabulary Size: {len(self.master_irreps)}")
         except Exception as e:
-            print(f"Error loading local database: {e}")
-            import traceback
-            traceback.print_exc()
-            self.formula_lookup = {}
+            print(f"✗ ERROR: Could not build vocabularies from SQLite DB. {e}")
 
+    def _get_kspace_data_from_db(self, space_group_number: int) -> Optional[pd.DataFrame]:
+        """
+        Queries the SQLite DB to get all k-points and irrep labels
+        for a given space group number.
+        """
+        try:
+            query = """
+                SELECT
+                  ir.k_point,
+                  ir.irrep_label
+                FROM irreps AS ir
+                LEFT JOIN ebr ON ir.ebr_id = ebr.id
+                LEFT JOIN space_groups AS sg ON ebr.space_group_id = sg.id
+                WHERE
+                  sg.number = ?;
+            """
+            # Use pandas to execute the query and return a DataFrame
+            df = pd.read_sql_query(query, self.conn, params=(space_group_number,))
+            if not df.empty:
+                return df
+        except Exception as e:
+            print(f"  ✗ Warning: Could not query k-space data for SG {space_group_number}: {e}")
+        return None
+    
     def generate_data_block_with_sg_check(self, jid: str) -> Optional[Dict]:
         self.processed_count += 1
         print(f"Processing JID: {jid}")
@@ -275,29 +265,27 @@ class TopologicalMaterialAnalyzer:
             print(f"  Error in symmetry analysis: {e}")
             primitive_structure = structure
             symm_ops = []
+        
+        print("  Querying SQLite DB for k-space data...")
+        kspace_df = self._get_kspace_data_from_db(sg_number_from_jarvis)
+        if kspace_df is None:
+            print(f"  Skipping {jid}: No k-space data found for SG {sg_number_from_jarvis}")
+            return None
+        
+        print(f"  ✓ Found {len(kspace_df)} k-space entries for SG {sg_number_from_jarvis}")
+        
+        # Now call the featurizer with the structured data
+        band_rep_vector, target_y = self._featurize_kspace_data(local_data_entry, kspace_df)
+        # --- End of major changes ---
 
-        # Generate Graphs and Features
+        # The rest of the generation process uses these outputs
         print("  Generating features...")
-        
-        # Crystal graph
         crystal_graph = self._create_crystal_graph(primitive_structure)
-        print(f"  Crystal graph: {crystal_graph.x.shape[0]} nodes, {crystal_graph.edge_index.shape[1]} edges")
-        
-        # ASPH features
         asph_vector = self._compute_asph_features(structure)
-        print(f"  ASPH features: {asph_vector.shape}")
+        kspace_graph = self._create_kspace_graph(band_rep_vector) # This now gets the clean vector
         
-        # Band representation features
-        band_rep_vector, target_y = self._featurize_bilbao_data(local_data_entry)
-        print(f"  Band rep features: {band_rep_vector.shape}, Target: {target_y.item()}")
+        crystal_graph.y = target_y # Set the correct label
         
-        # K-space graph
-        kspace_graph = self._create_kspace_graph(band_rep_vector)
-        print(f"  K-space graph: {kspace_graph.x.shape[0]} nodes")
-        
-        # Set the target 'y' on the primary graph object
-        crystal_graph.y = target_y
-
         # Assemble the final data block
         data_block = {
             'jid': jid,
@@ -376,6 +364,38 @@ class TopologicalMaterialAnalyzer:
             print(f"Error computing ASPH features: {e}")
             # Return zero vector if computation fails
             return torch.zeros(n_bins * 3 + 3, dtype=torch.float)  # 3 homology dims + 3 entropy features
+        
+    def _featurize_kspace_data(self, local_data_entry: dict, kspace_df: pd.DataFrame) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Converts structured k-space data from the DB into a feature vector
+        and gets the classification label from the local CSV data.
+        """
+        # --- Part 1: Determine the target label (same as before) ---
+        # This still comes from your high-level 'Property' column in the CSV
+        property_str = str(local_data_entry.get('Property', '')).upper()
+        is_topological = any(indicator in property_str for indicator in ['TI', 'SM', 'WEYL', 'DIRAC'])
+        target_y = torch.tensor([1.0 if is_topological else 0.0], dtype=torch.float)
+
+        # --- Part 2: Build the feature vector from the database query ---
+        feature_dim = len(self.master_k_points) + len(self.master_irreps)
+        band_rep_vector = torch.zeros(feature_dim, dtype=torch.float)
+
+        if kspace_df is not None:
+            # Create sets for fast lookups
+            present_k_points = set(kspace_df['k_point'])
+            present_irreps = set(kspace_df['irrep_label'])
+
+            # Populate the vector based on the queried data
+            for i, k_point in enumerate(self.master_k_points):
+                if k_point in present_k_points:
+                    band_rep_vector[i] = 1.0
+            
+            offset = len(self.master_k_points)
+            for i, irrep in enumerate(self.master_irreps):
+                if irrep in present_irreps:
+                    band_rep_vector[offset + i] = 1.0
+        
+        return band_rep_vector, target_y
 
     def _featurize_bilbao_data(self, local_data_entry: dict) -> Tuple[torch.Tensor, torch.Tensor]:
         """Converts raw topological data into numerical vectors."""
@@ -543,6 +563,7 @@ def main():
     """Main execution function."""
     # --- Configuration ---
     csv_path = "/Users/abiralshakya/Documents/Research/GraphVectorTopological/materials_database.csv"
+    db_path = "/Users/abiralshakya/Documents/Research/GraphVectorTopological/pebr_tr_nonmagnetic_rev4.db"
     output_dir = "./graph_vector_dataset"
     os.makedirs(output_dir, exist_ok=True)
     
@@ -551,7 +572,7 @@ def main():
     
     # --- Initialize Analyzer ---
     print("Initializing Topological Material Analyzer...")
-    analyzer = TopologicalMaterialAnalyzer(csv_path=csv_path)
+    analyzer = TopologicalMaterialAnalyzer(csv_path=csv_path, db_patah = db_path)
     
     if not analyzer.formula_lookup:
         print("ERROR: No materials loaded from local database. Please check the CSV file.")
