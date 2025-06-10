@@ -1,0 +1,11 @@
+{
+  "space_group_number": 189,
+  "ebr_data": {},
+  "topological_indices": {},
+  "decomposition_branches": {},
+  "graph_info": {
+    "num_nodes": 1,
+    "num_edges": 0,
+    "node_feature_dim": 10
+  }
+}
