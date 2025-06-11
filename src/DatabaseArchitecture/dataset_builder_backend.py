@@ -23,12 +23,13 @@ from gtda.homology import VietorisRipsPersistence
 from gtda.diagrams import BettiCurve, PersistenceEntropy
 from sklearn.preprocessing import StandardScaler
 import sqlite3
+from pathlib import Path
 import ast
 
 from jarvis.db.figshare import get_jid_data
 
 class TopologicalMaterialAnalyzer:
-    def __init__(self, csv_path: str, db_path: str):
+    def __init__(self, csv_path: str, db_path: str, kspace_graphs_base_dir: str):
         """
         Initialize the analyzer. This will load the local materials database
         and pre-compute necessary vocabularies for feature generation.
@@ -43,6 +44,9 @@ class TopologicalMaterialAnalyzer:
         self.conn = sqlite3.connect(self.db_path)
         self._load_and_prepare_databases()
 
+        self.kspace_graphs_base_dir = Path(kspace_graphs_base_dir)
+
+
     @dataclass
     class KSpaceTopologyData:
         """Data structure to capture k-space topology physics"""
@@ -54,6 +58,20 @@ class TopologicalMaterialAnalyzer:
         connectivity_matrix: np.ndarray  # K-point connectivity
         physics_features: Dict[str, torch.Tensor]  # Physics-informed features
 
+    def _load_shared_kspace_graph(self, sg_number: int) -> Optional[torch.Tensor]:
+        """
+        Loads the pre-generated k-space graph for a space group, if it exists.
+        Expected layout:  {base_dir}/SG_003/kspace_graph.pt
+        """
+        graph_pt = self.kspace_graphs_base_dir / f"SG_{sg_number:03d}" / "kspace_graph.pt"
+        if graph_pt.exists():
+            try:
+                return torch.load(graph_pt, map_location="cpu")
+            except Exception as e:
+                print(f"  ⚠ could not load shared k-space graph for SG {sg_number}: {e}")
+        else:
+            print(f"  ⚠ no shared k-space graph for SG {sg_number} at {graph_pt}")
+        return None
 
     def normalize_formula(self, formula: str) -> str:
         """Normalizes a chemical formula string for consistent lookups."""
@@ -248,24 +266,8 @@ class TopologicalMaterialAnalyzer:
         print("  Generating features...")
         crystal_graph = self._create_crystal_graph(primitive_structure)
         asph_vector = self._compute_asph_features(structure)
-        kspace_graph = self._create_kspace_graph(band_rep_vector)
 
         kspace_topology_data = self._load_pregenerated_kspace_data(sg_number)
-        
-        if kspace_topology_data:
-            kspace_graph = kspace_topology_data.kspace_graph # Get the PyG Data object
-            # Also capture other physics features if needed in the data block
-            physics_features_tensor = kspace_topology_data.physics_features
-            connectivity_matrix = kspace_topology_data.connectivity_matrix
-            data_block['kspace_physics_features'] = physics_features_tensor
-            data_block['kspace_connectivity_matrix'] = connectivity_matrix
-        else:
-            print(f"  Warning: No pre-generated k-space topology data found for SG {sg_number}. Creating fallback k-space graph.")
-            # Fallback to creating a generic k-space graph if pre-generated data isn't available
-            kspace_graph = self._create_fallback_kspace_graph(structure) # Re-using your fallback
-            physics_features_tensor = {} # Empty dict for fallback
-            connectivity_matrix = np.array([]) # Empty array for fallback
-
         
         crystal_graph.y = target_y
 
@@ -297,7 +299,16 @@ class TopologicalMaterialAnalyzer:
             'structure_props': basic_props,
             'local_topo_data': local_data_entry
         }
-        
+
+        if kspace_topology_data:
+            kspace_graph         = kspace_topology_data.kspace_graph
+            physics_features_tensor = kspace_topology_data.physics_features
+            connectivity_matrix     = kspace_topology_data.connectivity_matrix
+        else:
+            kspace_graph         = self._create_fallback_kspace_graph(structure)
+            physics_features_tensor = {}
+            connectivity_matrix     = np.array([])
+
         print(f"  ✓ Data block generated successfully")
         return data_block
 
@@ -433,8 +444,10 @@ class TopologicalMaterialAnalyzer:
         print("  Generating features...")
         crystal_graph = self._create_crystal_graph(primitive_structure)
         asph_vector = self._compute_asph_features(structure)
-        kspace_graph = self._create_kspace_graph(band_rep_vector)
-        
+        kspace_graph = self._load_shared_kspace_graph(sg_number)
+        if kspace_graph is None:
+            kspace_graph = self._create_fallback_kspace_graph(structure)
+
         crystal_graph.y = target_y
         
         # Assemble the final data block
@@ -469,6 +482,11 @@ class TopologicalMaterialAnalyzer:
         
         print(f"  ✓ Data block generated successfully")
         return data_block
+
+    def shared_graph_rel_path(self, sg_number: int) -> Optional[str]:
+        """Return relative path 'kspace_topology_graphs/SG_014/kspace_graph.pt' if file exists."""
+        p = self.kspace_graphs_base_dir / f"SG_{sg_number:03d}" / "kspace_graph.pt"
+        return str(p.relative_to(self.kspace_graphs_base_dir.parent)) if p.exists() else None
 
     def _get_elemental_features(self, atomic_number: int) -> torch.Tensor:
         """Creates a feature vector for a given element using basic atomic properties."""
@@ -671,6 +689,14 @@ class TopologicalMaterialAnalyzer:
         print(f"  ✓ Match found! ({self.matched_count}/{self.processed_count})")
         print(f"  Space group: {space_group} ({sg_number})")
 
+        shared_graph_path = (
+        self.kspace_graphs_base_dir
+        / f"SG_{sg_number:03d}"
+        / "kspace_graph.pt"
+            )
+        
+        shared_graph_rel = str(shared_graph_path.relative_to(self.kspace_graphs_base_dir.parent))
+
         # Get primitive structure and symmetry operations
         try:
             primitive_structure = analyzer.get_primitive_standard_structure()
@@ -696,7 +722,7 @@ class TopologicalMaterialAnalyzer:
         print("  Generating features...")
         crystal_graph = self._create_crystal_graph(primitive_structure)
         asph_vector = self._compute_asph_features(structure)
-        kspace_graph = self._create_kspace_graph(band_rep_vector)
+        #kspace_graph = self._create_kspace_graph(band_rep_vector)
         
         crystal_graph.y = target_y
 
@@ -720,14 +746,8 @@ class TopologicalMaterialAnalyzer:
                 'y': crystal_graph.y.numpy() if hasattr(crystal_graph.y, 'numpy') else crystal_graph.y,
                 'num_nodes': crystal_graph.num_nodes if hasattr(crystal_graph, 'num_nodes') else len(crystal_graph.x)
             }
-            
-            # Convert k-space graph to serializable format
-            kspace_graph_dict = {
-                'x': kspace_graph.x.numpy() if hasattr(kspace_graph.x, 'numpy') else kspace_graph.x,
-                'edge_index': kspace_graph.edge_index.numpy() if hasattr(kspace_graph.edge_index, 'numpy') else kspace_graph.edge_index,
-                'u': kspace_graph.u.numpy() if hasattr(kspace_graph.u, 'numpy') else kspace_graph.u,
-                'num_nodes': kspace_graph.num_nodes if hasattr(kspace_graph, 'num_nodes') else len(kspace_graph.x)
-            }
+
+            kspace_graph_dict = {"shared_path": shared_graph_rel}
             
             # Convert symmetry operations to serializable format
             symmetry_ops_dict = {
@@ -740,7 +760,7 @@ class TopologicalMaterialAnalyzer:
             print(f"  Warning: Error converting tensors to serializable format: {e}")
             # Fallback to original torch objects
             crystal_graph_dict = crystal_graph
-            kspace_graph_dict = kspace_graph
+            kspace_graph_dict = None #TODO: maybe add logic here
             symmetry_ops_dict = {
                 'rotations': torch.stack([torch.tensor(op.rotation_matrix, dtype=torch.float) 
                                         for op in symm_ops]) if symm_ops else torch.empty(0, 3, 3),
@@ -773,7 +793,7 @@ class TopologicalMaterialAnalyzer:
                     'asph': len(asph_vector) if hasattr(asph_vector, '__len__') else 0,
                     'band_rep': len(band_rep_vector) if hasattr(band_rep_vector, '__len__') else 0,
                     'crystal_graph_nodes': len(crystal_graph.x) if hasattr(crystal_graph, 'x') else 0,
-                    'kspace_graph_nodes': len(kspace_graph.x) if hasattr(kspace_graph, 'x') else 0
+                    #'kspace_graph_nodes': len(kspace_graph.x) if hasattr(kspace_graph, 'x') else 0
                 }
             }
         }

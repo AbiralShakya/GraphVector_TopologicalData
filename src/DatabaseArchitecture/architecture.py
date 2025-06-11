@@ -11,15 +11,11 @@ import pickle
 from dataset_builder_backend import TopologicalMaterialAnalyzer 
 import time
 import tqdm
-# Assuming KSpaceGraphBuilder and KSpacePhysicsGraphBuilder are correctly defined
-# from kspace_graph_generation import KSpacePhysicsGraphBuilder # This import is currently unused
 
 from pymatgen.ext.matproj import MPRester
 from pymatgen.core import Structure
 from pymatgen.analysis.structure_matcher import StructureMatcher
-
-# --- Keep your existing classes and methods (MaterialRecord, MultiModalMaterialDatabase, POSCARReader) ---
-# (I'll omit them here for brevity, assuming they are in your full script)
+from kspace_graph_generation import KSpacePhysicsGraphBuilder
 @dataclass
 class MaterialRecord:
     """Enhanced material record with vectorized features and expanded MP data"""
@@ -35,8 +31,7 @@ class MaterialRecord:
     elements: List[str]
     
     crystal_graph: Dict  # Real-space graph
-    # kspace_graph_reference: str  # Original: Reference to shared space group k-space graph - REMOVED
-    kspace_graph: Dict # ADDED: The actual k-space graph dictionary
+    kspace_graph_path: str
 
     asph_features: np.ndarray  
     vectorized_features: Dict 
@@ -340,12 +335,14 @@ class MultiModalMaterialDatabase:
         
         df = pd.DataFrame(records)
         
-        # Save as both CSV (human-readable) and parquet (efficient)
         df.to_csv(self.base_path / 'master_index.csv', index=False)
+        dict_cols = [c for c in df.columns if df[c].apply(lambda x: isinstance(x, dict)).any()]
+        for col in dict_cols:
+            df[col] = df[col].apply(lambda x: json.dumps(x) if isinstance(x, dict) else x)
+
         df.to_parquet(self.base_path / 'master_index.parquet', index=False)
-        
         return df
-        
+    
     def setup_directory_structure(self):
         """Create organized directory structure with new additions"""
         directories = [
@@ -412,8 +409,8 @@ class MultiModalMaterialDatabase:
         # Create a separate folder for kspace graphs specific to material if you want
         # or just save it alongside the crystal graph if it's always paired.
         # For this setup, it's best to save it next to the crystal graph for that material.
-        with open(graph_dir / 'kspace_graph.pkl', 'wb') as f:
-            pickle.dump(record.kspace_graph, f)
+        # with open(graph_dir / 'kspace_graph.pkl', 'wb') as f:
+        #     pickle.dump(record.kspace_graph, f)
         
         # Task 3: K-space graph is now just a reference, not saved per material
         # The actual k-space graph is managed by SpaceGroupManager
@@ -459,7 +456,8 @@ class MultiModalMaterialDatabase:
                 'point_cloud': str(point_cloud_path.relative_to(self.base_path)),
                 'crystal_graph': str((graph_dir / 'crystal_graph.pkl').relative_to(self.base_path)),
                 # 'kspace_graph_reference': record.kspace_graph_reference, # REMOVED
-                'kspace_graph': str((graph_dir / 'kspace_graph.pkl').relative_to(self.base_path)), # ADDED
+                #'kspace_graph': str((graph_dir / 'kspace_graph.pkl').relative_to(self.base_path)), 
+                "kspace_graph_shared" : record.kspace_graph_path,
                 'vectorized_features_dir': str(vectorized_dir.relative_to(self.base_path))
             },
             
@@ -758,7 +756,8 @@ class IntegratedMaterialProcessor:
             db_path: Path to SQLite database with k-space data
             database_manager: Your existing database manager for saving records
         """
-        self.topological_analyzer = TopologicalMaterialAnalyzer(csv_path, db_path)
+        KSPACE_GRAPH_OUTPUT_DIR = "/Users/abiralshakya/Documents/Research/GraphVectorTopological/kspace_topology_graphs"
+        self.topological_analyzer = TopologicalMaterialAnalyzer(csv_path, db_path, kspace_graphs_base_dir= KSPACE_GRAPH_OUTPUT_DIR)
         self.database = database_manager
         self.mp_rest = MPRester("8O0LxKct7DKVrG2KqE9WhieXWpmsAZuu")
 
@@ -861,11 +860,10 @@ class IntegratedMaterialProcessor:
                 else:
                     topological_class_data = "Trivial"
                 
-                # Use actual symmetry operations from topological analysis
                 symmetry_operations_data = topological_data_block['symmetry_ops']
                 local_database_props = local_topo_data
-                
-                # NEW: Extract kspace physics features and connectivity matrix
+                local_database_props = local_topo_data or {"_dummy_key": False}
+
                 kspace_physics_features_data = topological_data_block.get('kspace_physics_features')
                 kspace_connectivity_matrix_data = topological_data_block.get('kspace_connectivity_matrix')
                 
@@ -938,7 +936,8 @@ class IntegratedMaterialProcessor:
                 'shear_modulus': mp_material_data.get('shear_modulus'),
             }
 
-            # Create the MaterialRecord with integrated data
+            shared_graph_rel_path = self.topological_analyzer.shared_graph_rel_path(space_group_number)
+
             record = MaterialRecord(
                 jid=material_id,
                 formula=formula,
@@ -952,7 +951,7 @@ class IntegratedMaterialProcessor:
                 elements=elements,
                 
                 crystal_graph=crystal_graph_data,
-                kspace_graph=kspace_graph_data, # ADDED - the actual dict
+                kspace_graph_path= shared_graph_rel_path,
                 
                 asph_features=asph_features_data,
                 vectorized_features=vectorized_features,
@@ -977,12 +976,10 @@ class IntegratedMaterialProcessor:
                 local_database_props=local_database_props,
                 processing_timestamp=pd.Timestamp.now().isoformat(),
 
-                # NEW: Add the k-space physics features and connectivity matrix to MaterialRecord
                 kspace_physics_features=kspace_physics_features_data,
                 kspace_connectivity_matrix=kspace_connectivity_matrix_data
             )
             
-            # Save the record
             self.database.save_material_record(record, format_type)
             print(f"✓ Successfully saved material record for {material_id}")
             
@@ -1261,11 +1258,8 @@ def main():
     max_materials = 10 
 
     print("Pre-generating k-space graphs (if not already present)...")
-    # KSpacePhysicsGraphBuilder is imported but not used directly in the provided `main` function.
-    # If it's intended to be run, uncomment and ensure it's functional.
-    # For now, I'm just acknowledging its presence.
-    # kspace_graph_builder_instance = KSpacePhysicsGraphBuilder(csv_path, sqlite_db_path, KSPACE_GRAPHS_OUTPUT_DIR)
-    # kspace_graph_builder_instance.generate_kspace_graphs_for_all_space_groups()
+    kspace_graph_builder_instance = KSpacePhysicsGraphBuilder(csv_path, sqlite_db_path, KSPACE_GRAPHS_OUTPUT_DIR)
+    kspace_graph_builder_instance.generate_kspace_graphs_for_all_space_groups()
     print("K-space graphs pre-generation complete (skipped if not explicitly called).")
 
     database_manager_instance = MultiModalMaterialDatabase(MULTIMODAL_DB_OUTPUT_DIR)

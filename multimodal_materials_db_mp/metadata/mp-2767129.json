@@ -4,7 +4,7 @@
   "normalized_formula": "KGa2Cl7",
   "space_group": "Pna2_1",
   "space_group_number": 33,
-  "topological_class": "Unknown",
+  "topological_class": "Trivial",
   "topological_binary": 0.0,
   "band_gap": 4.9561,
   "formation_energy": -1.7557762807250001,
@@ -31,15 +31,23 @@
     "bulk_modulus": null,
     "shear_modulus": null
   },
-  "processing_timestamp": "2025-06-10T16:29:45.079328",
-  "local_database_props": {},
+  "processing_timestamp": "2025-06-10T17:55:24.264496",
+  "local_database_props": {
+    "Formula": "Cl7 Ga2 K1",
+    "Space Group": "33 (Pna21)",
+    "Property": "trivial (LCEBR)",
+    "ICSD_ID": 12,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-33/Mat-12/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/12",
+    "Unnamed: 6": NaN
+  },
   "num_atoms": 40,
   "file_locations": {
     "structure_hdf5": "structures/mp-2767129.h5",
     "poscar": "structures/mp-2767129_POSCAR",
     "point_cloud": "point_clouds/mp-2767129_asph.npy",
     "crystal_graph": "graphs/mp-2767129/crystal_graph.pkl",
-    "kspace_graph": "graphs/mp-2767129/kspace_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_033/kspace_graph.pt",
     "vectorized_features_dir": "vectorized_features/mp-2767129"
   },
   "vectorized_methods": [
@@ -50,10 +58,10 @@
     "combined_features"
   ],
   "vectorized_feature_sizes": {
-    "asph_features": 128,
-    "band_rep_features": 100,
+    "asph_features": 63,
+    "band_rep_features": 4756,
     "basic_properties": 4,
     "structural_properties": 4,
-    "combined_features": 236
+    "combined_features": 4827
   }
 }

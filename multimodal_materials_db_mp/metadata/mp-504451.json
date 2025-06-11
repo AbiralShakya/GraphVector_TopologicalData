@@ -4,8 +4,8 @@
   "normalized_formula": "Cs3MnCl5",
   "space_group": "I4/mcm",
   "space_group_number": 140,
-  "topological_class": "Unknown",
-  "topological_binary": 0.0,
+  "topological_class": "Semimetal",
+  "topological_binary": 1.0,
   "band_gap": 2.8966000000000003,
   "formation_energy": -2.031326017998083,
   "energy_above_hull": 0.0,
@@ -31,15 +31,23 @@
     "bulk_modulus": null,
     "shear_modulus": null
   },
-  "processing_timestamp": "2025-06-10T16:29:48.492951",
-  "local_database_props": {},
+  "processing_timestamp": "2025-06-10T17:55:27.294394",
+  "local_database_props": {
+    "Formula": "Cl5 Cs3 Mn1",
+    "Space Group": "140 (I4/mcm)",
+    "Property": "SM (ESFD)",
+    "ICSD_ID": 24,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-140/Mat-24/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/24",
+    "Unnamed: 6": NaN
+  },
   "num_atoms": 18,
   "file_locations": {
     "structure_hdf5": "structures/mp-504451.h5",
     "poscar": "structures/mp-504451_POSCAR",
     "point_cloud": "point_clouds/mp-504451_asph.npy",
     "crystal_graph": "graphs/mp-504451/crystal_graph.pkl",
-    "kspace_graph": "graphs/mp-504451/kspace_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_140/kspace_graph.pt",
     "vectorized_features_dir": "vectorized_features/mp-504451"
   },
   "vectorized_methods": [
@@ -50,10 +58,10 @@
     "combined_features"
   ],
   "vectorized_feature_sizes": {
-    "asph_features": 128,
-    "band_rep_features": 100,
+    "asph_features": 63,
+    "band_rep_features": 4756,
     "basic_properties": 4,
     "structural_properties": 4,
-    "combined_features": 236
+    "combined_features": 4827
   }
 }

@@ -4,8 +4,8 @@
   "normalized_formula": "KCuPH2O5",
   "space_group": "P2_1/c",
   "space_group_number": 14,
-  "topological_class": "Unknown",
-  "topological_binary": 0.0,
+  "topological_class": "Topological Insulator",
+  "topological_binary": 1.0,
   "band_gap": 0.016899999999999003,
   "formation_energy": -1.914859854439286,
   "energy_above_hull": 0.024161504000004,
@@ -31,15 +31,23 @@
     "bulk_modulus": null,
     "shear_modulus": null
   },
-  "processing_timestamp": "2025-06-10T16:29:44.348683",
-  "local_database_props": {},
+  "processing_timestamp": "2025-06-10T17:55:23.675819",
+  "local_database_props": {
+    "Formula": "H2 Cu1 K1 O5 P1",
+    "Space Group": "14 (P21/c)",
+    "Property": "TI (NLC)",
+    "ICSD_ID": 9,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-14/Mat-9/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/9",
+    "Unnamed: 6": NaN
+  },
   "num_atoms": 40,
   "file_locations": {
     "structure_hdf5": "structures/mp-706287.h5",
     "poscar": "structures/mp-706287_POSCAR",
     "point_cloud": "point_clouds/mp-706287_asph.npy",
     "crystal_graph": "graphs/mp-706287/crystal_graph.pkl",
-    "kspace_graph": "graphs/mp-706287/kspace_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_014/kspace_graph.pt",
     "vectorized_features_dir": "vectorized_features/mp-706287"
   },
   "vectorized_methods": [
@@ -50,10 +58,10 @@
     "combined_features"
   ],
   "vectorized_feature_sizes": {
-    "asph_features": 128,
-    "band_rep_features": 100,
+    "asph_features": 63,
+    "band_rep_features": 4756,
     "basic_properties": 4,
     "structural_properties": 4,
-    "combined_features": 236
+    "combined_features": 4827
   }
 }

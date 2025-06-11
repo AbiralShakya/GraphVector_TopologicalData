@@ -772,19 +772,14 @@ class KSpacePhysicsGraphBuilder:
         
         print(f"  Saved topology data for SG {space_group} to {sg_folder}")
 
-# Usage example with your actual paths
 def main():
     """Main execution function"""
     
-    # Your actual paths
     csv_path = "/Users/abiralshakya/Documents/Research/GraphVectorTopological/materials_database.csv"
     db_path = "/Users/abiralshakya/Documents/Research/GraphVectorTopological/pebr_tr_nonmagnetic_rev4.db"
     output_dir = "/Users/abiralshakya/Documents/Research/GraphVectorTopological/kspace_topology_graphs"
     
-    # Initialize the graph builder
-    graph_builder = KSpacePhysicsGraphBuilder(csv_path, db_path, output_dir)
-    
-    # Generate graphs for all space groups
+    graph_builder = KSpacePhysicsGraphBuilder(csv_path, db_path, output_dir)    
     results = graph_builder.generate_kspace_graphs_for_all_space_groups()
     
     # Print summary

@@ -4,7 +4,7 @@
   "normalized_formula": "PbWO4",
   "space_group": "P2_1/c",
   "space_group_number": 14,
-  "topological_class": "Unknown",
+  "topological_class": "Trivial",
   "topological_binary": 0.0,
   "band_gap": 1.879,
   "formation_energy": -2.016313206249999,
@@ -31,15 +31,23 @@
     "bulk_modulus": null,
     "shear_modulus": null
   },
-  "processing_timestamp": "2025-06-10T16:29:49.426126",
-  "local_database_props": {},
+  "processing_timestamp": "2025-06-10T17:55:28.098177",
+  "local_database_props": {
+    "Formula": "O4 Pb1 W1",
+    "Space Group": "64 (Cmce)",
+    "Property": "trivial (LCEBR)",
+    "ICSD_ID": 155522,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds_theory/SG-64/Mat-155522/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/155522",
+    "Unnamed: 6": NaN
+  },
   "num_atoms": 24,
   "file_locations": {
     "structure_hdf5": "structures/mp-1179954.h5",
     "poscar": "structures/mp-1179954_POSCAR",
     "point_cloud": "point_clouds/mp-1179954_asph.npy",
     "crystal_graph": "graphs/mp-1179954/crystal_graph.pkl",
-    "kspace_graph": "graphs/mp-1179954/kspace_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_014/kspace_graph.pt",
     "vectorized_features_dir": "vectorized_features/mp-1179954"
   },
   "vectorized_methods": [
@@ -50,10 +58,10 @@
     "combined_features"
   ],
   "vectorized_feature_sizes": {
-    "asph_features": 128,
-    "band_rep_features": 100,
+    "asph_features": 63,
+    "band_rep_features": 4756,
     "basic_properties": 4,
     "structural_properties": 4,
-    "combined_features": 236
+    "combined_features": 4827
   }
 }
