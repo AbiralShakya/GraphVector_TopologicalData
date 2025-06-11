@@ -1,0 +1,74 @@
+{
+  "jid": "mp-16960",
+  "formula": "AlPt2",
+  "normalized_formula": "AlPt2",
+  "space_group": "Pmma",
+  "space_group_number": 51,
+  "topological_class": "Semimetal",
+  "topological_binary": 1.0,
+  "band_gap": 0.0,
+  "formation_energy": -0.923852272499999,
+  "energy_above_hull": 0.0,
+  "density": 15.784602326908336,
+  "volume": 351.07281950517887,
+  "nsites": 24,
+  "total_magnetization": 0.0,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.0,
+    "formation_energy_per_atom": -0.923852272499999,
+    "is_stable": true
+  },
+  "electronic_structure": {
+    "band_gap": 0.0,
+    "is_metal": true,
+    "is_gap_direct": false,
+    "cbm": null,
+    "vbm": null
+  },
+  "mechanical_properties": {
+    "bulk_modulus": {
+      "voigt": 205.103,
+      "reuss": 204.998,
+      "vrh": 205.051
+    },
+    "shear_modulus": {
+      "voigt": 86.471,
+      "reuss": 81.476,
+      "vrh": 83.974
+    }
+  },
+  "processing_timestamp": "2025-06-10T23:37:06.079907",
+  "local_database_props": {
+    "Formula": "Al1 Pt2",
+    "Space Group": "62 (Pnma)",
+    "Property": "SM (ES)",
+    "ICSD_ID": 58130,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-62/Mat-58130/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/58130",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 24,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-16960.h5",
+    "point_cloud": "point_clouds/mp-16960_asph.npy",
+    "crystal_graph": "graphs/mp-16960/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_051/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-16960"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

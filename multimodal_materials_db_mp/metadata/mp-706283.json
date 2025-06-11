@@ -1,0 +1,66 @@
+{
+  "jid": "mp-706283",
+  "formula": "InH7N2OF4",
+  "normalized_formula": "InH7N2OF4",
+  "space_group": "P2_12_12_1",
+  "space_group_number": 19,
+  "topological_class": "Trivial",
+  "topological_binary": 0.0,
+  "band_gap": 4.0872,
+  "formation_energy": -1.407402008527778,
+  "energy_above_hull": 0.08869011627776201,
+  "density": 2.8657526907308943,
+  "volume": 560.6222459773913,
+  "nsites": 60,
+  "total_magnetization": 0.0020927,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.08869011627776201,
+    "formation_energy_per_atom": -1.407402008527778,
+    "is_stable": false
+  },
+  "electronic_structure": {
+    "band_gap": 4.0872,
+    "is_metal": false,
+    "is_gap_direct": true,
+    "cbm": 3.2533,
+    "vbm": -0.8339000000000001
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:09.045016",
+  "local_database_props": {
+    "Formula": "H7 F4 In1 N2 O1",
+    "Space Group": "19 (P212121)",
+    "Property": "trivial (LCEBR)",
+    "ICSD_ID": 35,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-19/Mat-35/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/35",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 60,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-706283.h5",
+    "point_cloud": "point_clouds/mp-706283_asph.npy",
+    "crystal_graph": "graphs/mp-706283/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_019/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-706283"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

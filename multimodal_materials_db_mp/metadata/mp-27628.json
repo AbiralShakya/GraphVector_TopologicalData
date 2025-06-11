@@ -1,0 +1,66 @@
+{
+  "jid": "mp-27628",
+  "formula": "Te3Cl2",
+  "normalized_formula": "Te3Cl2",
+  "space_group": "P2_1/c",
+  "space_group_number": 14,
+  "topological_class": "Trivial",
+  "topological_binary": 0.0,
+  "band_gap": 1.3552,
+  "formation_energy": -0.33295714550000005,
+  "energy_above_hull": 0.0,
+  "density": 4.614888003138834,
+  "volume": 653.013929905466,
+  "nsites": 20,
+  "total_magnetization": 0.0,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.0,
+    "formation_energy_per_atom": -0.33295714550000005,
+    "is_stable": true
+  },
+  "electronic_structure": {
+    "band_gap": 1.3552,
+    "is_metal": false,
+    "is_gap_direct": false,
+    "cbm": 4.0377,
+    "vbm": 2.6825
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:21.671428",
+  "local_database_props": {
+    "Formula": "Cl2 Te3",
+    "Space Group": "14 (P21/c)",
+    "Property": "trivial (LCEBR)",
+    "ICSD_ID": 105,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-14/Mat-105/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/105",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 20,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-27628.h5",
+    "point_cloud": "point_clouds/mp-27628_asph.npy",
+    "crystal_graph": "graphs/mp-27628/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_014/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-27628"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "jid": "mp-3870",
+  "formula": "Sr2Nb2O7",
+  "normalized_formula": "Sr2Nb2O7",
+  "space_group": "Cmc2_1",
+  "space_group_number": 36,
+  "topological_class": "Trivial",
+  "topological_binary": 0.0,
+  "band_gap": 2.6843999999999992,
+  "formation_energy": -3.300364764999999,
+  "energy_above_hull": 0.0,
+  "density": 5.055677253984123,
+  "volume": 310.74594948079374,
+  "nsites": 22,
+  "total_magnetization": 0.0,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.0,
+    "formation_energy_per_atom": -3.300364764999999,
+    "is_stable": true
+  },
+  "electronic_structure": {
+    "band_gap": 2.6843999999999992,
+    "is_metal": false,
+    "is_gap_direct": false,
+    "cbm": 4.079,
+    "vbm": 1.3946
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:39.118712",
+  "local_database_props": {
+    "Formula": "Nb2 O7 Sr2",
+    "Space Group": "36 (Cmc21)",
+    "Property": "trivial (LCEBR)",
+    "ICSD_ID": 187,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-36/Mat-187/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/187",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 22,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-3870.h5",
+    "point_cloud": "point_clouds/mp-3870_asph.npy",
+    "crystal_graph": "graphs/mp-3870/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_036/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-3870"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

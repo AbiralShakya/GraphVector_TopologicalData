@@ -1,0 +1,66 @@
+{
+  "jid": "mp-27311",
+  "formula": "LaCO",
+  "normalized_formula": "LaCO",
+  "space_group": "C2/m",
+  "space_group_number": 12,
+  "topological_class": "Trivial",
+  "topological_binary": 0.0,
+  "band_gap": 2.7456,
+  "formation_energy": -2.151695355000002,
+  "energy_above_hull": 0.054498851944444,
+  "density": 5.313413165673725,
+  "volume": 104.3283539851216,
+  "nsites": 6,
+  "total_magnetization": 4.22e-05,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.054498851944444,
+    "formation_energy_per_atom": -2.151695355000002,
+    "is_stable": false
+  },
+  "electronic_structure": {
+    "band_gap": 2.7456,
+    "is_metal": false,
+    "is_gap_direct": true,
+    "cbm": 7.3467,
+    "vbm": 4.6011
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:37:06.622877",
+  "local_database_props": {
+    "Formula": "C2 La2 O2",
+    "Space Group": "12 (C2/m)",
+    "Property": "trivial (LCEBR)",
+    "ICSD_ID": 462,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-12/Mat-462/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/462",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 6,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-27311.h5",
+    "point_cloud": "point_clouds/mp-27311_asph.npy",
+    "crystal_graph": "graphs/mp-27311/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_012/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-27311"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

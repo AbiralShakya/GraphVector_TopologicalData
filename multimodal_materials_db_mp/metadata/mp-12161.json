@@ -1,0 +1,66 @@
+{
+  "jid": "mp-12161",
+  "formula": "K2SrCu(NO2)6",
+  "normalized_formula": "K2SrCu(NO2)6",
+  "space_group": "Fmmm",
+  "space_group_number": 69,
+  "topological_class": "Semimetal",
+  "topological_binary": 1.0,
+  "band_gap": 0.042499999999999004,
+  "formation_energy": -1.171304879295454,
+  "energy_above_hull": 0.133532631590906,
+  "density": 2.720543724780332,
+  "volume": 308.47845974447984,
+  "nsites": 22,
+  "total_magnetization": 1.0004711,
+  "magnetic_type": "FM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.133532631590906,
+    "formation_energy_per_atom": -1.171304879295454,
+    "is_stable": false
+  },
+  "electronic_structure": {
+    "band_gap": 0.042499999999999004,
+    "is_metal": false,
+    "is_gap_direct": false,
+    "cbm": 1.3315000000000001,
+    "vbm": 1.289
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:36.556810",
+  "local_database_props": {
+    "Formula": "Cu1 K2 N6 O12 Sr1",
+    "Space Group": "69 (Fmmm)",
+    "Property": "SM (ESFD)",
+    "ICSD_ID": 178,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-69/Mat-178/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/178",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 22,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-12161.h5",
+    "point_cloud": "point_clouds/mp-12161_asph.npy",
+    "crystal_graph": "graphs/mp-12161/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_069/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-12161"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

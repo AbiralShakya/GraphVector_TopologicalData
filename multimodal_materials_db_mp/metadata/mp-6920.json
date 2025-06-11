@@ -1,0 +1,66 @@
+{
+  "jid": "mp-6920",
+  "formula": "KNO3",
+  "normalized_formula": "KNO3",
+  "space_group": "R3m",
+  "space_group_number": 160,
+  "topological_class": "Trivial",
+  "topological_binary": 0.0,
+  "band_gap": 2.9813,
+  "formation_energy": -1.41949764345,
+  "energy_above_hull": 0.0026409535000000003,
+  "density": 2.249993051470205,
+  "volume": 74.61614758460318,
+  "nsites": 5,
+  "total_magnetization": 0.0,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.0026409535000000003,
+    "formation_energy_per_atom": -1.41949764345,
+    "is_stable": true
+  },
+  "electronic_structure": {
+    "band_gap": 2.9813,
+    "is_metal": false,
+    "is_gap_direct": true,
+    "cbm": 1.9349,
+    "vbm": -1.0464
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:54.674890",
+  "local_database_props": {
+    "Formula": "K1 N1 O3",
+    "Space Group": "62 (Pnma)",
+    "Property": "trivial (LCEBR)",
+    "ICSD_ID": 10289,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-62/Mat-10289/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/10289",
+    "Unnamed: 6": "https://www.topologicalquantumchemistry.com/#/detail/16661"
+  },
+  "num_atoms": 5,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-6920.h5",
+    "point_cloud": "point_clouds/mp-6920_asph.npy",
+    "crystal_graph": "graphs/mp-6920/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_160/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-6920"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "jid": "mp-559757",
+  "formula": "Ba3Cu2(ClO2)2",
+  "normalized_formula": "Ba3Cu2(ClO2)2",
+  "space_group": "Pmma",
+  "space_group_number": 51,
+  "topological_class": "Topological Insulator",
+  "topological_binary": 1.0,
+  "band_gap": 0.1749,
+  "formation_energy": -2.247765554545455,
+  "energy_above_hull": 0.024044572428976,
+  "density": 5.177501748453996,
+  "volume": 432.3183375489634,
+  "nsites": 22,
+  "total_magnetization": 4.0000882,
+  "magnetic_type": "FM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.024044572428976,
+    "formation_energy_per_atom": -2.247765554545455,
+    "is_stable": true
+  },
+  "electronic_structure": {
+    "band_gap": 0.1749,
+    "is_metal": false,
+    "is_gap_direct": false,
+    "cbm": 3.2727,
+    "vbm": 3.0978
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:24.823704",
+  "local_database_props": {
+    "Formula": "Ba3 Cl2 Cu2 O4",
+    "Space Group": "51 (Pmma)",
+    "Property": "TI (NLC)",
+    "ICSD_ID": 115,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-51/Mat-115/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/115",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 22,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-559757.h5",
+    "point_cloud": "point_clouds/mp-559757_asph.npy",
+    "crystal_graph": "graphs/mp-559757/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_051/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-559757"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

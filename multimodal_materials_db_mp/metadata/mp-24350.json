@@ -31,7 +31,7 @@
     "bulk_modulus": null,
     "shear_modulus": null
   },
-  "processing_timestamp": "2025-06-10T23:30:26.005673",
+  "processing_timestamp": "2025-06-10T23:36:03.811230",
   "local_database_props": {
     "Formula": "C2 H8 Co1 K2 O10",
     "Space Group": "14 (P21/c)",
@@ -44,7 +44,6 @@
   "num_atoms": 46,
   "file_locations": {
     "structure_hdf5": "structures/mp-24350.h5",
-    "poscar": "structures/mp-24350_POSCAR",
     "point_cloud": "point_clouds/mp-24350_asph.npy",
     "crystal_graph": "graphs/mp-24350/crystal_graph.pkl",
     "kspace_graph_shared": "kspace_topology_graphs/SG_014/kspace_graph.pt",

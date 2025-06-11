@@ -1,0 +1,66 @@
+{
+  "jid": "mp-669543",
+  "formula": "RbHgC3(SN)3",
+  "normalized_formula": "RbHgC3(SN)3",
+  "space_group": "P2_1/m",
+  "space_group_number": 11,
+  "topological_class": "Trivial",
+  "topological_binary": 0.0,
+  "band_gap": 1.9419,
+  "formation_energy": -0.219394107045456,
+  "energy_above_hull": 0.13524203600649,
+  "density": 3.024013650989726,
+  "volume": 505.5231379667537,
+  "nsites": 22,
+  "total_magnetization": 0.0019617,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.13524203600649,
+    "formation_energy_per_atom": -0.219394107045456,
+    "is_stable": false
+  },
+  "electronic_structure": {
+    "band_gap": 1.9419,
+    "is_metal": false,
+    "is_gap_direct": false,
+    "cbm": 1.3727,
+    "vbm": -0.5692
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:20.250294",
+  "local_database_props": {
+    "Formula": "C3 Hg1 N3 Rb1 S3",
+    "Space Group": "11 (P21/m)",
+    "Property": "trivial (LCEBR)",
+    "ICSD_ID": 101,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-11/Mat-101/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/101",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 22,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-669543.h5",
+    "point_cloud": "point_clouds/mp-669543_asph.npy",
+    "crystal_graph": "graphs/mp-669543/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_011/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-669543"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

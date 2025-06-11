@@ -1,0 +1,66 @@
+{
+  "jid": "mp-633158",
+  "formula": "NaTeH6O6F",
+  "normalized_formula": "NaTeH6O6F",
+  "space_group": "R3",
+  "space_group_number": 146,
+  "topological_class": "Trivial",
+  "topological_binary": 0.0,
+  "band_gap": 3.5809,
+  "formation_energy": -1.5307509293697321,
+  "energy_above_hull": 0.0,
+  "density": 3.112611327001973,
+  "volume": 144.91237523204776,
+  "nsites": 15,
+  "total_magnetization": 4.3600000000000016e-05,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.0,
+    "formation_energy_per_atom": -1.5307509293697321,
+    "is_stable": true
+  },
+  "electronic_structure": {
+    "band_gap": 3.5809,
+    "is_metal": false,
+    "is_gap_direct": false,
+    "cbm": 3.0916,
+    "vbm": -0.4893
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:09.774570",
+  "local_database_props": {
+    "Formula": "H6 F1 Na1 O6 Te1",
+    "Space Group": "146 (R3)",
+    "Property": "trivial (LCEBR)",
+    "ICSD_ID": 42,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-146/Mat-42/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/42",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 15,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-633158.h5",
+    "point_cloud": "point_clouds/mp-633158_asph.npy",
+    "crystal_graph": "graphs/mp-633158/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_146/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-633158"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

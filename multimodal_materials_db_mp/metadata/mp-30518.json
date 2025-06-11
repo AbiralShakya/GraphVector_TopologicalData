@@ -1,0 +1,66 @@
+{
+  "jid": "mp-30518",
+  "formula": "V6O11",
+  "normalized_formula": "V6O11",
+  "space_group": "P-1",
+  "space_group_number": 2,
+  "topological_class": "Topological Insulator",
+  "topological_binary": 1.0,
+  "band_gap": 0.739899999999999,
+  "formation_energy": -2.486746045,
+  "energy_above_hull": 0.039274930661765003,
+  "density": 4.703070247886312,
+  "volume": 340.11230076371044,
+  "nsites": 34,
+  "total_magnetization": 15.9999995,
+  "magnetic_type": "FM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.039274930661765003,
+    "formation_energy_per_atom": -2.486746045,
+    "is_stable": false
+  },
+  "electronic_structure": {
+    "band_gap": 0.739899999999999,
+    "is_metal": false,
+    "is_gap_direct": false,
+    "cbm": 4.2898,
+    "vbm": 3.5499
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:40.537408",
+  "local_database_props": {
+    "Formula": "O11 V6",
+    "Space Group": "2 (P-1)",
+    "Property": "TI (NLC)",
+    "ICSD_ID": 196,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-2/Mat-196/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/196",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 34,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-30518.h5",
+    "point_cloud": "point_clouds/mp-30518_asph.npy",
+    "crystal_graph": "graphs/mp-30518/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_002/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-30518"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

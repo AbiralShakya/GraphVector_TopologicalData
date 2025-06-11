@@ -1,0 +1,74 @@
+{
+  "jid": "mp-22414",
+  "formula": "CuSeO3",
+  "normalized_formula": "CuSeO3",
+  "space_group": "Pnma",
+  "space_group_number": 62,
+  "topological_class": "Trivial",
+  "topological_binary": 0.0,
+  "band_gap": 0.0,
+  "formation_energy": -1.066740095968749,
+  "energy_above_hull": 0.028767922499999002,
+  "density": 5.140191656939322,
+  "volume": 246.169549747677,
+  "nsites": 20,
+  "total_magnetization": 4.0057562,
+  "magnetic_type": "FM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.028767922499999002,
+    "formation_energy_per_atom": -1.066740095968749,
+    "is_stable": false
+  },
+  "electronic_structure": {
+    "band_gap": 0.0,
+    "is_metal": true,
+    "is_gap_direct": false,
+    "cbm": null,
+    "vbm": null
+  },
+  "mechanical_properties": {
+    "bulk_modulus": {
+      "voigt": 33.473,
+      "reuss": 20.768,
+      "vrh": 27.12
+    },
+    "shear_modulus": {
+      "voigt": 32.228,
+      "reuss": 24.54,
+      "vrh": 28.384
+    }
+  },
+  "processing_timestamp": "2025-06-10T23:37:09.789977",
+  "local_database_props": {
+    "Formula": "Cu1 O3 Se1",
+    "Space Group": "2 (P-1)",
+    "Property": "trivial (LCEBR)",
+    "ICSD_ID": 29508,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-2/Mat-29508/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/29508",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 20,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-22414.h5",
+    "point_cloud": "point_clouds/mp-22414_asph.npy",
+    "crystal_graph": "graphs/mp-22414/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_062/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-22414"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "jid": "mp-6475",
+  "formula": "NaZr2(PO4)3",
+  "normalized_formula": "NaZr2(PO4)3",
+  "space_group": "R-3c",
+  "space_group_number": 167,
+  "topological_class": "Trivial",
+  "topological_binary": 0.0,
+  "band_gap": 4.1967,
+  "formation_energy": -3.167063734183772,
+  "energy_above_hull": 0.0,
+  "density": 3.064365117380467,
+  "volume": 531.4304143810898,
+  "nsites": 36,
+  "total_magnetization": 0.0029483,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.0,
+    "formation_energy_per_atom": -3.167063734183772,
+    "is_stable": true
+  },
+  "electronic_structure": {
+    "band_gap": 4.1967,
+    "is_metal": false,
+    "is_gap_direct": false,
+    "cbm": 4.4063,
+    "vbm": 0.2096
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:37:07.541881",
+  "local_database_props": {
+    "Formula": "Na1 O12 P3 Zr2",
+    "Space Group": "167 (R-3c)",
+    "Property": "trivial (LCEBR)",
+    "ICSD_ID": 467,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-167/Mat-467/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/467",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 36,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-6475.h5",
+    "point_cloud": "point_clouds/mp-6475_asph.npy",
+    "crystal_graph": "graphs/mp-6475/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_167/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-6475"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

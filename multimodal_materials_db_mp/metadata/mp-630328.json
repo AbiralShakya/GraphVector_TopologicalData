@@ -1,0 +1,66 @@
+{
+  "jid": "mp-630328",
+  "formula": "Ba3FeS5",
+  "normalized_formula": "Ba3FeS5",
+  "space_group": "Pnma",
+  "space_group_number": 62,
+  "topological_class": "Trivial",
+  "topological_binary": 0.0,
+  "band_gap": 0.0,
+  "formation_energy": -1.761802130555554,
+  "energy_above_hull": 0.07373367527777801,
+  "density": 4.210845332188741,
+  "volume": 990.8407390320203,
+  "nsites": 36,
+  "total_magnetization": 15.9954397,
+  "magnetic_type": "FM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.07373367527777801,
+    "formation_energy_per_atom": -1.761802130555554,
+    "is_stable": false
+  },
+  "electronic_structure": {
+    "band_gap": 0.0,
+    "is_metal": true,
+    "is_gap_direct": false,
+    "cbm": null,
+    "vbm": null
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:44.461569",
+  "local_database_props": {
+    "Formula": "Ba3 Fe1 S5",
+    "Space Group": "62 (Pnma)",
+    "Property": "trivial (LCEBR)",
+    "ICSD_ID": 50512,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-62/Mat-50512/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/50512",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 36,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-630328.h5",
+    "point_cloud": "point_clouds/mp-630328_asph.npy",
+    "crystal_graph": "graphs/mp-630328/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_062/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-630328"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

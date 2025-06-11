@@ -1,0 +1,66 @@
+{
+  "jid": "mp-554823",
+  "formula": "Na2Sn(CO2)4",
+  "normalized_formula": "Na2Sn(CO2)4",
+  "space_group": "C2/c",
+  "space_group_number": 15,
+  "topological_class": "Trivial",
+  "topological_binary": 0.0,
+  "band_gap": 2.7678000000000003,
+  "formation_energy": -1.737967641850574,
+  "energy_above_hull": 0.041851707361113,
+  "density": 2.828110933172135,
+  "volume": 400.11965740730056,
+  "nsites": 30,
+  "total_magnetization": 0.0080845,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.041851707361113,
+    "formation_energy_per_atom": -1.737967641850574,
+    "is_stable": false
+  },
+  "electronic_structure": {
+    "band_gap": 2.7678000000000003,
+    "is_metal": false,
+    "is_gap_direct": false,
+    "cbm": 3.7291,
+    "vbm": 0.9613
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:55.515734",
+  "local_database_props": {
+    "Formula": "C4 Na2 O8 Sn1",
+    "Space Group": "15 (C2/c)",
+    "Property": "trivial (LCEBR)",
+    "ICSD_ID": 388,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-15/Mat-388/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/388",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 30,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-554823.h5",
+    "point_cloud": "point_clouds/mp-554823_asph.npy",
+    "crystal_graph": "graphs/mp-554823/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_015/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-554823"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

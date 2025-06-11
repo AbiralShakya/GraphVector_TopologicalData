@@ -1,0 +1,74 @@
+{
+  "jid": "mp-7364",
+  "formula": "Ca(SiAu)2",
+  "normalized_formula": "Ca(SiAu)2",
+  "space_group": "I4/mmm",
+  "space_group_number": 139,
+  "topological_class": "Topological Insulator",
+  "topological_binary": 1.0,
+  "band_gap": 0.0,
+  "formation_energy": -0.513944779999997,
+  "energy_above_hull": 0.0,
+  "density": 8.62627572611423,
+  "volume": 94.35898129645916,
+  "nsites": 5,
+  "total_magnetization": 2e-07,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.0,
+    "formation_energy_per_atom": -0.513944779999997,
+    "is_stable": true
+  },
+  "electronic_structure": {
+    "band_gap": 0.0,
+    "is_metal": true,
+    "is_gap_direct": false,
+    "cbm": null,
+    "vbm": null
+  },
+  "mechanical_properties": {
+    "bulk_modulus": {
+      "voigt": 94.079,
+      "reuss": 92.1,
+      "vrh": 93.089
+    },
+    "shear_modulus": {
+      "voigt": 38.732,
+      "reuss": 33.782,
+      "vrh": 36.257
+    }
+  },
+  "processing_timestamp": "2025-06-10T23:37:00.192666",
+  "local_database_props": {
+    "Formula": "Au2 Ca1 Si2",
+    "Space Group": "139 (I4/mmm)",
+    "Property": "TI (SEBR)",
+    "ICSD_ID": 412,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-139/Mat-412/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/412",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 5,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-7364.h5",
+    "point_cloud": "point_clouds/mp-7364_asph.npy",
+    "crystal_graph": "graphs/mp-7364/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_139/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-7364"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

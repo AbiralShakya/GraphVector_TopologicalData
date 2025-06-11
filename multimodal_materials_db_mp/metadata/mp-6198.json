@@ -1,0 +1,66 @@
+{
+  "jid": "mp-6198",
+  "formula": "SrGa2(SiO4)2",
+  "normalized_formula": "SrGa2(SiO4)2",
+  "space_group": "C2/c",
+  "space_group_number": 15,
+  "topological_class": "Trivial",
+  "topological_binary": 0.0,
+  "band_gap": 4.0422,
+  "formation_energy": -2.971813028269231,
+  "energy_above_hull": 0.015729732884628003,
+  "density": 3.7456746937030863,
+  "volume": 729.2327170769458,
+  "nsites": 52,
+  "total_magnetization": 8e-07,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.015729732884628003,
+    "formation_energy_per_atom": -2.971813028269231,
+    "is_stable": true
+  },
+  "electronic_structure": {
+    "band_gap": 4.0422,
+    "is_metal": false,
+    "is_gap_direct": false,
+    "cbm": 4.5551,
+    "vbm": 0.5129
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:33.691197",
+  "local_database_props": {
+    "Formula": "Ga2 O8 Si2 Sr1",
+    "Space Group": "14 (P21/c)",
+    "Property": "trivial (LCEBR)",
+    "ICSD_ID": 34414,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-14/Mat-34414/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/34414",
+    "Unnamed: 6": "https://www.topologicalquantumchemistry.com/#/detail/191480"
+  },
+  "num_atoms": 52,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-6198.h5",
+    "point_cloud": "point_clouds/mp-6198_asph.npy",
+    "crystal_graph": "graphs/mp-6198/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_015/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-6198"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

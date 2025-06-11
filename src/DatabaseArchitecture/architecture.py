@@ -416,10 +416,10 @@ class MultiModalMaterialDatabase:
         # The actual k-space graph is managed by SpaceGroupManager
 
         # 4. Create POSCAR file
-        poscar_path = self.base_path / 'structures' / f"{record.jid}_POSCAR"
-        poscar_content = self._create_poscar_string(record)
-        with open(poscar_path, 'w') as f:
-            f.write(poscar_content)
+       # poscar_path = self.base_path / 'structures' / f"{record.jid}_POSCAR"
+      #  poscar_content = self._create_poscar_string(record)
+        #with open(poscar_path, 'w') as f:
+        #    f.write(poscar_content)
         
         # 5. Enhanced metadata with new MP properties
         metadata = {
@@ -452,7 +452,7 @@ class MultiModalMaterialDatabase:
             # File locations
             'file_locations': {
                 'structure_hdf5': str(structure_path.relative_to(self.base_path)),
-                'poscar': str(poscar_path.relative_to(self.base_path)),
+                #'poscar': str(poscar_path.relative_to(self.base_path)),
                 'point_cloud': str(point_cloud_path.relative_to(self.base_path)),
                 'crystal_graph': str((graph_dir / 'crystal_graph.pkl').relative_to(self.base_path)),
                 # 'kspace_graph_reference': record.kspace_graph_reference, # REMOVED
@@ -1255,7 +1255,7 @@ def main():
     
     mp_api_key = "8O0LxKct7DKVrG2KqE9WhieXWpmsAZuu" # put in gitignore lol doesnt matter for now
     print(f"Using MP API Key: {mp_api_key}")
-    max_materials = 10 
+    max_materials = 100
 
     print("Pre-generating k-space graphs (if not already present)...")
     kspace_graph_builder_instance = KSpacePhysicsGraphBuilder(csv_path, sqlite_db_path, KSPACE_GRAPHS_OUTPUT_DIR)

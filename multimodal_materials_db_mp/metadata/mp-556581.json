@@ -1,0 +1,66 @@
+{
+  "jid": "mp-556581",
+  "formula": "Fe2PClO4",
+  "normalized_formula": "Fe2PClO4",
+  "space_group": "C2/c",
+  "space_group_number": 15,
+  "topological_class": "Topological Insulator",
+  "topological_binary": 1.0,
+  "band_gap": 0.5959999999999991,
+  "formation_energy": -2.116387919642856,
+  "energy_above_hull": 0.0,
+  "density": 3.5437145640185053,
+  "volume": 453.80670414947684,
+  "nsites": 32,
+  "total_magnetization": 7e-07,
+  "magnetic_type": "AFM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.0,
+    "formation_energy_per_atom": -2.116387919642856,
+    "is_stable": true
+  },
+  "electronic_structure": {
+    "band_gap": 0.5959999999999991,
+    "is_metal": false,
+    "is_gap_direct": true,
+    "cbm": 2.3823,
+    "vbm": 1.7863
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:35.670719",
+  "local_database_props": {
+    "Formula": "Cl1 Fe2 O4 P1",
+    "Space Group": "15 (C2/c)",
+    "Property": "TI (NLC)",
+    "ICSD_ID": 171,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-15/Mat-171/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/171",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 32,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-556581.h5",
+    "point_cloud": "point_clouds/mp-556581_asph.npy",
+    "crystal_graph": "graphs/mp-556581/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_015/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-556581"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

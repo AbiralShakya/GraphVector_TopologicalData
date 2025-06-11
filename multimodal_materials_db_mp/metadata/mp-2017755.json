@@ -1,0 +1,66 @@
+{
+  "jid": "mp-2017755",
+  "formula": "GeS2",
+  "normalized_formula": "GeS2",
+  "space_group": "Pc",
+  "space_group_number": 7,
+  "topological_class": "Trivial",
+  "topological_binary": 0.0,
+  "band_gap": 2.8353,
+  "formation_energy": -0.39072004409722105,
+  "energy_above_hull": 0.00010686972222100001,
+  "density": 2.848387174148899,
+  "volume": 956.8022080709302,
+  "nsites": 36,
+  "total_magnetization": 0.0,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.00010686972222100001,
+    "formation_energy_per_atom": -0.39072004409722105,
+    "is_stable": true
+  },
+  "electronic_structure": {
+    "band_gap": 2.8353,
+    "is_metal": false,
+    "is_gap_direct": false,
+    "cbm": 3.8833,
+    "vbm": 1.048
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:10.447190",
+  "local_database_props": {
+    "Formula": "Ge1 S2",
+    "Space Group": "122 (I-42d)",
+    "Property": "trivial (LCEBR)",
+    "ICSD_ID": 637784,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-122/Mat-637784/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/637784",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 36,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-2017755.h5",
+    "point_cloud": "point_clouds/mp-2017755_asph.npy",
+    "crystal_graph": "graphs/mp-2017755/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_007/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-2017755"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

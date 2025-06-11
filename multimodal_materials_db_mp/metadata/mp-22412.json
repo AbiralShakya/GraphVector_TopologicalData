@@ -1,0 +1,74 @@
+{
+  "jid": "mp-22412",
+  "formula": "Ba(MnGe)2",
+  "normalized_formula": "Ba(MnGe)2",
+  "space_group": "I4/mmm",
+  "space_group_number": 139,
+  "topological_class": "Semimetal",
+  "topological_binary": 1.0,
+  "band_gap": 0.0,
+  "formation_energy": -0.23623205517241402,
+  "energy_above_hull": 0.08192184357759201,
+  "density": 5.816611380186937,
+  "volume": 112.04693958837903,
+  "nsites": 5,
+  "total_magnetization": 5.7798911,
+  "magnetic_type": "FM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.08192184357759201,
+    "formation_energy_per_atom": -0.23623205517241402,
+    "is_stable": false
+  },
+  "electronic_structure": {
+    "band_gap": 0.0,
+    "is_metal": true,
+    "is_gap_direct": false,
+    "cbm": null,
+    "vbm": null
+  },
+  "mechanical_properties": {
+    "bulk_modulus": {
+      "voigt": 52.224,
+      "reuss": 47.885,
+      "vrh": 50.054
+    },
+    "shear_modulus": {
+      "voigt": 37.183,
+      "reuss": 31.674,
+      "vrh": 34.428
+    }
+  },
+  "processing_timestamp": "2025-06-10T23:36:57.640929",
+  "local_database_props": {
+    "Formula": "Ba1 Ge2 Mn2",
+    "Space Group": "139 (I4/mmm)",
+    "Property": "SM (ES)",
+    "ICSD_ID": 404,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-139/Mat-404/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/404",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 5,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-22412.h5",
+    "point_cloud": "point_clouds/mp-22412_asph.npy",
+    "crystal_graph": "graphs/mp-22412/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_139/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-22412"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

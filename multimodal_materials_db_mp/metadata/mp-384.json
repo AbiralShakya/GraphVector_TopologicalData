@@ -1,0 +1,74 @@
+{
+  "jid": "mp-384",
+  "formula": "MgP4",
+  "normalized_formula": "MgP4",
+  "space_group": "P2_1/c",
+  "space_group_number": 14,
+  "topological_class": "Trivial",
+  "topological_binary": 0.0,
+  "band_gap": 0.7289000000000001,
+  "formation_energy": -0.298333085714285,
+  "energy_above_hull": 0.0,
+  "density": 2.501306360680703,
+  "volume": 196.7707540703042,
+  "nsites": 10,
+  "total_magnetization": 0.0,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.0,
+    "formation_energy_per_atom": -0.298333085714285,
+    "is_stable": true
+  },
+  "electronic_structure": {
+    "band_gap": 0.7289000000000001,
+    "is_metal": false,
+    "is_gap_direct": false,
+    "cbm": 5.8918,
+    "vbm": 5.1629
+  },
+  "mechanical_properties": {
+    "bulk_modulus": {
+      "voigt": 58.095,
+      "reuss": 56.831,
+      "vrh": 57.463
+    },
+    "shear_modulus": {
+      "voigt": 38.15,
+      "reuss": 36.046,
+      "vrh": 37.098
+    }
+  },
+  "processing_timestamp": "2025-06-10T23:36:23.783945",
+  "local_database_props": {
+    "Formula": "Mg1 P4",
+    "Space Group": "14 (P21/c)",
+    "Property": "trivial (LCEBR)",
+    "ICSD_ID": 113,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-14/Mat-113/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/113",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 10,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-384.h5",
+    "point_cloud": "point_clouds/mp-384_asph.npy",
+    "crystal_graph": "graphs/mp-384/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_014/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-384"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

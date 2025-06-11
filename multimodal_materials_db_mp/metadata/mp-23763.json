@@ -1,0 +1,66 @@
+{
+  "jid": "mp-23763",
+  "formula": "SnH8(NCl3)2",
+  "normalized_formula": "SnH8(NCl3)2",
+  "space_group": "Fm-3m",
+  "space_group_number": 225,
+  "topological_class": "Trivial",
+  "topological_binary": 0.0,
+  "band_gap": 2.3281,
+  "formation_energy": -0.984600160882353,
+  "energy_above_hull": 0.0,
+  "density": 2.449067317795603,
+  "volume": 249.17905375381716,
+  "nsites": 17,
+  "total_magnetization": 1.3e-06,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.0,
+    "formation_energy_per_atom": -0.984600160882353,
+    "is_stable": true
+  },
+  "electronic_structure": {
+    "band_gap": 2.3281,
+    "is_metal": false,
+    "is_gap_direct": true,
+    "cbm": 2.1638,
+    "vbm": -0.1643
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:37:11.719490",
+  "local_database_props": {
+    "Formula": "H8 Cl6 N2 Sn1",
+    "Space Group": "225 (Fm-3m)",
+    "Property": "trivial (LCEBR)",
+    "ICSD_ID": 605,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-225/Mat-605/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/605",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 17,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-23763.h5",
+    "point_cloud": "point_clouds/mp-23763_asph.npy",
+    "crystal_graph": "graphs/mp-23763/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_225/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-23763"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

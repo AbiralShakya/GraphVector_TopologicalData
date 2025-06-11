@@ -1,0 +1,66 @@
+{
+  "jid": "mp-561735",
+  "formula": "Cs7O",
+  "normalized_formula": "Cs7O",
+  "space_group": "P-6m2",
+  "space_group_number": 187,
+  "topological_class": "Semimetal",
+  "topological_binary": 1.0,
+  "band_gap": 0.0,
+  "formation_energy": -0.448905838239943,
+  "energy_above_hull": 0.010467804755746001,
+  "density": 2.097981564019763,
+  "volume": 2247.060490426545,
+  "nsites": 24,
+  "total_magnetization": 0.4362076,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.010467804755746001,
+    "formation_energy_per_atom": -0.448905838239943,
+    "is_stable": true
+  },
+  "electronic_structure": {
+    "band_gap": 0.0,
+    "is_metal": true,
+    "is_gap_direct": false,
+    "cbm": null,
+    "vbm": null
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:23.326338",
+  "local_database_props": {
+    "Formula": "Cs7 O1",
+    "Space Group": "187 (P-6m2)",
+    "Property": "SM (ESFD)",
+    "ICSD_ID": 112,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-187/Mat-112/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/112",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 24,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-561735.h5",
+    "point_cloud": "point_clouds/mp-561735_asph.npy",
+    "crystal_graph": "graphs/mp-561735/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_187/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-561735"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

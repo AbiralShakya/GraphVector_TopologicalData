@@ -1,0 +1,66 @@
+{
+  "jid": "mp-27298",
+  "formula": "Ca11Bi10",
+  "normalized_formula": "Ca11Bi10",
+  "space_group": "I4/mmm",
+  "space_group_number": 139,
+  "topological_class": "Topological Insulator",
+  "topological_binary": 1.0,
+  "band_gap": 0.0,
+  "formation_energy": -0.9456154535714251,
+  "energy_above_hull": 0.0,
+  "density": 6.222752422580245,
+  "volume": 1350.6123432169695,
+  "nsites": 42,
+  "total_magnetization": 9.03e-05,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.0,
+    "formation_energy_per_atom": -0.9456154535714251,
+    "is_stable": true
+  },
+  "electronic_structure": {
+    "band_gap": 0.0,
+    "is_metal": true,
+    "is_gap_direct": false,
+    "cbm": null,
+    "vbm": null
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:37:03.875780",
+  "local_database_props": {
+    "Formula": "Bi10 Ca11",
+    "Space Group": "139 (I4/mmm)",
+    "Property": "TI (SEBR)",
+    "ICSD_ID": 434,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-139/Mat-434/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/434",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 42,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-27298.h5",
+    "point_cloud": "point_clouds/mp-27298_asph.npy",
+    "crystal_graph": "graphs/mp-27298/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_139/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-27298"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

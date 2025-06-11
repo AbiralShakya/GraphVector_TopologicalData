@@ -1,0 +1,74 @@
+{
+  "jid": "mp-20605",
+  "formula": "PbC2(SN)2",
+  "normalized_formula": "PbC2(SN)2",
+  "space_group": "C2/c",
+  "space_group_number": 15,
+  "topological_class": "Trivial",
+  "topological_binary": 0.0,
+  "band_gap": 2.652,
+  "formation_energy": -0.138549264999999,
+  "energy_above_hull": 0.14755362954081502,
+  "density": 3.899810242434225,
+  "volume": 275.3774413537261,
+  "nsites": 14,
+  "total_magnetization": 0.0005461,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.14755362954081502,
+    "formation_energy_per_atom": -0.138549264999999,
+    "is_stable": false
+  },
+  "electronic_structure": {
+    "band_gap": 2.652,
+    "is_metal": false,
+    "is_gap_direct": false,
+    "cbm": 4.2576,
+    "vbm": 1.6056
+  },
+  "mechanical_properties": {
+    "bulk_modulus": {
+      "voigt": 28.592,
+      "reuss": 24.035,
+      "vrh": 26.314
+    },
+    "shear_modulus": {
+      "voigt": 12.804,
+      "reuss": 8.988,
+      "vrh": 10.896
+    }
+  },
+  "processing_timestamp": "2025-06-10T23:36:28.741412",
+  "local_database_props": {
+    "Formula": "C2 N2 Pb1 S2",
+    "Space Group": "15 (C2/c)",
+    "Property": "trivial (LCEBR)",
+    "ICSD_ID": 143,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-15/Mat-143/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/143",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 14,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-20605.h5",
+    "point_cloud": "point_clouds/mp-20605_asph.npy",
+    "crystal_graph": "graphs/mp-20605/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_015/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-20605"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

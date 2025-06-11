@@ -1,0 +1,66 @@
+{
+  "jid": "mp-24119",
+  "formula": "Ca2HN",
+  "normalized_formula": "Ca2HN",
+  "space_group": "Fd-3m",
+  "space_group_number": 227,
+  "topological_class": "Trivial",
+  "topological_binary": 0.0,
+  "band_gap": 1.6356000000000002,
+  "formation_energy": -0.9456374556250001,
+  "energy_above_hull": 0.0,
+  "density": 2.462779663361686,
+  "volume": 256.6767430548098,
+  "nsites": 16,
+  "total_magnetization": 0.0,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.0,
+    "formation_energy_per_atom": -0.9456374556250001,
+    "is_stable": true
+  },
+  "electronic_structure": {
+    "band_gap": 1.6356000000000002,
+    "is_metal": false,
+    "is_gap_direct": false,
+    "cbm": 3.8936,
+    "vbm": 2.258
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:46.890209",
+  "local_database_props": {
+    "Formula": "H1 Ca2 N1",
+    "Space Group": "227 (Fd-3m)",
+    "Property": "trivial (LCEBR)",
+    "ICSD_ID": 292,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-227/Mat-292/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/292",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 16,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-24119.h5",
+    "point_cloud": "point_clouds/mp-24119_asph.npy",
+    "crystal_graph": "graphs/mp-24119/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_227/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-24119"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "jid": "mp-7332",
+  "formula": "NdP5",
+  "normalized_formula": "NdP5",
+  "space_group": "P2_1/m",
+  "space_group_number": 11,
+  "topological_class": "Semimetal",
+  "topological_binary": 1.0,
+  "band_gap": 0.0,
+  "formation_energy": -0.6451083537301581,
+  "energy_above_hull": 0.0,
+  "density": 3.842260282585458,
+  "volume": 258.53802122595937,
+  "nsites": 12,
+  "total_magnetization": 0.0,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.0,
+    "formation_energy_per_atom": -0.6451083537301581,
+    "is_stable": true
+  },
+  "electronic_structure": {
+    "band_gap": 0.0,
+    "is_metal": true,
+    "is_gap_direct": false,
+    "cbm": null,
+    "vbm": null
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:51.930353",
+  "local_database_props": {
+    "Formula": "Nd1 P5",
+    "Space Group": "11 (P21/m)",
+    "Property": "SM (ESFD)",
+    "ICSD_ID": 358,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-11/Mat-358/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/358",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 12,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-7332.h5",
+    "point_cloud": "point_clouds/mp-7332_asph.npy",
+    "crystal_graph": "graphs/mp-7332/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_011/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-7332"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

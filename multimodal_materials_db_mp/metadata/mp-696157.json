@@ -1,0 +1,66 @@
+{
+  "jid": "mp-696157",
+  "formula": "NaP(HO)6",
+  "normalized_formula": "NaP(HO)6",
+  "space_group": "P2_12_12_1",
+  "space_group_number": 19,
+  "topological_class": "Trivial",
+  "topological_binary": 0.0,
+  "band_gap": 5.5455000000000005,
+  "formation_energy": -1.7651883006087261,
+  "energy_above_hull": 0.009772894285734001,
+  "density": 1.8711144745921442,
+  "volume": 553.8018551265644,
+  "nsites": 56,
+  "total_magnetization": 0.0051267,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.009772894285734001,
+    "formation_energy_per_atom": -1.7651883006087261,
+    "is_stable": true
+  },
+  "electronic_structure": {
+    "band_gap": 5.5455000000000005,
+    "is_metal": false,
+    "is_gap_direct": true,
+    "cbm": 4.1797,
+    "vbm": -1.3658000000000001
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:12.832067",
+  "local_database_props": {
+    "Formula": "H6 Na1 O6 P1",
+    "Space Group": "19 (P212121)",
+    "Property": "trivial (LCEBR)",
+    "ICSD_ID": 65,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-19/Mat-65/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/65",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 56,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-696157.h5",
+    "point_cloud": "point_clouds/mp-696157_asph.npy",
+    "crystal_graph": "graphs/mp-696157/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_019/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-696157"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "jid": "mp-610469",
+  "formula": "CeBiS2O",
+  "normalized_formula": "CeBiS2O",
+  "space_group": "P4/nmm",
+  "space_group_number": 129,
+  "topological_class": "Semimetal",
+  "topological_binary": 1.0,
+  "band_gap": 0.0,
+  "formation_energy": -2.040102500999999,
+  "energy_above_hull": 0.032493181749994,
+  "density": 6.493388956885671,
+  "volume": 219.52980609203559,
+  "nsites": 10,
+  "total_magnetization": 1.726905599999999,
+  "magnetic_type": "FM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.032493181749994,
+    "formation_energy_per_atom": -2.040102500999999,
+    "is_stable": false
+  },
+  "electronic_structure": {
+    "band_gap": 0.0,
+    "is_metal": true,
+    "is_gap_direct": false,
+    "cbm": null,
+    "vbm": null
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:15.211355",
+  "local_database_props": {
+    "Formula": "Bi1 Ce1 O1 S2",
+    "Space Group": "129 (P4/nmm)",
+    "Property": "SM (ESFD)",
+    "ICSD_ID": 80,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-129/Mat-80/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/80",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 10,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-610469.h5",
+    "point_cloud": "point_clouds/mp-610469_asph.npy",
+    "crystal_graph": "graphs/mp-610469/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_129/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-610469"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

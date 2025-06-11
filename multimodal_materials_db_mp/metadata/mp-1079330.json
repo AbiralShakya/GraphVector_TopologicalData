@@ -1,0 +1,66 @@
+{
+  "jid": "mp-1079330",
+  "formula": "MgVO3",
+  "normalized_formula": "MgVO3",
+  "space_group": "Cmc2_1",
+  "space_group_number": 36,
+  "topological_class": "Topological Insulator",
+  "topological_binary": 1.0,
+  "band_gap": 0.0,
+  "formation_energy": -2.5842052320000013,
+  "energy_above_hull": 0.18472074199999503,
+  "density": 2.813136887097381,
+  "volume": 145.497817784871,
+  "nsites": 10,
+  "total_magnetization": 0.0332291,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.18472074199999503,
+    "formation_energy_per_atom": -2.5842052320000013,
+    "is_stable": false
+  },
+  "electronic_structure": {
+    "band_gap": 0.0,
+    "is_metal": true,
+    "is_gap_direct": false,
+    "cbm": 2.782,
+    "vbm": 2.8168
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:45.515224",
+  "local_database_props": {
+    "Formula": "Mg1 O3 V1",
+    "Space Group": "65 (Cmmm)",
+    "Property": "TI (NLC)",
+    "ICSD_ID": 15927,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-65/Mat-15927/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/15927",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 10,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-1079330.h5",
+    "point_cloud": "point_clouds/mp-1079330_asph.npy",
+    "crystal_graph": "graphs/mp-1079330/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_036/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-1079330"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

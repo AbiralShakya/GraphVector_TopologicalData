@@ -1,0 +1,66 @@
+{
+  "jid": "mp-27229",
+  "formula": "Sb6S2O15",
+  "normalized_formula": "Sb6S2O15",
+  "space_group": "Ccc2",
+  "space_group_number": 37,
+  "topological_class": "Trivial",
+  "topological_binary": 0.0,
+  "band_gap": 3.270399999999999,
+  "formation_energy": -1.812846898478262,
+  "energy_above_hull": 0.0,
+  "density": 5.112666628907409,
+  "volume": 672.1064941939793,
+  "nsites": 46,
+  "total_magnetization": 0.0,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.0,
+    "formation_energy_per_atom": -1.812846898478262,
+    "is_stable": true
+  },
+  "electronic_structure": {
+    "band_gap": 3.270399999999999,
+    "is_metal": false,
+    "is_gap_direct": false,
+    "cbm": 6.6865,
+    "vbm": 3.4161
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:50.418994",
+  "local_database_props": {
+    "Formula": "O15 S2 Sb6",
+    "Space Group": "37 (Ccc2)",
+    "Property": "trivial (LCEBR)",
+    "ICSD_ID": 341,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-37/Mat-341/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/341",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 46,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-27229.h5",
+    "point_cloud": "point_clouds/mp-27229_asph.npy",
+    "crystal_graph": "graphs/mp-27229/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_037/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-27229"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

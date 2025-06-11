@@ -1,0 +1,66 @@
+{
+  "jid": "mp-23069",
+  "formula": "Fe(IO3)3",
+  "normalized_formula": "Fe(IO3)3",
+  "space_group": "P6_3",
+  "space_group_number": 173,
+  "topological_class": "Semimetal",
+  "topological_binary": 1.0,
+  "band_gap": 2.0217,
+  "formation_energy": -0.978675665384626,
+  "energy_above_hull": 0.0,
+  "density": 5.005665172475196,
+  "volume": 385.17596368137714,
+  "nsites": 26,
+  "total_magnetization": 9.9999999,
+  "magnetic_type": "FM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.0,
+    "formation_energy_per_atom": -0.978675665384626,
+    "is_stable": true
+  },
+  "electronic_structure": {
+    "band_gap": 2.0217,
+    "is_metal": false,
+    "is_gap_direct": false,
+    "cbm": 4.0898,
+    "vbm": 2.0681
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:46.261139",
+  "local_database_props": {
+    "Formula": "Fe1 I3 O9",
+    "Space Group": "173 (P63)",
+    "Property": "SM (ES)",
+    "ICSD_ID": 286,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-173/Mat-286/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/286",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 26,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-23069.h5",
+    "point_cloud": "point_clouds/mp-23069_asph.npy",
+    "crystal_graph": "graphs/mp-23069/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_173/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-23069"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

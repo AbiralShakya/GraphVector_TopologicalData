@@ -31,7 +31,7 @@
     "bulk_modulus": null,
     "shear_modulus": null
   },
-  "processing_timestamp": "2025-06-10T23:30:24.719823",
+  "processing_timestamp": "2025-06-10T23:36:02.534900",
   "local_database_props": {
     "Formula": "Cu1 N6 O12 Pb1 Tl2",
     "Space Group": "202 (Fm-3)",
@@ -44,7 +44,6 @@
   "num_atoms": 22,
   "file_locations": {
     "structure_hdf5": "structures/mp-1192663.h5",
-    "poscar": "structures/mp-1192663_POSCAR",
     "point_cloud": "point_clouds/mp-1192663_asph.npy",
     "crystal_graph": "graphs/mp-1192663/crystal_graph.pkl",
     "kspace_graph_shared": "kspace_topology_graphs/SG_202/kspace_graph.pt",

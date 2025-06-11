@@ -1,0 +1,66 @@
+{
+  "jid": "mp-5039",
+  "formula": "KPO3",
+  "normalized_formula": "KPO3",
+  "space_group": "P2_1/c",
+  "space_group_number": 14,
+  "topological_class": "Trivial",
+  "topological_binary": 0.0,
+  "band_gap": 5.1269,
+  "formation_energy": -2.68566805237857,
+  "energy_above_hull": 0.0,
+  "density": 2.44484784723836,
+  "volume": 641.5459608291362,
+  "nsites": 40,
+  "total_magnetization": 0.0,
+  "magnetic_type": "NM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.0,
+    "formation_energy_per_atom": -2.68566805237857,
+    "is_stable": true
+  },
+  "electronic_structure": {
+    "band_gap": 5.1269,
+    "is_metal": false,
+    "is_gap_direct": true,
+    "cbm": 4.3845,
+    "vbm": -0.7424000000000001
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:14.706101",
+  "local_database_props": {
+    "Formula": "K1 O3 P1",
+    "Space Group": "62 (Pnma)",
+    "Property": "trivial (LCEBR)",
+    "ICSD_ID": 26148,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-62/Mat-26148/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/26148",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 40,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-5039.h5",
+    "point_cloud": "point_clouds/mp-5039_asph.npy",
+    "crystal_graph": "graphs/mp-5039/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_014/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-5039"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

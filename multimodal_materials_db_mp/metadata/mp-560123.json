@@ -1,0 +1,66 @@
+{
+  "jid": "mp-560123",
+  "formula": "FeBi3(MoO6)2",
+  "normalized_formula": "FeBi3(MoO6)2",
+  "space_group": "C2/c",
+  "space_group_number": 15,
+  "topological_class": "Semimetal",
+  "topological_binary": 1.0,
+  "band_gap": 1.233299999999999,
+  "formation_energy": -1.847384193611112,
+  "energy_above_hull": 0.002494154583332,
+  "density": 6.853580711159333,
+  "volume": 516.8769479453239,
+  "nsites": 36,
+  "total_magnetization": 10.0020799,
+  "magnetic_type": "FM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.002494154583332,
+    "formation_energy_per_atom": -1.847384193611112,
+    "is_stable": true
+  },
+  "electronic_structure": {
+    "band_gap": 1.233299999999999,
+    "is_metal": false,
+    "is_gap_direct": false,
+    "cbm": 4.2047,
+    "vbm": 2.9714
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:36:11.337594",
+  "local_database_props": {
+    "Formula": "Bi3 Fe1 Mo2 O12",
+    "Space Group": "15 (C2/c)",
+    "Property": "SM (ESFD)",
+    "ICSD_ID": 45,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-15/Mat-45/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/45",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 36,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-560123.h5",
+    "point_cloud": "point_clouds/mp-560123_asph.npy",
+    "crystal_graph": "graphs/mp-560123/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_015/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-560123"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}

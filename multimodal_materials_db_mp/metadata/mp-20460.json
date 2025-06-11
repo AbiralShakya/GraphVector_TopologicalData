@@ -1,0 +1,66 @@
+{
+  "jid": "mp-20460",
+  "formula": "NiSeO3",
+  "normalized_formula": "NiSeO3",
+  "space_group": "Pnma",
+  "space_group_number": 62,
+  "topological_class": "Trivial",
+  "topological_binary": 0.0,
+  "band_gap": 0.0,
+  "formation_energy": -1.25510434046875,
+  "energy_above_hull": 0.0,
+  "density": 5.667949949635488,
+  "volume": 217.56136685478137,
+  "nsites": 20,
+  "total_magnetization": 7.9999976,
+  "magnetic_type": "FM",
+  "theoretical": null,
+  "stability": {
+    "energy_above_hull": 0.0,
+    "formation_energy_per_atom": -1.25510434046875,
+    "is_stable": true
+  },
+  "electronic_structure": {
+    "band_gap": 0.0,
+    "is_metal": true,
+    "is_gap_direct": false,
+    "cbm": null,
+    "vbm": null
+  },
+  "mechanical_properties": {
+    "bulk_modulus": null,
+    "shear_modulus": null
+  },
+  "processing_timestamp": "2025-06-10T23:37:09.064437",
+  "local_database_props": {
+    "Formula": "Ni1 O3 Se1",
+    "Space Group": "62 (Pnma)",
+    "Property": "trivial (LCEBR)",
+    "ICSD_ID": 497,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-62/Mat-497/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/497",
+    "Unnamed: 6": NaN
+  },
+  "num_atoms": 20,
+  "file_locations": {
+    "structure_hdf5": "structures/mp-20460.h5",
+    "point_cloud": "point_clouds/mp-20460_asph.npy",
+    "crystal_graph": "graphs/mp-20460/crystal_graph.pkl",
+    "kspace_graph_shared": "kspace_topology_graphs/SG_062/kspace_graph.pt",
+    "vectorized_features_dir": "vectorized_features/mp-20460"
+  },
+  "vectorized_methods": [
+    "asph_features",
+    "band_rep_features",
+    "basic_properties",
+    "structural_properties",
+    "combined_features"
+  ],
+  "vectorized_feature_sizes": {
+    "asph_features": 63,
+    "band_rep_features": 4756,
+    "basic_properties": 4,
+    "structural_properties": 4,
+    "combined_features": 4827
+  }
+}
