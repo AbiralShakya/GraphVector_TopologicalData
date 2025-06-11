@@ -15,7 +15,7 @@ import json
 import time
 import pickle
 
-from pymatgen.core import Structure
+from pymatgen.core import Structure, Composition
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 from pymatgen.analysis.local_env import VoronoiNN
 from torch_geometric.data import Data
@@ -74,47 +74,20 @@ class TopologicalMaterialAnalyzer:
         return None
 
     def normalize_formula(self, formula: str) -> str:
-        """Normalizes a chemical formula string for consistent lookups."""
-        if pd.isna(formula) or formula == '':
-            return ''
-        
-        formula_clean = str(formula).replace(" ", "").replace("_", "")
-        # Handle common variations
-        formula_clean = formula_clean.replace("(", "").replace(")", "")
-        
-        # Extract elements and their counts
-        pattern = r'([A-Z][a-z]?)(\d*\.?\d*)'
-        matches = re.findall(pattern, formula_clean)
-        
-        element_counts = {}
-        for element, count in matches:
-            if count == '' or count == '1':
-                count = 1
-            else:
-                try:
-                    count = float(count)
-                    if count == int(count):
-                        count = int(count)
-                except:
-                    count = 1
-            
-            if element in element_counts:
-                element_counts[element] += count
-            else:
-                element_counts[element] = count
-        
-        # Sort elements alphabetically and create normalized formula
-        sorted_elements = sorted(element_counts.keys())
-        normalized_parts = []
-        for elem in sorted_elements:
-            count = element_counts[elem]
-            if count == 1:
-                normalized_parts.append(elem)
-            else:
-                normalized_parts.append(f"{elem}{count}")
-        
-        return "".join(normalized_parts)
+        comp = Composition(formula)
 
+        # Reduce to the smallest whole-number ratio
+        comp_reduced, _ = comp.get_reduced_composition_and_factor()
+
+        # Alphabetise the element symbols (Materials Project convention)
+        elements_sorted = sorted(comp_reduced.elements, key=lambda el: el.symbol)
+
+        # Build the string, omitting the “1” for single atoms
+        return ''.join(
+            f"{el.symbol}{int(comp_reduced[el]) if comp_reduced[el] != 1 else ''}"
+            for el in elements_sorted
+        )
+    
     def _load_and_prepare_databases(self):
         """
         Loads the local CSV for labels and queries the SQLite DB

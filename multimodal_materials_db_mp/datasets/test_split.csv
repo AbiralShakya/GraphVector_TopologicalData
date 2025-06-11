@@ -1,2 +1,0 @@
-jid,formula,normalized_formula,space_group,space_group_number,topological_class,topological_binary,band_gap,formation_energy,processing_timestamp,local_database_props,num_atoms,file_locations
-mp-30965,NaClO2,NaClO2,Unknown,15,Unknown,0.0,2.4465,-0.9925589840948271,2025-06-10T10:39:12.880470,,8,"{""structure_hdf5"": ""structures/mp-30965.h5"", ""poscar"": ""structures/mp-30965_POSCAR"", ""point_cloud"": ""point_clouds/mp-30965_asph.npy"", ""crystal_graph"": ""graphs/mp-30965/crystal_graph.pt"", ""kspace_graph"": ""graphs/mp-30965/kspace_graph.pt""}"

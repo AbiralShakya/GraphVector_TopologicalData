@@ -835,9 +835,9 @@ class IntegratedMaterialProcessor:
                 
                 # Extract features from topological analysis
                 crystal_graph_data = topological_data_block['crystal_graph']
-                kspace_graph_data = topological_data_block['kspace_graph'] # NOW THE ACTUAL DICT
-                asph_features_data = topological_data_block['asph_features'] # Already numpy from enhanced method
-                band_rep_features = topological_data_block['band_rep_features'] # Already numpy
+                kspace_graph_data = topological_data_block['kspace_graph'] 
+                asph_features_data = topological_data_block['asph_features'] 
+                band_rep_features = topological_data_block['band_rep_features'] 
                 
                 # Extract topological classification
                 target_label = topological_data_block['target_label'].item() if isinstance(topological_data_block['target_label'], np.ndarray) else topological_data_block['target_label']

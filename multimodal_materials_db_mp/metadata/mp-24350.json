@@ -4,8 +4,8 @@
   "normalized_formula": "K2CoH8(CO5)2",
   "space_group": "P2_1/c",
   "space_group_number": 14,
-  "topological_class": "Unknown",
-  "topological_binary": 0.0,
+  "topological_class": "Semimetal",
+  "topological_binary": 1.0,
   "band_gap": 1.7805,
   "formation_energy": -1.5629499323695661,
   "energy_above_hull": 0.030206298478260004,
@@ -31,8 +31,16 @@
     "bulk_modulus": null,
     "shear_modulus": null
   },
-  "processing_timestamp": "2025-06-10T17:55:25.231398",
-  "local_database_props": {},
+  "processing_timestamp": "2025-06-10T23:30:26.005673",
+  "local_database_props": {
+    "Formula": "C2 H8 Co1 K2 O10",
+    "Space Group": "14 (P21/c)",
+    "Property": "SM (ESFD)",
+    "ICSD_ID": 17,
+    "POSCAR_link": "https://www.topologicalquantumchemistry.com/data/nonalloycompounds/SG-14/Mat-17/POSCAR",
+    "MatProject_link": "https://legacy.materialsproject.org/materials/icsd/17",
+    "Unnamed: 6": NaN
+  },
   "num_atoms": 46,
   "file_locations": {
     "structure_hdf5": "structures/mp-24350.h5",
@@ -50,10 +58,10 @@
     "combined_features"
   ],
   "vectorized_feature_sizes": {
-    "asph_features": 128,
-    "band_rep_features": 100,
+    "asph_features": 63,
+    "band_rep_features": 4756,
     "basic_properties": 4,
     "structural_properties": 4,
-    "combined_features": 236
+    "combined_features": 4827
   }
 }

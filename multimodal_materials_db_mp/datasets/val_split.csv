@@ -1,2 +1,0 @@
-jid,formula,normalized_formula,space_group,space_group_number,topological_class,topological_binary,band_gap,formation_energy,processing_timestamp,local_database_props,num_atoms,file_locations
-mp-1179954,PbWO4,PbWO4,Unknown,14,Unknown,0.0,1.879,-2.016313206249999,2025-06-10T10:39:14.114266,,24,"{""structure_hdf5"": ""structures/mp-1179954.h5"", ""poscar"": ""structures/mp-1179954_POSCAR"", ""point_cloud"": ""point_clouds/mp-1179954_asph.npy"", ""crystal_graph"": ""graphs/mp-1179954/crystal_graph.pt"", ""kspace_graph"": ""graphs/mp-1179954/kspace_graph.pt""}"
